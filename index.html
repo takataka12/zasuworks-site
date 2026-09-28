@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090909">
+<title>ZASU WORKS | Music / Apps / Web / Mastering</title>
+<meta name="description" content="ZASU WORKSは、iOSアプリ、Webサービス、AI活用、音楽制作、Mixing / Masteringを横断するインディペンデント・クリエイティブテックスタジオです。">
+<meta property="og:title" content="ZASU WORKS">
+<meta property="og:description" content="Music / Apps / Web / Mastering — ソフトウェア開発と音楽制作を横断するZASU WORKS公式サイト。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://zasuworks.jp/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://zasuworks.jp/">
+<style>
+:root{--bg:#f1f1ee;--ink:#090909;--muted:#666;--line:rgba(9,9,9,.18)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Helvetica Neue",Arial,"Yu Gothic",Meiryo,sans-serif;line-height:1.65;overflow-x:hidden}a{color:inherit}.noise{position:fixed;inset:0;z-index:99;pointer-events:none;opacity:.055;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+header{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:15px 5vw;background:rgba(241,241,238,.9);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,.08)}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-weight:1000;letter-spacing:-.05em}.mark{width:42px;height:42px;border:2px solid;border-radius:50%;display:grid;place-items:center;font-size:12px}.nav{display:flex;gap:24px}.nav a{text-decoration:none;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.1em}
+.hero{position:relative;min-height:100vh;padding:145px 6vw 70px;display:flex;flex-direction:column;justify-content:center;background:#090909;color:#fff;overflow:hidden}.grid{position:absolute;inset:0;opacity:.17;background-image:linear-gradient(rgba(255,255,255,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.13) 1px,transparent 1px);background-size:56px 56px;transform:perspective(520px) rotateX(62deg) scale(1.5) translateY(28%);transform-origin:center bottom}.stamp{position:absolute;right:-42px;top:110px;width:220px;aspect-ratio:1;border:4px double rgba(255,255,255,.55);border-radius:50%;display:grid;place-items:center;text-align:center;font-weight:900;line-height:1.8;transform:rotate(14deg);opacity:.55}.hero-inner{position:relative;z-index:2;max-width:1000px}.eyebrow{margin:0 0 14px;font-size:12px;font-weight:900;letter-spacing:.22em}.hero h1{margin:0;font-size:clamp(74px,15vw,205px);line-height:.72;letter-spacing:-.085em;font-weight:1000}.hero h1 span{color:transparent;-webkit-text-stroke:2px #fff}.lead{max-width:820px;margin:36px 0 0;font-size:clamp(18px,2vw,28px);font-weight:750}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:36px}.btn{display:inline-flex;min-height:52px;padding:0 22px;align-items:center;justify-content:center;border-radius:999px;text-decoration:none;font-size:14px;font-weight:900}.primary{background:#fff;color:#000}.ghost{border:1px solid rgba(255,255,255,.45);color:#fff}.meta{position:absolute;right:5vw;bottom:32px;display:flex;gap:20px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.68}
+.marquee{overflow:hidden;white-space:nowrap;background:#fff;border-top:1px solid;border-bottom:1px solid;font-size:13px;font-weight:950;letter-spacing:.12em}.marquee div{display:inline-block;padding:17px 0;animation:scroll 22s linear infinite}@keyframes scroll{to{transform:translateX(-38%)}}
+.section{padding:105px 6vw}.dark{background:#090909;color:#fff}.head{display:flex;gap:22px;align-items:flex-start;margin-bottom:54px}.num{font-size:12px;font-weight:900;opacity:.55;padding-top:10px}h2{margin:0;font-size:clamp(48px,7vw,94px);line-height:.95;letter-spacing:-.06em}
+.services{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{padding:30px;border:1px solid var(--line);min-height:390px;display:flex;flex-direction:column;background:rgba(255,255,255,.42)}.card h3{margin:46px 0 12px;font-size:34px;letter-spacing:-.04em}.card p{color:#333}.card ul{list-style:none;margin:auto 0 0;padding:18px 0 0;border-top:1px solid var(--line);font-size:13px;font-weight:800}
+.works{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.work{grid-column:span 4;min-height:300px;padding:28px;border:1px solid rgba(255,255,255,.22);display:flex;flex-direction:column;text-decoration:none;background:rgba(255,255,255,.025);transition:.2s}.work:hover{background:#fff;color:#000;transform:translateY(-3px)}.work.featured{grid-column:span 8;min-height:390px;background:#f1f1ee;color:#000}.kicker{font-size:11px;font-weight:900;letter-spacing:.16em;opacity:.55}.work h3{margin:auto 0 12px;font-size:clamp(34px,4vw,66px);letter-spacing:-.06em;line-height:.95}.work p{margin:0;max-width:580px;opacity:.78}.work strong{margin-top:18px;font-size:13px}
+.statement{padding:125px 6vw;text-align:center;background:#fff;border-block:1px solid}.statement p{max-width:1050px;margin:auto;font-size:clamp(31px,5vw,68px);line-height:1.25;letter-spacing:-.04em}
+.about{display:grid;grid-template-columns:1.3fr 1fr;gap:80px}.about-copy{font-size:clamp(20px,2.4vw,33px);font-weight:750;letter-spacing:-.03em}.facts{margin:0;border-top:1px solid var(--line)}.facts div{display:grid;grid-template-columns:120px 1fr;gap:18px;padding:18px 0;border-bottom:1px solid var(--line)}.facts dt{font-size:12px;font-weight:900;color:var(--muted)}.facts dd{margin:0;font-weight:800}
+.contact{padding:115px 6vw;background:#090909;color:#fff}.contact h2{font-size:clamp(58px,9vw,124px)}.contact p{max-width:760px}.mail{margin-top:44px;font-size:clamp(22px,4vw,46px);font-weight:1000;letter-spacing:-.04em}
+footer{padding:28px 6vw 42px;display:grid;grid-template-columns:1fr auto;gap:24px;border-top:1px solid var(--line)}footer strong{display:block;font-size:22px}.links{display:flex;gap:16px;flex-wrap:wrap}.links a{font-size:12px;font-weight:900;text-decoration:none}
+@media(max-width:900px){header{padding:12px 18px}.nav{gap:12px}.nav a:nth-child(-n+2){display:none}.hero{padding:128px 22px 58px;min-height:92vh}.stamp{width:155px;right:-48px;top:92px;font-size:10px}.meta{display:none}.section{padding:82px 22px}.services{grid-template-columns:1fr}.card{min-height:330px}.works{grid-template-columns:1fr}.work,.work.featured{grid-column:auto;min-height:295px}.about{grid-template-columns:1fr;gap:36px}.statement{padding:88px 22px}.contact{padding:88px 22px}footer{grid-template-columns:1fr}}
+</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"ZASU WORKS","url":"https://zasuworks.jp/","email":"zasuworks@gmail.com","sameAs":["https://x.com/zasuworks","https://zasuofficial.jp/","https://zasumaster.com/"]}</script>
+</head>
+<body>
+<div class="noise" aria-hidden="true"></div>
+<header>
+<a class="brand" href="#top"><span class="mark">ZW</span><span>ZASU WORKS</span></a>
+<nav class="nav"><a href="#services">Services</a><a href="#works">Works</a><a href="#about">About</a><a href="#contact">Contact</a></nav>
+</header>
+<main>
+<section class="hero" id="top">
+<div class="grid"></div><div class="stamp">TOKYO<br>ZASU WORKS<br>HARDCORE CREATIVE</div>
+<div class="hero-inner">
+<p class="eyebrow">MUSIC / APPS / WEB / MASTERING</p>
+<h1>ZASU<br><span>WORKS</span></h1>
+<p class="lead">音楽を作る。アプリを作る。Webサービスを作る。<br>ジャンルをまたいで、使えるものを最後まで形にする。</p>
+<div class="actions"><a class="btn primary" href="#contact">制作を相談する</a><a class="btn ghost" href="#works">制作実績を見る</a></div>
+</div>
+<div class="meta"><span>Independent Creative Tech Studio</span><span>Tokyo, Japan</span><span>Est. 2026</span></div>
+</section>
+<section class="marquee"><div>iOS APPS — WEB SERVICES — AI TOOLS — MUSIC PRODUCTION — MIXING — MASTERING — ZASU MASTER — iOS APPS — WEB SERVICES — AI TOOLS —</div></section>
+
+<section class="section" id="services">
+<div class="head"><span class="num">01</span><div><p class="eyebrow">WHAT WE DO</p><h2>Services</h2></div></div>
+<div class="services">
+<article class="card"><span>A</span><h3>Apps & Software</h3><p>iOSアプリ、個人向けツール、AIを活用した機能などを企画から実装まで。小さく速く作り、実際に使えるところまで仕上げます。</p><ul><li>iOS / SwiftUI</li><li>AI-assisted tools</li><li>Audio / media utilities</li></ul></article>
+<article class="card"><span>B</span><h3>Web Services</h3><p>サービスサイト、Webアプリ、配信・受付・自動化などのWeb体験を設計・構築します。公開後の改善まで継続可能です。</p><ul><li>Web apps / landing pages</li><li>Cloud deployment</li><li>Automation / integrations</li></ul></article>
+<article class="card"><span>C</span><h3>Music & Audio</h3><p>楽曲制作、ボーカル処理、Mixing / Mastering、音圧・音質調整など。音楽制作とソフトウェア開発の両側から音を扱います。</p><ul><li>Music production</li><li>Mixing</li><li>Mastering</li></ul></article>
+</div>
+</section>
+
+<section class="section dark" id="works">
+<div class="head"><span class="num">02</span><div><p class="eyebrow">SELECTED WORKS</p><h2>Built by ZASU WORKS</h2></div></div>
+<div class="works">
+<a class="work featured" href="https://zasumaster.com/" target="_blank" rel="noopener"><div class="kicker">WEB / AUDIO</div><h3>ZASU MASTER</h3><p>オンライン・マスタリングサービス。音圧調整、リファレンス処理、ダウンロードまでをWeb上で完結。</p><strong>zasumaster.com ↗</strong></a>
+<article class="work"><div class="kicker">iOS APP</div><h3>Hook Player</h3><p>楽曲の“いい所”を短時間で巡回するための音楽プレイヤー。</p></article>
+<article class="work"><div class="kicker">iOS APP</div><h3>PortraitWide</h3><p>縦持ちのまま横長動画を見やすくする視聴補助アプリ。</p></article>
+<article class="work"><div class="kicker">iOS APP</div><h3>SoloFrame</h3><p>個人制作の映像・発信を支えるクリエイターツール。</p></article>
+<article class="work"><div class="kicker">LIVE / TOOL</div><h3>ZASU LIVE</h3><p>配信・クリエイター運用を自分たちの手に取り戻すためのライブツール。</p></article>
+<a class="work" href="https://zasuofficial.jp/" target="_blank" rel="noopener"><div class="kicker">MUSIC / PORTAL</div><h3>ZASU</h3><p>音楽活動、作品、各種コンテンツをまとめたZASU公式ポータル。</p><strong>zasuofficial.jp ↗</strong></a>
+</div>
+</section>
+
+<section class="statement"><p>“普通の制作会社”ではなく、<br><strong>作りたいものを自分で作って、ちゃんと公開する。</strong></p></section>
+
+<section class="section" id="about">
+<div class="head"><span class="num">03</span><div><p class="eyebrow">ABOUT</p><h2>ZASU WORKS</h2></div></div>
+<div class="about">
+<div class="about-copy"><p>ZASU WORKSは、ソフトウェア開発と音楽制作を横断するインディペンデントな制作事業です。</p><p>iOSアプリ、Webサービス、AI活用、音楽・音声コンテンツ、Mixing / Masteringまで、アイデアを実際に使える形にすることを重視しています。</p></div>
+<dl class="facts"><div><dt>屋号</dt><dd>ZASU WORKS</dd></div><div><dt>所在地</dt><dd>Tokyo, Japan</dd></div><div><dt>事業開始</dt><dd>2026.10.01</dd></div><div><dt>事業内容</dt><dd>Software / Web / Music / Audio</dd></div><div><dt>Contact</dt><dd><a href="mailto:zasuworks@gmail.com">zasuworks@gmail.com</a></dd></div></dl>
+</div>
+</section>
+
+<section class="contact" id="contact">
+<p class="eyebrow">CONTACT</p><h2>作りたいもの、<br>聞かせてください。</h2>
+<p>アプリ開発、Webサービス、楽曲制作、Mixing / Mastering、その他の制作相談まで。内容が固まっていなくても大丈夫です。</p>
+<div class="actions"><a class="btn primary" href="mailto:zasuworks@gmail.com?subject=ZASU%20WORKS%20お問い合わせ">メールで問い合わせる</a><a class="btn ghost" href="https://x.com/zasuworks" target="_blank" rel="noopener">X @zasuworks ↗</a></div>
+<div class="mail">zasuworks@gmail.com</div>
+</section>
+</main>
+<footer><div><strong>ZASU WORKS</strong><span>Music / Apps / Web / Mastering</span></div><div class="links"><a href="https://x.com/zasuworks" target="_blank" rel="noopener">X</a><a href="https://zasuofficial.jp/" target="_blank" rel="noopener">ZASU</a><a href="https://zasumaster.com/" target="_blank" rel="noopener">ZASU MASTER</a></div></footer>
+</body>
+</html>
