@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="theme-color" content="#080808">
+<title>Admin Console｜ZASU WORKS</title>
+<link rel="stylesheet" href="assets/style.css?v=20260929-1">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="/"><span>ZW</span><strong>ZASU WORKS</strong></a>
+    <div class="admin-badge">ADMIN CONSOLE</div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="loginView" class="login-view">
+    <div class="eyebrow">ZASU WORKS / PRIVATE</div>
+    <h1>CONTROL<br>THE WORK.</h1>
+    <p class="lead">案件作成、進行管理、ファイル納品、メッセージ、ZASU MASTER連携をまとめて操作します。</p>
+    <div class="card login-card">
+      <label>ADMIN KEY<input id="adminKeyInput" type="password" autocomplete="current-password" placeholder="管理キー"></label>
+      <button id="loginButton" class="btn">OPEN CONSOLE</button>
+      <div id="loginStatus" class="status-text"></div>
+    </div>
+  </section>
+
+  <section id="appView" hidden>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">CLIENT OPERATIONS</div>
+        <h1>CLIENT<br>CONSOLE.</h1>
+      </div>
+      <div class="page-actions">
+        <button id="refreshButton" class="btn ghost">REFRESH</button>
+        <button id="newProjectButton" class="btn">NEW PROJECT</button>
+        <button id="logoutButton" class="btn ghost">LOG OUT</button>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat card"><span>ACTIVE</span><strong id="statActive">0</strong></div>
+      <div class="stat card"><span>WAITING CLIENT</span><strong id="statWaiting">0</strong></div>
+      <div class="stat card"><span>READY</span><strong id="statReady">0</strong></div>
+      <div class="stat card"><span>DELIVERED</span><strong id="statDelivered">0</strong></div>
+    </div>
+
+    <div class="toolbar card">
+      <input id="searchInput" placeholder="案件名 / 顧客名 / PROJECT CODEを検索">
+      <select id="statusFilter">
+        <option value="">すべてのステータス</option>
+        <option value="request_received">受付完了</option>
+        <option value="awaiting_files">素材待ち</option>
+        <option value="mixing">MIX中</option>
+        <option value="preview_ready">確認待ち</option>
+        <option value="revision_requested">修正対応中</option>
+        <option value="mastering">MASTERING</option>
+        <option value="ready">納品準備完了</option>
+        <option value="delivered">納品完了</option>
+        <option value="on_hold">保留中</option>
+        <option value="cancelled">キャンセル</option>
+      </select>
+    </div>
+
+    <div class="workspace">
+      <aside class="project-list card">
+        <div class="section-title"><span>PROJECTS</span><strong id="projectCount">0</strong></div>
+        <div id="projectList"></div>
+      </aside>
+
+      <section id="detailPane" class="detail-pane card">
+        <div class="empty-state">
+          <div class="eyebrow">SELECT PROJECT</div>
+          <h2>案件を選択してください。</h2>
+          <p>左の一覧から案件を開くと、進行・連絡・納品を操作できます。</p>
+        </div>
+      </section>
+    </div>
+  </section>
+</main>
+
+<div id="modalBackdrop" class="modal-backdrop" hidden>
+  <div class="modal card">
+    <div class="modal-head">
+      <div><div class="eyebrow">NEW PROJECT</div><h2>案件を作成</h2></div>
+      <button id="closeModalButton" class="icon-btn">×</button>
+    </div>
+    <div class="form-grid">
+      <label>CLIENT NAME<input id="newClientName" placeholder="お客様名"></label>
+      <label>PROJECT TITLE<input id="newTitle" placeholder="少女レイ / 歌ってみたMIX"></label>
+      <label>SERVICE
+        <select id="newServiceType">
+          <option value="mix">歌ってみたMIX</option>
+          <option value="mastering">マスタリング</option>
+          <option value="mix_master">MIX + MASTERING</option>
+          <option value="web">Web制作</option>
+          <option value="app">アプリ制作</option>
+          <option value="other">その他</option>
+        </select>
+      </label>
+      <label>PAYMENT
+        <select id="newPaymentStatus">
+          <option value="unpaid">未決済</option>
+          <option value="pending">確認中</option>
+          <option value="paid">支払済</option>
+          <option value="waived">無料 / モニター</option>
+        </select>
+      </label>
+      <label>PRICE ¥<input id="newPriceYen" type="number" min="0" placeholder="3000"></label>
+      <label>DUE DATE<input id="newDueAt" type="datetime-local"></label>
+      <label>MAX REVISIONS<input id="newMaxRevisions" type="number" min="0" max="20" value="2"></label>
+      <label class="check-label"><input id="newUseMaster" type="checkbox"> ZASU MASTERを使用予定</label>
+    </div>
+    <label>CLIENT NOTE<textarea id="newClientNote" placeholder="お客様にも見せる補足"></textarea></label>
+    <label>INTERNAL NOTE<textarea id="newInternalNote" placeholder="自分用メモ"></textarea></label>
+    <button id="createProjectButton" class="btn wide">CREATE PROJECT</button>
+    <div id="createStatus" class="status-text"></div>
+  </div>
+</div>
+
+<div id="credentialBackdrop" class="modal-backdrop" hidden>
+  <div class="modal card credential-modal">
+    <div class="eyebrow">CLIENT ACCESS CREATED</div>
+    <h2>顧客用アクセス情報</h2>
+    <p class="muted">ACCESS KEYはこの画面を閉じると再表示できません。必要なら後から再発行できます。</p>
+    <div class="credential-box"><span>PROJECT CODE</span><strong id="createdProjectCode">—</strong></div>
+    <div class="credential-box"><span>ACCESS KEY</span><strong id="createdAccessKey">—</strong></div>
+    <button id="copyInviteButton" class="btn wide">COPY INVITATION</button>
+    <button id="closeCredentialButton" class="btn ghost wide">CLOSE</button>
+  </div>
+</div>
+
+<script src="assets/config.js?v=20260929-1"></script>
+<script src="assets/app.js?v=20260929-1"></script>
+</body>
+</html>
