@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090909"><meta name="color-scheme" content="dark">
+<title>AvatarLive — iPhoneだけでLive2D配信</title>
+<meta name="description" content="AvatarLiveは、iPhoneだけでLive2Dモデルのトラッキング、録画、RTMP/RTMPSライブ配信まで完結するVTuber向けiOSアプリです。">
+<style>
+:root{--bg:#090909;--panel:#141414;--text:#f5f5f5;--muted:#a4a4a4;--line:#2b2b2b;--green:#65e36f;--orange:#ffb14b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;line-height:1.72}a{color:inherit}.wrap{width:min(1050px,calc(100% - 36px));margin:auto}
+header{padding:18px 0;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(9,9,9,.9);backdrop-filter:blur(18px);z-index:5}.nav{display:flex;align-items:center;justify-content:space-between}.brand{font-weight:950;letter-spacing:-.04em}.nav a{text-decoration:none;color:#bbb;font-size:12px;margin-left:18px}
+.hero{padding:86px 0 70px;background:radial-gradient(circle at 76% 10%,rgba(101,227,111,.17),transparent 33%),linear-gradient(#111,#090909)}.badge{display:inline-flex;border:1px solid rgba(255,177,75,.35);color:#ffd09a;border-radius:999px;padding:7px 11px;font-size:11px;font-weight:800}.hero h1{font-size:clamp(56px,12vw,116px);line-height:.9;letter-spacing:-.075em;margin:24px 0}.lead{font-size:clamp(22px,3vw,34px);font-weight:850;line-height:1.25;letter-spacing:-.035em;max-width:850px}.copy{max-width:760px;color:#bbb}.tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:25px}.tag{border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:10px;color:#aaa}
+main{padding-bottom:70px}section{padding:48px 0;border-bottom:1px solid var(--line)}h2{font-size:clamp(32px,5vw,54px);letter-spacing:-.05em;margin:0 0 20px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px}.card h3{margin:0 0 7px}.card p{margin:0;color:#aaa;font-size:14px}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.step{padding:15px;border:1px solid var(--line);border-radius:14px;background:#111}.step b{color:var(--green);font-size:11px}.step strong{display:block;margin-top:12px}
+.notice{border:1px solid rgba(255,177,75,.35);background:rgba(255,177,75,.06);border-radius:18px;padding:22px}.notice p{margin:0;color:#d7d7d7}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 18px;border-radius:999px;border:1px solid #3a3a3a;text-decoration:none;font-size:12px;font-weight:900}.btn.primary{background:white;color:#090909;border-color:white}
+.specs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.spec{display:flex;justify-content:space-between;gap:14px;padding:14px;border:1px solid var(--line);background:#111;border-radius:12px}.spec span{color:#aaa;text-align:right}
+footer{padding:30px 0 45px;color:#777;font-size:11px}.links a{margin-right:14px;color:#aaa}
+@media(max-width:720px){.grid,.specs{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.hero{padding:60px 0 48px}.nav .hide{display:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap nav"><div class="brand">AvatarLive</div><nav><a class="hide" href="#features">機能</a><a class="hide" href="#specs">仕様</a><a href="support/">Support</a></nav></div></header>
+<div class="hero"><div class="wrap">
+<div class="badge">Release Candidate / Live2D publication approval pending</div>
+<h1>AvatarLive</h1>
+<div class="lead">iPhoneだけで、Live2D配信まで。</div>
+<p class="copy">TrueDepth / ARKitでLive2Dモデルをリアルタイムに動かし、録画から720p30のRTMP/RTMPSライブ配信までをiPhone単体で行うVTuber向けiOSアプリです。</p>
+<div class="tags"><span class="tag">iOS</span><span class="tag">Cubism SDK for Native</span><span class="tag">ARKit</span><span class="tag">RTMP / RTMPS</span><span class="tag">720p / 30fps</span></div>
+</div></div>
+<main class="wrap">
+<section id="features"><h2>できること</h2><div class="grid">
+<div class="card"><h3>Live2Dモデルをインポート</h3><p>利用権を有するモデルをZIPまたはフォルダから読み込み。model3.json / moc3 / textures / physics / pose / motions等に対応。</p></div>
+<div class="card"><h3>ARKitフェイストラッキング</h3><p>顔の向き、瞬き、口の開閉をTrueDepthカメラから取得してLive2Dパラメータへリアルタイム反映。</p></div>
+<div class="card"><h3>iPhoneから直接ライブ配信</h3><p>1280×720 / 30fpsの配信用キャンバスをH.264/AACで生成し、RTMP/RTMPS対応サービスへ送信。</p></div>
+<div class="card"><h3>録画・音声・背景</h3><p>ローカル録画、外部マイク、Voice Gain、Photo背景、モデル位置・倍率の保存に対応。</p></div>
+</div></section>
+<section><h2>配信までの流れ</h2><div class="flow">
+<div class="step"><b>01</b><strong>Import</strong></div><div class="step"><b>02</b><strong>Track</strong></div><div class="step"><b>03</b><strong>Render</strong></div><div class="step"><b>04</b><strong>Encode</strong></div><div class="step"><b>05</b><strong>Live</strong></div>
+</div></section>
+<section id="specs"><h2>仕様</h2><div class="specs">
+<div class="spec"><b>Platform</b><span>iOS</span></div><div class="spec"><b>Face Tracking</b><span>ARKit / TrueDepth</span></div><div class="spec"><b>Live2D</b><span>Cubism SDK for Native / Cubism 5</span></div><div class="spec"><b>Streaming</b><span>RTMP / RTMPS</span></div><div class="spec"><b>Video</b><span>1280×720 / 30fps / H.264</span></div><div class="spec"><b>Audio</b><span>AAC Mono</span></div>
+</div></section>
+<section><div class="notice"><h2 style="font-size:26px">Publication Status</h2><p>AvatarLiveは現在公開前のRelease Candidateです。Live2D Cubism SDKを使用した一般公開について、株式会社Live2Dの拡張性アプリケーション出版許諾審査中です。正式な指定文言・専用ロゴ等は契約内容に従い公開前に反映します。</p></div>
+<div class="actions"><a class="btn primary" href="review/">Live2D審査用ページ</a><a class="btn" href="support/">Support</a><a class="btn" href="privacy/">Privacy</a></div></section>
+</main>
+<footer><div class="wrap"><div>AvatarLive / ZASU WORKS</div><div class="links"><a href="https://zasuworks.jp/">ZASU WORKS</a><a href="support/">Support</a><a href="privacy/">Privacy</a><a href="terms/">Terms</a></div></div></footer>
+</body></html>
