@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080808">
+<title>Client Portal｜ZASU WORKS</title>
+<meta name="description" content="ZASU WORKS Client Portal。制作進行、ファイル共有、修正連絡、納品をひとつに。">
+<link rel="stylesheet" href="assets/style.css?v=20260929-1">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/"><span>ZW</span><strong>ZASU WORKS</strong></a>
+    <div class="portal-tag">CLIENT PORTAL</div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="gate" class="gate">
+    <div class="eyebrow">ZASU WORKS / CLIENT PORTAL</div>
+    <h1>YOUR PROJECT.<br>ONE PLACE.</h1>
+    <p class="lead">制作状況、ファイル送信、修正連絡、完成データまで。案件ごとの専用ページです。</p>
+    <div class="card gate-card">
+      <label>PROJECT CODE<input id="projectCode" autocomplete="off" placeholder="ZW-0001"></label>
+      <label>ACCESS KEY<input id="accessToken" type="password" autocomplete="current-password" placeholder="アクセスキー"></label>
+      <button id="openPortal" class="btn">OPEN PROJECT</button>
+      <div id="gateStatus" class="status-text"></div>
+    </div>
+  </section>
+
+  <section id="portal" hidden>
+    <div class="portal-head">
+      <div>
+        <div class="eyebrow" id="projectCodeLabel">PROJECT</div>
+        <h1 id="projectTitle" class="project-title">—</h1>
+        <p id="clientName" class="lead"></p>
+      </div>
+      <button id="logoutButton" class="btn ghost small">LOG OUT</button>
+    </div>
+
+    <div class="status-hero card">
+      <div class="status-top">
+        <div>
+          <div id="statusPill" class="status-pill">STATUS</div>
+          <h2 id="statusTitle">確認中</h2>
+          <p id="statusDescription" class="muted"></p>
+        </div>
+        <div class="status-percent" id="statusPercent">0%</div>
+      </div>
+      <div class="progress-track"><span id="progressBar"></span></div>
+      <div id="masterDetail" class="master-detail" hidden></div>
+    </div>
+
+    <div class="summary-grid">
+      <div class="card metric"><span>SERVICE</span><strong id="serviceType">—</strong></div>
+      <div class="card metric"><span>PAYMENT</span><strong id="paymentStatus">—</strong></div>
+      <div class="card metric"><span>REVISION</span><strong id="revisionStatus">—</strong></div>
+      <div class="card metric"><span>DUE</span><strong id="dueDate">—</strong></div>
+    </div>
+
+    <div class="two-col">
+      <section class="card">
+        <div class="section-head"><div><div class="eyebrow">FILES</div><h3>ファイル送信</h3></div></div>
+        <p class="muted">WAV / FLAC / ZIPなどを送れます。大きいファイルは自動で分割して安全に保存します。</p>
+        <select id="fileKind">
+          <option value="vocal">ボーカル</option>
+          <option value="instrumental">インスト / 2MIX</option>
+          <option value="stems">ステム / ZIP</option>
+          <option value="reference">参考音源</option>
+          <option value="lyrics">歌詞 / テキスト</option>
+          <option value="other">その他</option>
+        </select>
+        <label class="dropzone" for="fileInput">
+          <input id="fileInput" type="file">
+          <strong>FILEを選択</strong>
+          <span>最大500MB / 40MBごとに分割アップロード</span>
+        </label>
+        <div id="fileSelected" class="file-selected">ファイル未選択</div>
+        <button id="uploadButton" class="btn wide">UPLOAD FILE</button>
+        <div class="upload-progress" id="uploadProgress" hidden><span id="uploadProgressBar"></span></div>
+        <div id="uploadStatus" class="status-text"></div>
+        <div id="fileList" class="file-list"></div>
+      </section>
+
+      <section class="card">
+        <div class="section-head"><div><div class="eyebrow">MESSAGES</div><h3>制作メッセージ</h3></div></div>
+        <div id="messageList" class="message-list"></div>
+        <textarea id="messageInput" maxlength="3000" placeholder="修正希望や確認事項を書いてください"></textarea>
+        <button id="sendMessage" class="btn wide">SEND MESSAGE</button>
+        <div id="messageStatus" class="status-text"></div>
+      </section>
+    </div>
+
+    <section class="card timeline-card">
+      <div class="eyebrow">TIMELINE</div>
+      <h3>進行履歴</h3>
+      <div id="timeline" class="timeline"></div>
+    </section>
+  </section>
+</main>
+
+<footer><div class="wrap">© 2026 ZASU WORKS</div></footer>
+<script src="assets/config.js?v=20260929-1"></script>
+<script src="assets/app.js?v=20260929-1"></script>
+</body>
+</html>
