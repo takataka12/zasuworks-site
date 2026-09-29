@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090909">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="noindex,nofollow">
+<link rel="canonical" href="https://zasuworks.jp/avatarlive/review/">
+<title>AvatarLive — Live2D Publication Review</title>
+<meta name="description" content="AvatarLive — iPhone-only Live2D VTuber streaming app. Publication review page.">
+<style>
+:root{--bg:#090909;--panel:#141414;--panel2:#1b1b1b;--text:#f5f5f5;--muted:#a8a8a8;--line:#2d2d2d;--green:#62e46d;--orange:#ffb14b;--red:#ff5a5f}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Hiragino Sans","Yu Gothic",Meiryo,sans-serif;line-height:1.72;-webkit-font-smoothing:antialiased}
+a{color:inherit}.wrap{width:min(1040px,calc(100% - 36px));margin:auto}.hero{padding:84px 0 64px;border-bottom:1px solid var(--line);background:radial-gradient(circle at 78% 10%,rgba(98,228,109,.15),transparent 34%),linear-gradient(180deg,#111,#090909)}
+.badge{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,177,75,.38);color:#ffd19a;background:rgba(255,177,75,.08);border-radius:999px;padding:7px 12px;font-size:12px;font-weight:800;letter-spacing:.05em}.badge:before{content:"●";font-size:9px;color:var(--orange)}
+h1{font-size:clamp(58px,11vw,116px);letter-spacing:-.075em;line-height:.88;margin:24px 0 26px}.lead{max-width:800px;font-size:clamp(20px,3vw,31px);font-weight:760;line-height:1.35;letter-spacing:-.03em;margin:0}.sub{max-width:760px;color:var(--muted);margin:18px 0 0}.meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:27px}.meta span{border:1px solid var(--line);background:#151515;border-radius:999px;padding:7px 11px;font-size:11px;color:#ccc}
+main{padding:30px 0 74px}section{padding:40px 0;border-bottom:1px solid var(--line)}h2{font-size:clamp(28px,5vw,48px);letter-spacing:-.045em;margin:0 0 18px}p,li{color:#d0d0d0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{border:1px solid var(--line);background:var(--panel);border-radius:17px;padding:20px}.card h3{margin:0 0 8px;font-size:18px}.card p{margin:0;color:var(--muted);font-size:14px}
+.demo{display:grid;grid-template-columns:1.35fr .65fr;gap:16px}.video{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#000}.video img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}.cap{padding:12px 14px;color:#aaa;font-size:12px}.diag{display:grid;gap:10px}.metric{border:1px solid var(--line);border-radius:15px;background:#121212;padding:16px}.metric b{display:block;font-size:26px;letter-spacing:-.04em}.metric small{color:#818181}.metric.ok b{color:var(--green)}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.step{border:1px solid var(--line);border-radius:14px;padding:14px;background:#111}.step b{color:var(--green);font-size:11px}.step strong{display:block;margin-top:14px;font-size:15px}.arrow{color:#555}
+.specs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.spec{display:flex;justify-content:space-between;gap:20px;border:1px solid var(--line);background:#111;border-radius:13px;padding:13px 15px}.spec b{font-size:12px}.spec span{font-size:12px;color:#aaa;text-align:right}
+.notice{border:1px solid rgba(255,177,75,.35);background:linear-gradient(135deg,rgba(255,177,75,.09),rgba(255,255,255,.015));border-radius:18px;padding:22px}.notice h2{font-size:25px;margin-bottom:9px}.notice p{margin:0}
+.status{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}.pill{border:1px solid #373737;border-radius:999px;padding:7px 10px;font-size:11px;color:#aaa}.pill.ok{border-color:rgba(98,228,109,.35);color:var(--green)}
+.cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.btn{display:inline-flex;min-height:46px;align-items:center;justify-content:center;padding:0 18px;border-radius:999px;border:1px solid #3a3a3a;text-decoration:none;font-size:12px;font-weight:850}.btn.primary{background:#fff;color:#090909;border-color:#fff}
+footer{border-top:1px solid var(--line);padding:26px 0 42px;color:#737373;font-size:11px}
+@media(max-width:760px){.hero{padding:58px 0 46px}.grid,.demo,.specs{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.step{display:grid;grid-template-columns:60px 1fr;align-items:center}.step strong{margin-top:0}.diag{grid-template-columns:repeat(2,1fr)}section{padding:32px 0}}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+<div class="badge">Publication Review / Approval Pending</div>
+<h1>AvatarLive</h1>
+<p class="lead">iPhoneだけで、Live2Dモデルのトラッキング・録画・ライブ配信まで。</p>
+<p class="sub">AvatarLiveは、TrueDepth / ARKitフェイストラッキングでユーザーが用意したLive2D Cubismモデルをリアルタイムに動かし、iPhone単体で録画およびRTMP/RTMPSライブ配信を行うiOSアプリです。</p>
+<div class="meta"><span>Platform: iOS</span><span>Cubism SDK for Native</span><span>Cubism 5</span><span>Release Candidate</span><span>ZASU WORKS</span></div>
+</div></header>
+
+<main class="wrap">
+<section><h2>Product Overview</h2>
+<div class="grid">
+<article class="card"><h3>Live2D Model Import</h3><p>利用権を有するLive2DモデルをZIPまたはフォルダから読み込み。model3.json / moc3 / textures / physics / pose / motions等を扱います。</p></article>
+<article class="card"><h3>ARKit Face Tracking</h3><p>iPhoneのTrueDepthカメラで顔向き・瞬き・口の開閉を取得し、Live2Dパラメータへリアルタイム反映します。</p></article>
+<article class="card"><h3>RTMP / RTMPS Streaming</h3><p>操作画面とは別の1280×720 / 30fps配信用キャンバスを生成し、H.264 / AACで対応サービスへ直接送信します。</p></article>
+<article class="card"><h3>Recording & Audio</h3><p>ローカル録画、外部マイク、Voice Gain、AAC mono音声に対応。配信用映像に操作UIは含みません。</p></article>
+<article class="card"><h3>Background & Framing</h3><p>Black / Dark / Gradient / Photo背景と、Zoom / Horizontal / Verticalをモデルごとに保存できます。</p></article>
+<article class="card"><h3>On-device Workflow</h3><p>フェイストラッキング、Live2D描画、配信用フレーム生成をiPhone上で実行します。</p></article>
+</div></section>
+
+<section><h2>Working Broadcast</h2>
+<div class="demo">
+<div class="video"><a href="https://www.youtube.com/live/A4Qnjp7Wp9c" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/A4Qnjp7Wp9c/maxresdefault.jpg" alt="AvatarLive YouTube Live test stream"></a><div class="cap">YouTube Liveで実際に行ったAvatarLive配信テスト。画像をタップすると配信ページを開きます。</div></div>
+<div class="diag">
+<div class="metric ok"><small>STREAM OUTPUT</small><b>1280×720</b><small>30 fps</small></div>
+<div class="metric ok"><small>SEND</small><b>30.0</b><small>stable output</small></div>
+<div class="metric"><small>RENDER</small><b>30.0</b><small>Live2D render</small></div>
+<div class="metric"><small>RENDER TIME</small><b>≈ 5 ms</b><small>tested on device</small></div>
+</div>
+</div></section>
+
+<section><h2>Live2D Usage</h2>
+<div class="flow">
+<div class="step"><b>01</b><strong>Import Model</strong></div>
+<div class="step"><b>02</b><strong>ARKit Tracking</strong></div>
+<div class="step"><b>03</b><strong>Live2D Render</strong></div>
+<div class="step"><b>04</b><strong>H.264 / AAC</strong></div>
+<div class="step"><b>05</b><strong>RTMP Live</strong></div>
+</div>
+<p>ユーザーが所有または利用許諾を得たLive2Dモデルをアプリへインポートし、ARKitで取得した顔の向き、瞬き、口の開閉をリアルタイムに反映します。モデル側に設定されたLipSync、EyeBlink、Physics、Pose等を利用し、モデルの表示倍率・位置・背景を調整した上でVTuberライブ配信および録画に使用します。</p>
+</section>
+
+<section><h2>Technical Specifications</h2>
+<div class="specs">
+<div class="spec"><b>OS</b><span>iOS</span></div>
+<div class="spec"><b>SDK</b><span>Cubism SDK for Native / Cubism 5</span></div>
+<div class="spec"><b>Face Tracking</b><span>ARKit / TrueDepth</span></div>
+<div class="spec"><b>Model Input</b><span>ZIP / Folder</span></div>
+<div class="spec"><b>Video</b><span>1280×720 / 30fps / H.264</span></div>
+<div class="spec"><b>Audio</b><span>AAC Mono</span></div>
+<div class="spec"><b>Streaming</b><span>RTMP / RTMPS</span></div>
+<div class="spec"><b>Distribution</b><span>iOS App Store planned</span></div>
+</div></section>
+
+<section class="notice"><h2>Publication Status</h2>
+<p>AvatarLiveは現在、一般公開前のRelease Candidate段階です。Live2D Cubism SDKを使用した一般公開について、株式会社Live2Dの「拡張性アプリケーション出版許諾契約」の審査・契約を申請するための説明ページです。正式な専用ロゴ、指定ステートメント、許諾済み表記は、審査および契約内容に従って公開前に反映します。</p>
+<div class="status"><span class="pill ok">RC: Working</span><span class="pill ok">Model Import: Working</span><span class="pill ok">720p30 RTMP: Working</span><span class="pill">Live2D Publication: Approval Pending</span></div></section>
+
+<section><h2>English Summary</h2>
+<p>AvatarLive is an iOS application designed to make Live2D VTuber streaming possible entirely on an iPhone. It uses the iPhone TrueDepth camera and ARKit facial tracking to drive a user-imported Live2D Cubism model in real time, including head movement, eye blinking and lip sync. AvatarLive renders a dedicated 1280×720 / 30 fps broadcast canvas, encodes H.264 video with AAC audio, and streams directly to RTMP/RTMPS-compatible services. The broadcast output is separated from the app's control interface, so viewers see only the Live2D model and selected background.</p>
+<div class="cta"><a class="btn primary" href="https://zasuworks.jp/">ZASU WORKS</a><a class="btn" href="https://www.youtube.com/live/A4Qnjp7Wp9c" target="_blank" rel="noopener">Live Test ↗</a></div></section>
+</main>
+<footer><div class="wrap">AvatarLive / ZASU WORKS — Review page for Live2D publication-license application. This page does not claim publication approval.</div></footer>
+</body>
+</html>
