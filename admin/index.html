@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="theme-color" content="#080808">
 <title>Admin Console｜ZASU WORKS</title>
-<link rel="stylesheet" href="assets/style.css?v=20261002-2">
+<link rel="stylesheet" href="assets/style.css?v=20261002-3">
 </head>
 <body>
 <header class="topbar">
@@ -113,6 +113,60 @@
           <div id="guardRecentEvents" class="guard-event-list"></div>
         </div>
       </div>
+      <div class="calibration-panel card">
+        <div class="section-title"><span>REAL COST CALIBRATION</span><strong id="calibrationReadyLabel">WAITING DATA</strong></div>
+
+        <div class="calibration-kpi-grid">
+          <div><span>CURRENT</span><strong id="calibrationCurrent">¥10.00 / CU</strong></div>
+          <div><span>RAW RECOMMEND</span><strong id="calibrationRaw">—</strong></div>
+          <div><span>SAFE RECOMMEND</span><strong id="calibrationSafe">—</strong></div>
+          <div><span>DRIFT</span><strong id="calibrationDrift">—</strong></div>
+          <div><span>CONFIDENCE</span><strong id="calibrationConfidence">INSUFFICIENT</strong></div>
+        </div>
+
+        <div class="calibration-summary">
+          <div><span>ACTUAL COST</span><strong id="calibrationActualCost">¥0</strong></div>
+          <div><span>OBSERVED CU</span><strong id="calibrationUnits">0 CU</strong></div>
+          <div><span>SAMPLE DAYS</span><strong id="calibrationDays">0</strong></div>
+          <div><span>SAMPLES</span><strong id="calibrationSamplesCount">0</strong></div>
+        </div>
+
+        <div id="calibrationServiceBreakdown" class="calibration-services"></div>
+
+        <div class="calibration-form">
+          <label>SERVICE
+            <select id="calibrationService">
+              <option value="cloud_run">Cloud Run</option>
+              <option value="cloud_storage">Cloud Storage</option>
+              <option value="networking">Networking</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+          <label>PERIOD START<input id="calibrationStart" type="date"></label>
+          <label>PERIOD END<input id="calibrationEnd" type="date"></label>
+          <label>ACTUAL COST ¥<input id="calibrationCost" type="number" min="0" step="0.01" placeholder="例: 428"></label>
+          <label class="check-label calibration-check"><input id="calibrationInclude" type="checkbox" checked> 校正に含める</label>
+        </div>
+
+        <div class="calibration-actions">
+          <button id="calibrationAddButton" class="btn small">ADD / UPDATE COST</button>
+          <button id="calibrationApplyButton" class="btn ghost small" disabled>APPLY SAFE RECOMMEND</button>
+          <button id="calibrationAutoButton" class="btn ghost small">AUTO APPLY: OFF</button>
+        </div>
+        <div id="calibrationStatus" class="status-text"></div>
+
+        <div class="calibration-bottom">
+          <div>
+            <div class="eyebrow">RECENT ACTUAL COST SAMPLES</div>
+            <div id="calibrationSamples" class="calibration-samples"></div>
+          </div>
+          <div>
+            <div class="eyebrow">CALIBRATION HISTORY</div>
+            <div id="calibrationHistory" class="calibration-samples"></div>
+          </div>
+        </div>
+      </div>
+
       <div id="guardLoadStatus" class="status-text"></div>
     </section>
 
@@ -208,7 +262,7 @@
   </div>
 </div>
 
-<script src="assets/config.js?v=20261002-2"></script>
-<script src="assets/app.js?v=20261002-2"></script>
+<script src="assets/config.js?v=20261002-3"></script>
+<script src="assets/app.js?v=20261002-3"></script>
 </body>
 </html>
