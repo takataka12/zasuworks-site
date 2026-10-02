@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="theme-color" content="#080808">
 <title>Admin Console｜ZASU WORKS</title>
-<link rel="stylesheet" href="assets/style.css?v=20261002-4">
+<link rel="stylesheet" href="assets/style.css?v=20261002-5">
 </head>
 <body>
 <header class="topbar">
@@ -167,6 +167,67 @@
         </div>
       </div>
 
+      <div class="gcp-billing-panel card">
+        <div class="gcp-billing-head">
+          <div>
+            <div class="eyebrow">GOOGLE CLOUD BILLING EXPORT</div>
+            <h3>AUTO COST SYNC</h3>
+            <p>Cloud Billing Detailed Export → BigQuery → COST GUARD。直近実費を⑨の校正へ、月初来実費を⑤のBudget Guardへ自動反映します。</p>
+          </div>
+          <span id="gcpBillingConnectionBadge" class="gcp-connection-badge offline">NOT CONFIGURED</span>
+        </div>
+
+        <div class="gcp-billing-kpi-grid">
+          <div><span>CREDENTIAL</span><strong id="gcpBillingCredential">MISSING</strong></div>
+          <div><span>LAST SYNC</span><strong id="gcpBillingLastSync">—</strong></div>
+          <div><span>MTD ACTUAL</span><strong id="gcpBillingMtd">¥0</strong></div>
+          <div><span>LAST QUERY</span><strong id="gcpBillingBytes">—</strong></div>
+          <div><span>IMPORTED</span><strong id="gcpBillingRows">0</strong></div>
+        </div>
+
+        <div class="gcp-billing-config">
+          <label>BIGQUERY PROJECT ID<input id="gcpBillingProjectId" placeholder="billing-export-project"></label>
+          <label>DATASET ID<input id="gcpBillingDatasetId" placeholder="billing_export"></label>
+          <label>DETAILED EXPORT TABLE<input id="gcpBillingTableId" placeholder="gcp_billing_export_resource_v1_XXXXXX_XXXXXX_XXXXXX"></label>
+          <label>ZASU COST PROJECT ID<input id="gcpBillingCostProjectId" placeholder="your-zasu-gcp-project"></label>
+          <label>LOOKBACK DAYS<input id="gcpBillingLookback" type="number" min="2" max="31" value="7"></label>
+          <label>MAX QUERY MB<input id="gcpBillingMaxMb" type="number" min="10" max="10240" value="256"></label>
+          <label>CURRENCY<input id="gcpBillingCurrency" maxlength="3" value="JPY"></label>
+          <label class="check-label"><input id="gcpBillingEnabled" type="checkbox"> AUTO SYNC ENABLED</label>
+          <label class="check-label"><input id="gcpBillingBudget" type="checkbox" checked> FEED MONTHLY BUDGET</label>
+          <label class="check-label"><input id="gcpBillingCalibration" type="checkbox" checked> FEED COST CALIBRATION</label>
+        </div>
+
+        <div class="gcp-billing-actions">
+          <button id="gcpBillingSaveButton" class="btn small">SAVE BIGQUERY CONFIG</button>
+          <button id="gcpBillingSyncButton" class="btn ghost small">SYNC NOW</button>
+        </div>
+
+        <div class="gcp-credential-box">
+          <div>
+            <div class="eyebrow">SERVICE ACCOUNT CREDENTIAL</div>
+            <p id="gcpBillingCredentialMeta">BigQuery Job User + Data Viewer の最小権限。秘密鍵はSupabase Vaultに保存し、画面へ再表示しません。</p>
+          </div>
+          <textarea id="gcpBillingCredentialJson" spellcheck="false" placeholder='{"type":"service_account", ...}'></textarea>
+          <button id="gcpBillingCredentialButton" class="btn ghost small">STORE CREDENTIAL IN VAULT</button>
+        </div>
+
+        <div class="gcp-billing-bottom">
+          <div>
+            <div class="eyebrow">SYNC HISTORY</div>
+            <div id="gcpBillingHistory" class="gcp-sync-history"></div>
+          </div>
+          <div class="gcp-setup-note">
+            <div class="eyebrow">GOOGLE CLOUD SIDE</div>
+            <p>1. Cloud Billing → Billing export → Detailed usage cost data をBigQueryへ有効化</p>
+            <p>2. 同期用Service Accountに BigQuery Job User（Project）</p>
+            <p>3. Billing Datasetに BigQuery Data Viewer</p>
+            <p>4. 上のProject / Dataset / Detailed Export Table / ZASU Projectを保存</p>
+          </div>
+        </div>
+        <div id="gcpBillingStatus" class="status-text"></div>
+      </div>
+
       <div class="chaos-panel card">
         <div class="chaos-head">
           <div>
@@ -305,7 +366,7 @@
   </div>
 </div>
 
-<script src="assets/config.js?v=20261002-4"></script>
-<script src="assets/app.js?v=20261002-4"></script>
+<script src="assets/config.js?v=20261002-5"></script>
+<script src="assets/app.js?v=20261002-5"></script>
 </body>
 </html>
