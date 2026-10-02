@@ -1,6 +1,7 @@
 const cfg=window.ZASU_ADMIN_CONFIG||{};
 const q=s=>document.querySelector(s);
 let adminKey="",projects=[],selectedId=null,selected=null,masterJobs=[],lastCredential=null;
+let guardStats=null,guardRefreshTimer=null;
 
 const statusLabels={request_received:"受付完了",awaiting_files:"素材待ち",mixing:"MIX中",preview_ready:"確認待ち",revision_requested:"修正対応中",mastering:"MASTERING",ready:"納品準備完了",delivered:"納品完了",on_hold:"保留中",cancelled:"キャンセル"};
 const serviceLabels={mix:"歌ってみたMIX",mastering:"マスタリング",mix_master:"MIX + MASTERING",web:"Web制作",app:"アプリ制作",other:"その他"};
@@ -10,6 +11,15 @@ function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&l
 function humanBytes(n){n=Number(n||0);if(n<1024*1024)return(n/1024).toFixed(1)+" KB";return(n/1024/1024).toFixed(1)+" MB"}
 function fmt(v){if(!v)return"—";return new Date(v).toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})}
 function dateInput(v){if(!v)return"";const d=new Date(v),z=new Date(d.getTime()-d.getTimezoneOffset()*60000);return z.toISOString().slice(0,16)}
+function yen(v){return "¥"+Math.round(Number(v||0)).toLocaleString("ja-JP")}
+function pct(v){const n=Number(v||0);return Number.isFinite(n)?n.toFixed(n%1?1:0)+"%":"0%"}
+function secHuman(v){const n=Math.max(0,Number(v||0));if(n<60)return Math.round(n)+"s";if(n<3600)return Math.round(n/60)+"m";return (n/3600).toFixed(1)+"h"}
+async function statsApi(action="stats",payload={}){
+  const r=await fetch(cfg.statsApi,{method:"POST",headers:{"Content-Type":"application/json","x-zasu-admin-key":adminKey},body:JSON.stringify({action,...payload})});
+  const b=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(b.error||"stats_request_failed");
+  return b;
+}
 async function api(action,payload={}){
   const r=await fetch(cfg.adminApi,{method:"POST",headers:{"Content-Type":"application/json","x-zasu-admin-key":adminKey},body:JSON.stringify({action,...payload})});
   const b=await r.json().catch(()=>({}));
@@ -19,16 +29,136 @@ async function api(action,payload={}){
 async function login(){
   adminKey=q("#adminKeyInput").value.trim();if(!adminKey)return;
   const b=q("#loginButton");b.disabled=true;b.textContent="OPENING...";
-  try{await loadProjects();sessionStorage.setItem("zw_admin_key",adminKey);q("#loginView").hidden=true;q("#appView").hidden=false}
+  try{
+    await loadProjects();
+    sessionStorage.setItem("zw_admin_key",adminKey);
+    q("#loginView").hidden=true;q("#appView").hidden=false;
+    loadGuardStats().catch(()=>{});
+    startGuardAutoRefresh();
+  }
   catch(e){q("#loginStatus").textContent=e.message==="unauthorized"?"ADMIN KEYが違います。":"接続できませんでした。"}
   finally{b.disabled=false;b.textContent="OPEN CONSOLE"}
 }
 q("#loginButton").onclick=login;q("#adminKeyInput").addEventListener("keydown",e=>{if(e.key==="Enter")login()});
 q("#logoutButton").onclick=()=>{sessionStorage.removeItem("zw_admin_key");location.reload()};
-q("#refreshButton").onclick=async()=>{await loadProjects();if(selectedId)await openProject(selectedId)};
+q("#refreshButton").onclick=async()=>{await Promise.all([loadProjects(),loadGuardStats().catch(()=>null)]);if(selectedId)await openProject(selectedId)};
 q("#newProjectButton").onclick=()=>{q("#modalBackdrop").hidden=false;q("#createStatus").textContent=""};
 q("#closeModalButton").onclick=()=>q("#modalBackdrop").hidden=true;
 q("#closeCredentialButton").onclick=()=>q("#credentialBackdrop").hidden=true;
+
+
+async function loadGuardStats(){
+  if(!cfg.statsApi)return;
+  const status=q("#guardLoadStatus");
+  if(status)status.textContent="COST GUARDを更新中…";
+  try{
+    const hours=Number(q("#guardWindow")?.value||24);
+    guardStats=await statsApi("stats",{hours});
+    renderGuardDashboard();
+    if(status)status.textContent="";
+  }catch(e){
+    if(status)status.textContent="COST GUARDの取得に失敗しました: "+String(e.message||e);
+  }
+}
+function startGuardAutoRefresh(){
+  if(guardRefreshTimer)clearInterval(guardRefreshTimer);
+  guardRefreshTimer=setInterval(()=>{if(!document.hidden)loadGuardStats().catch(()=>{})},30000);
+}
+function guardLevelLabel(level){return String(level||"green").toUpperCase()}
+function renderGuardRows(root,rows,empty="データなし"){
+  root.innerHTML=rows.length?rows.join(""):'<div class="guard-empty">'+empty+'</div>';
+}
+function renderGuardDashboard(){
+  if(!guardStats)return;
+  const b=guardStats;
+  const state=b.cost_guard?.state||{};
+  const mode=String(state.guard_mode||(state.emergency_paused?"red":"green")).toLowerCase();
+  const modeCard=q("#guardModeCard");
+  modeCard.classList.remove("mode-green","mode-yellow","mode-red");
+  modeCard.classList.add("mode-"+(mode==="red"?"red":mode==="yellow"?"yellow":"green"));
+  q("#guardModeText").textContent=guardLevelLabel(mode);
+  q("#guardModeMeta").textContent=[
+    "SOURCE "+String(state.guard_mode_source||"auto").toUpperCase(),
+    state.guard_mode_reason||"normal",
+    state.emergency_paused?"NEW PROCESSING PAUSED":"ADMISSION OPEN"
+  ].join(" / ");
+
+  const budget=b.monthly_budget?.snapshot||{};
+  const effective=Number(budget.effective_spend_yen||0),kill=Number(budget.kill_yen||8000);
+  const percent=kill>0?Math.min(100,Math.max(0,effective/kill*100)):0;
+  q("#guardBudgetAmount").textContent=yen(effective)+" / "+yen(kill);
+  q("#guardBudgetStatus").textContent=guardLevelLabel(budget.status||"green");
+  q("#guardBudgetBar").style.width=percent+"%";
+  q("#guardBudgetRemaining").textContent="残り "+yen(Math.max(0,kill-effective));
+  q("#guardBudgetPercent").textContent=pct(percent);
+  q("#budgetResetKillButton").hidden=budget.kill_latched!==true;
+
+  const d=b.dashboard||{},cu=d.cost_units||{},queue=d.queue||{},cache=d.cache||{},ug=d.user_guard||{};
+  const abuse=b.abuse_score?.summary||{};
+  q("#guardCostUnits").textContent=Number(cu.allowed_units||0).toLocaleString()+" CU";
+  q("#guardCostEstimate").textContent="推定 "+yen(cu.estimated_yen||0);
+  q("#guardQueue").textContent=Number(queue.queued_total||0).toLocaleString();
+  q("#guardProcessing").textContent="PROCESSING "+Number(queue.processing_total||0).toLocaleString();
+  q("#guardCacheRate").textContent=pct(cache.hit_rate||0);
+  q("#guardCacheCount").textContent=Number(cache.hits||0)+" / "+Number(cache.completed_jobs||0)+" jobs";
+  q("#guardCacheSaved").textContent=yen(cache.estimated_saved_yen||0);
+  q("#guardCacheSavedCu").textContent=Number(cache.saved_cost_units||0)+" CU avoided";
+  q("#guardBotMax").textContent=String(abuse.max_score||0);
+  q("#guardBotState").textContent="WATCH "+Number(abuse.watch||0)+" / BLOCK "+Number(abuse.block||0);
+  q("#guardUserDenials").textContent=Number(ug.denials||0).toLocaleString();
+  q("#guardCuDenied").textContent=Number(cu.denied_events||0).toLocaleString();
+  q("#guardCuEvents").textContent=Number(cu.events||0).toLocaleString()+" events";
+
+  const health=b.health?.latest||{};
+  const hs=String(health.overall_status||"unknown").toUpperCase();
+  q("#guardHealth").textContent=hs;
+  q("#guardHealthIssues").textContent=Array.isArray(health.issues)&&health.issues.length?health.issues.length+" issue(s)":"no active issue";
+
+  q("#guardQueueTotal").textContent=Number(queue.queued_total||0)+" queued";
+  const services=queue.services||{};
+  renderGuardRows(q("#guardQueueBreakdown"),["mix","master","convert"].map(name=>{
+    const x=services[name]||{};
+    return '<div class="guard-row"><span>'+name.toUpperCase()+'</span><strong>'+Number(x.queued||0)+' Q / '+Number(x.processing||0)+' P</strong><small>oldest '+secHuman(x.oldest_queued_seconds||0)+'</small></div>';
+  }));
+
+  q("#guardCuTotal").textContent=Number(cu.allowed_units||0)+" CU";
+  const scopes=Object.entries(cu.by_scope||{}).sort((a,b)=>Number(b[1]?.allowed_units||0)-Number(a[1]?.allowed_units||0));
+  renderGuardRows(q("#guardCuBreakdown"),scopes.map(([name,x])=>
+    '<div class="guard-row"><span>'+esc(name)+'</span><strong>'+Number(x.allowed_units||0)+' CU</strong><small>'+Number(x.denied_events||0)+' denied</small></div>'
+  ),"CUイベントなし");
+
+  q("#guardAbuseEvents").textContent=Number(abuse.events||0)+" events";
+  const abuseItems=[
+    ["NORMAL",abuse.normal||0,"normal"],
+    ["WATCH",abuse.watch||0,"watch"],
+    ["THROTTLE",abuse.throttle||0,"throttle"],
+    ["BLOCK",abuse.block||0,"block"]
+  ];
+  q("#guardAbuseBreakdown").innerHTML=abuseItems.map(([label,value,cls])=>
+    '<div class="score-box '+cls+'"><span>'+label+'</span><strong>'+Number(value)+'</strong></div>'
+  ).join("");
+
+  const costEvents=(b.cost_guard?.recent_events||[]).map(x=>({
+    type:"GUARD",title:x.reason||x.event_type||"guard event",at:x.created_at
+  }));
+  const abuseEvents=(b.abuse_score?.recent_events||[]).map(x=>({
+    type:String(x.level||"watch").toUpperCase(),
+    title:String(x.scope||"request")+" / SCORE "+Number(x.score||0),
+    at:x.created_at
+  }));
+  const events=[...costEvents,...abuseEvents].sort((a,b)=>new Date(b.at)-new Date(a.at)).slice(0,10);
+  renderGuardRows(q("#guardRecentEvents"),events.map(x=>
+    '<div class="guard-event"><span class="guard-event-type">'+esc(x.type)+'</span><div><strong>'+esc(x.title)+'</strong><small>'+esc(fmt(x.at))+'</small></div></div>'
+  ),"直近イベントなし");
+
+  q("#guardUpdatedAt").textContent="UPDATED "+fmt(b.generated_at);
+}
+async function setGuardMode(action,label){
+  if(action==="cost_guard_red"&&!confirm("Guard ModeをREDにして、新規MIX / MASTER / CONVERTを一時停止しますか？"))return;
+  if(action!=="cost_guard_red"&&!confirm("Guard Modeを"+label+"へ手動変更しますか？"))return;
+  await statsApi(action);
+  await loadGuardStats();
+}
 
 async function loadProjects(){
   const b=await api("list_projects");projects=b.projects||[];renderStats();renderProjectList();
@@ -189,6 +319,15 @@ function copyClientInfo(code,key){
   navigator.clipboard.writeText(text).then(()=>alert("顧客用案内をコピーしました。"));
 }
 q("#copyInviteButton").onclick=()=>lastCredential&&copyClientInfo(lastCredential.code,lastCredential.key);
+q("#guardRefreshButton").onclick=()=>loadGuardStats();
+q("#guardWindow").onchange=()=>loadGuardStats();
+q("#guardGreenButton").onclick=()=>setGuardMode("cost_guard_green","GREEN").catch(e=>alert(e.message||"変更失敗"));
+q("#guardYellowButton").onclick=()=>setGuardMode("cost_guard_yellow","YELLOW").catch(e=>alert(e.message||"変更失敗"));
+q("#guardRedButton").onclick=()=>setGuardMode("cost_guard_red","RED").catch(e=>alert(e.message||"変更失敗"));
+q("#budgetResetKillButton").onclick=async()=>{
+  if(!confirm("月額予算Killのラッチを解除しますか？ 実コストが閾値以上なら再度REDになります。"))return;
+  try{await statsApi("budget_reset_kill");await loadGuardStats()}catch(e){alert(e.message||"解除失敗")}
+};
 
 q("#createProjectButton").onclick=async()=>{
   const b=q("#createProjectButton"),title=q("#newTitle").value.trim();if(!title){q("#createStatus").textContent="PROJECT TITLEを入力してください。";return}b.disabled=true;b.textContent="CREATING...";
@@ -198,4 +337,4 @@ q("#createProjectButton").onclick=async()=>{
   }catch(_){q("#createStatus").textContent="案件作成に失敗しました。"}finally{b.disabled=false;b.textContent="CREATE PROJECT"}
 };
 
-const saved=sessionStorage.getItem("zw_admin_key");if(saved){adminKey=saved;loadProjects().then(()=>{q("#loginView").hidden=true;q("#appView").hidden=false}).catch(()=>sessionStorage.removeItem("zw_admin_key"))}
+const saved=sessionStorage.getItem("zw_admin_key");if(saved){adminKey=saved;loadProjects().then(()=>{q("#loginView").hidden=true;q("#appView").hidden=false;loadGuardStats().catch(()=>{});startGuardAutoRefresh()}).catch(()=>sessionStorage.removeItem("zw_admin_key"))}
