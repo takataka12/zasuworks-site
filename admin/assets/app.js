@@ -92,6 +92,8 @@ function renderGuardDashboard(){
   q("#guardBudgetRemaining").textContent="残り "+yen(Math.max(0,kill-effective));
   q("#guardBudgetPercent").textContent=pct(percent);
   q("#budgetResetKillButton").hidden=budget.kill_latched!==true;
+  q("#guardGreenButton").disabled=budget.kill_latched===true;
+  q("#guardYellowButton").disabled=budget.kill_latched===true;
 
   const d=b.dashboard||{},cu=d.cost_units||{},queue=d.queue||{},cache=d.cache||{},ug=d.user_guard||{};
   const abuse=b.abuse_score?.summary||{};
