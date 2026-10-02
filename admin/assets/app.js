@@ -164,6 +164,64 @@ async function toggleCalibrationAuto(){
     await loadGuardStats();
   }catch(e){alert(e.message||"AUTO設定に失敗しました。")}
 }
+const chaosLabels={
+  full_suite:"FULL SUITE",
+  burst_mix_30:"30 USER MIX BURST",
+  same_user_spam:"USER SPAM",
+  bot_attack:"BOT ATTACK",
+  budget_edge:"BUDGET KILL",
+  cache_storm:"CACHE STORM",
+  worker_outage:"WORKER OUTAGE",
+  worker_recovery:"WORKER RECOVERY",
+  red_mode:"RED MODE",
+  calibration_outlier:"COST OUTLIER"
+};
+function chaosBadge(status){
+  const s=String(status||"").toLowerCase();
+  return '<span class="chaos-result-badge '+esc(s)+'">'+esc(s.toUpperCase()||"—")+'</span>';
+}
+function renderFailureDrill(){
+  const runs=guardStats?.failure_drill?.recent_runs||[];
+  const last=runs[0]||null;
+  q("#chaosLastStatus").innerHTML=last?chaosBadge(last.status):"—";
+  q("#chaosLastScenario").textContent=last?(chaosLabels[last.scenario]||last.scenario):"—";
+  q("#chaosCheckCount").textContent=last&&Array.isArray(last.results)?String(last.results.length):"0";
+  q("#chaosDuration").textContent=last?String(Number(last.duration_ms||0))+" ms":"—";
+
+  const latestChecks=last&&Array.isArray(last.results)?last.results:[];
+  q("#chaosResults").innerHTML=latestChecks.length?latestChecks.map(x=>
+    '<div class="chaos-check '+esc(String(x.status||""))+'">'+
+      chaosBadge(x.status)+
+      '<div><strong>'+esc(x.name||"check")+'</strong>'+
+      '<small>'+esc(JSON.stringify(x.details||{}))+'</small></div>'+
+    '</div>'
+  ).join(""):'<div class="guard-empty">まだDrillを実行していません。</div>';
+
+  q("#chaosHistory").innerHTML=runs.length?runs.slice(0,12).map(x=>
+    '<div class="chaos-history-row">'+
+      chaosBadge(x.status)+
+      '<div><strong>'+esc(chaosLabels[x.scenario]||x.scenario)+'</strong>'+
+      '<small>'+esc(fmt(x.created_at))+' / '+Number(x.duration_ms||0)+' ms</small></div>'+
+    '</div>'
+  ).join(""):'<div class="guard-empty">履歴なし</div>';
+}
+async function runFailureDrill(scenario){
+  const label=chaosLabels[scenario]||scenario;
+  const status=q("#chaosStatus");
+  const buttons=[...document.querySelectorAll(".chaos-button")];
+  buttons.forEach(b=>b.disabled=true);
+  status.textContent=label+" をdry-run検証中…";
+  try{
+    const res=await statsApi("failure_drill_run",{scenario});
+    const run=res.run||{};
+    status.textContent=label+" → "+String(run.status||"unknown").toUpperCase()+" / 本番状態の変更なし";
+    await loadGuardStats();
+  }catch(e){
+    status.textContent="Drill失敗: "+String(e.message||e);
+  }finally{
+    buttons.forEach(b=>b.disabled=false);
+  }
+}
 function renderGuardDashboard(){
   if(!guardStats)return;
   const b=guardStats;
@@ -251,6 +309,7 @@ function renderGuardDashboard(){
 
   q("#guardUpdatedAt").textContent="UPDATED "+fmt(b.generated_at);
   renderCostCalibration();
+  renderFailureDrill();
 }
 async function setGuardMode(action,label){
   if(action==="cost_guard_red"&&!confirm("Guard ModeをREDにして、新規MIX / MASTER / CONVERTを一時停止しますか？"))return;
@@ -426,6 +485,9 @@ q("#guardRedButton").onclick=()=>setGuardMode("cost_guard_red","RED").catch(e=>a
 q("#calibrationAddButton").onclick=()=>addCalibrationSample();
 q("#calibrationApplyButton").onclick=()=>applyCalibration();
 q("#calibrationAutoButton").onclick=()=>toggleCalibrationAuto();
+document.querySelectorAll(".chaos-button").forEach(btn=>{
+  btn.addEventListener("click",()=>runFailureDrill(btn.dataset.chaosScenario||"full_suite"));
+});
 q("#budgetResetKillButton").onclick=async()=>{
   if(!confirm("月額予算Killのラッチを解除しますか？ 実コストが閾値以上なら再度REDになります。"))return;
   try{await statsApi("budget_reset_kill");await loadGuardStats()}catch(e){alert(e.message||"解除失敗")}
