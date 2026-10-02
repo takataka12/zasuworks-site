@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="theme-color" content="#080808">
 <title>Admin Console｜ZASU WORKS</title>
-<link rel="stylesheet" href="assets/style.css?v=20261002-3">
+<link rel="stylesheet" href="assets/style.css?v=20261002-4">
 </head>
 <body>
 <header class="topbar">
@@ -167,6 +167,49 @@
         </div>
       </div>
 
+      <div class="chaos-panel card">
+        <div class="chaos-head">
+          <div>
+            <div class="eyebrow">FAILURE DRILL / CHAOS TEST</div>
+            <h3>COST GUARD SAFETY DRILL</h3>
+            <p>現在の本番設定を使って安全条件をdry-run検証します。本番Queue / Guard / Budget / Worker状態は変更しません。</p>
+          </div>
+          <span class="chaos-safe-badge">DRY-RUN / ZERO PROD MUTATION</span>
+        </div>
+
+        <div class="chaos-actions">
+          <button class="btn small chaos-button primary" data-chaos-scenario="full_suite">RUN FULL SUITE</button>
+          <button class="btn ghost small chaos-button" data-chaos-scenario="burst_mix_30">30 USER MIX BURST</button>
+          <button class="btn ghost small chaos-button" data-chaos-scenario="same_user_spam">USER SPAM</button>
+          <button class="btn ghost small chaos-button" data-chaos-scenario="bot_attack">BOT ATTACK</button>
+          <button class="btn ghost small chaos-button" data-chaos-scenario="budget_edge">BUDGET KILL</button>
+          <button class="btn ghost small chaos-button" data-chaos-scenario="cache_storm">CACHE STORM</button>
+          <button class="btn ghost small chaos-button" data-chaos-scenario="worker_outage">WORKER OUTAGE</button>
+          <button class="btn ghost small chaos-button" data-chaos-scenario="worker_recovery">WORKER RECOVERY</button>
+          <button class="btn ghost small chaos-button" data-chaos-scenario="red_mode">RED MODE</button>
+          <button class="btn ghost small chaos-button" data-chaos-scenario="calibration_outlier">COST OUTLIER</button>
+        </div>
+
+        <div class="chaos-summary-grid">
+          <div><span>LAST RESULT</span><strong id="chaosLastStatus">—</strong></div>
+          <div><span>SCENARIO</span><strong id="chaosLastScenario">—</strong></div>
+          <div><span>CHECKS</span><strong id="chaosCheckCount">0</strong></div>
+          <div><span>DURATION</span><strong id="chaosDuration">—</strong></div>
+        </div>
+
+        <div class="chaos-body">
+          <div>
+            <div class="eyebrow">LATEST CHECKS</div>
+            <div id="chaosResults" class="chaos-results"></div>
+          </div>
+          <div>
+            <div class="eyebrow">DRILL HISTORY</div>
+            <div id="chaosHistory" class="chaos-history"></div>
+          </div>
+        </div>
+        <div id="chaosStatus" class="status-text"></div>
+      </div>
+
       <div id="guardLoadStatus" class="status-text"></div>
     </section>
 
@@ -262,7 +305,7 @@
   </div>
 </div>
 
-<script src="assets/config.js?v=20261002-3"></script>
-<script src="assets/app.js?v=20261002-3"></script>
+<script src="assets/config.js?v=20261002-4"></script>
+<script src="assets/app.js?v=20261002-4"></script>
 </body>
 </html>
