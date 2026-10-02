@@ -27,3 +27,27 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.wrap{width:min(
 @media(max-width:1000px){.guard-hero{grid-template-columns:1fr 1fr}.guard-refresh{grid-column:1/-1;border-left:0;border-top:1px solid #262626;padding:14px 0 0;display:grid;grid-template-columns:1fr auto auto;align-items:end}.guard-kpi-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:760px){.guard-hero{grid-template-columns:1fr}.guard-budget,.guard-refresh{border-left:0;border-top:1px solid #262626;padding:16px 0 0}.guard-refresh{display:flex;align-items:stretch}.guard-kpi-grid,.guard-detail-grid{grid-template-columns:1fr 1fr}.guard-score-grid{grid-template-columns:1fr 1fr}.guard-row{grid-template-columns:1fr auto}.guard-row small{grid-column:1/-1;text-align:left}}
 @media(max-width:480px){.guard-kpi-grid,.guard-detail-grid{grid-template-columns:1fr}}
+
+.calibration-panel{padding:18px}
+.calibration-kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px}
+.calibration-kpi-grid>div,.calibration-summary>div{border:1px solid #272727;border-radius:12px;background:#0b0b0b;padding:12px}
+.calibration-kpi-grid span,.calibration-summary span{display:block;color:#6f6f6f;font-size:8px;letter-spacing:.1em;font-weight:900}
+.calibration-kpi-grid strong{display:block;font-size:18px;margin-top:5px;letter-spacing:-.025em}
+.calibration-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.calibration-summary strong{display:block;font-size:16px;margin-top:4px}
+.calibration-services{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.calibration-services>div{display:flex;justify-content:space-between;gap:8px;padding:9px 11px;border-bottom:1px solid #222}
+.calibration-services span{font-size:9px;color:#777}.calibration-services strong{font-size:11px}
+.calibration-form{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr auto;gap:8px;align-items:end;border-top:1px solid #242424;padding-top:13px}
+.calibration-form input,.calibration-form select{margin-top:5px}
+.calibration-check{min-height:44px;white-space:nowrap;padding:0 8px}
+.calibration-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+#calibrationAutoButton.enabled{border-color:#315b3f;color:#8ce2a6}
+.calibration-bottom{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:15px;border-top:1px solid #242424;padding-top:14px}
+.calibration-samples{display:grid;gap:5px;margin-top:8px;max-height:260px;overflow:auto}
+.calibration-sample{display:flex;justify-content:space-between;gap:14px;padding:9px 10px;border:1px solid #242424;border-radius:10px;background:#0a0a0a}
+.calibration-sample>div:last-child{text-align:right}
+.calibration-sample strong{display:block;font-size:10px}.calibration-sample span{display:block;font-size:8px;color:#666;margin-top:2px}
+@media(max-width:1000px){.calibration-kpi-grid{grid-template-columns:repeat(3,1fr)}.calibration-form{grid-template-columns:1fr 1fr 1fr}.calibration-check{align-self:end}}
+@media(max-width:760px){.calibration-kpi-grid,.calibration-summary,.calibration-services{grid-template-columns:1fr 1fr}.calibration-form{grid-template-columns:1fr 1fr}.calibration-bottom{grid-template-columns:1fr}}
+@media(max-width:480px){.calibration-kpi-grid,.calibration-summary,.calibration-services,.calibration-form{grid-template-columns:1fr}}
