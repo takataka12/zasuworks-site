@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="theme-color" content="#080808">
 <title>Admin Console｜ZASU WORKS</title>
-<link rel="stylesheet" href="assets/style.css?v=20260929-1">
+<link rel="stylesheet" href="assets/style.css?v=20261002-2">
 </head>
 <body>
 <header class="topbar">
@@ -40,6 +40,81 @@
         <button id="logoutButton" class="btn ghost">LOG OUT</button>
       </div>
     </div>
+
+    <section id="costGuardSection" class="guard-section">
+      <div id="guardModeCard" class="guard-hero card mode-green">
+        <div class="guard-hero-main">
+          <div class="eyebrow">COST GUARD V2.2 / LIVE</div>
+          <div class="guard-mode-line">
+            <span id="guardModeDot" class="guard-dot"></span>
+            <strong id="guardModeText">GREEN</strong>
+          </div>
+          <div id="guardModeMeta" class="guard-meta">読み込み中…</div>
+          <div class="guard-actions">
+            <button id="guardGreenButton" class="btn ghost small">GREEN</button>
+            <button id="guardYellowButton" class="btn ghost small">YELLOW</button>
+            <button id="guardRedButton" class="btn ghost small danger">RED / PAUSE</button>
+          </div>
+        </div>
+        <div class="guard-budget">
+          <div class="guard-budget-head">
+            <div>
+              <div class="eyebrow">MONTHLY BUDGET</div>
+              <strong id="guardBudgetAmount">¥0 / ¥8,000</strong>
+            </div>
+            <span id="guardBudgetStatus" class="guard-pill">GREEN</span>
+          </div>
+          <div class="budget-track"><span id="guardBudgetBar"></span></div>
+          <div class="guard-budget-foot">
+            <span id="guardBudgetRemaining">残り ¥8,000</span>
+            <span id="guardBudgetPercent">0%</span>
+          </div>
+          <button id="budgetResetKillButton" class="btn ghost small" hidden>RESET BUDGET KILL</button>
+        </div>
+        <div class="guard-refresh">
+          <label>WINDOW
+            <select id="guardWindow">
+              <option value="24">24 HOURS</option>
+              <option value="168">7 DAYS</option>
+              <option value="720">30 DAYS</option>
+            </select>
+          </label>
+          <button id="guardRefreshButton" class="btn ghost small">REFRESH GUARD</button>
+          <span id="guardUpdatedAt">—</span>
+        </div>
+      </div>
+
+      <div class="guard-kpi-grid">
+        <div class="guard-kpi card"><span>COST UNITS</span><strong id="guardCostUnits">0 CU</strong><small id="guardCostEstimate">推定 ¥0</small></div>
+        <div class="guard-kpi card"><span>QUEUE</span><strong id="guardQueue">0</strong><small id="guardProcessing">PROCESSING 0</small></div>
+        <div class="guard-kpi card"><span>CACHE HIT</span><strong id="guardCacheRate">0%</strong><small id="guardCacheCount">0 / 0 jobs</small></div>
+        <div class="guard-kpi card"><span>CACHE SAVED</span><strong id="guardCacheSaved">¥0</strong><small id="guardCacheSavedCu">0 CU avoided</small></div>
+        <div class="guard-kpi card"><span>BOT SCORE</span><strong id="guardBotMax">0</strong><small id="guardBotState">WATCH 0 / BLOCK 0</small></div>
+        <div class="guard-kpi card"><span>USER GUARD</span><strong id="guardUserDenials">0</strong><small>identity limit denials</small></div>
+        <div class="guard-kpi card"><span>CU DENIED</span><strong id="guardCuDenied">0</strong><small id="guardCuEvents">0 events</small></div>
+        <div class="guard-kpi card"><span>HEALTH</span><strong id="guardHealth">—</strong><small id="guardHealthIssues">no snapshot</small></div>
+      </div>
+
+      <div class="guard-detail-grid">
+        <div class="guard-panel card">
+          <div class="section-title"><span>QUEUE / SERVICE</span><strong id="guardQueueTotal">0</strong></div>
+          <div id="guardQueueBreakdown" class="guard-list"></div>
+        </div>
+        <div class="guard-panel card">
+          <div class="section-title"><span>COST UNIT / SCOPE</span><strong id="guardCuTotal">0 CU</strong></div>
+          <div id="guardCuBreakdown" class="guard-list"></div>
+        </div>
+        <div class="guard-panel card">
+          <div class="section-title"><span>ABUSE SCORE</span><strong id="guardAbuseEvents">0</strong></div>
+          <div id="guardAbuseBreakdown" class="guard-score-grid"></div>
+        </div>
+        <div class="guard-panel card">
+          <div class="section-title"><span>RECENT GUARD EVENTS</span><strong>LIVE</strong></div>
+          <div id="guardRecentEvents" class="guard-event-list"></div>
+        </div>
+      </div>
+      <div id="guardLoadStatus" class="status-text"></div>
+    </section>
 
     <div class="stats-grid">
       <div class="stat card"><span>ACTIVE</span><strong id="statActive">0</strong></div>
@@ -133,7 +208,7 @@
   </div>
 </div>
 
-<script src="assets/config.js?v=20260929-1"></script>
-<script src="assets/app.js?v=20260929-1"></script>
+<script src="assets/config.js?v=20261002-2"></script>
+<script src="assets/app.js?v=20261002-2"></script>
 </body>
 </html>
