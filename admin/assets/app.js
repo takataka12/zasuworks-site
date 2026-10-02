@@ -164,6 +164,110 @@ async function toggleCalibrationAuto(){
     await loadGuardStats();
   }catch(e){alert(e.message||"AUTO設定に失敗しました。")}
 }
+function renderGcpBilling(){
+  const g=guardStats?.gcp_billing||{};
+  const s=g.status||{};
+  const configured=s.configured===true;
+  const credential=s.credentials_configured===true;
+  const badge=q("#gcpBillingConnectionBadge");
+  badge.textContent=configured?"CONNECTED":s.enabled?"SETUP INCOMPLETE":"NOT CONFIGURED";
+  badge.classList.remove("online","offline","warning");
+  badge.classList.add(configured?"online":s.enabled?"warning":"offline");
+
+  q("#gcpBillingCredential").textContent=credential?"STORED":"MISSING";
+  q("#gcpBillingLastSync").textContent=s.last_success_at?fmt(s.last_success_at):"—";
+  q("#gcpBillingMtd").textContent=yen(s.last_mtd_yen||0);
+  q("#gcpBillingBytes").textContent=s.last_query_bytes?humanBytes(Number(s.last_query_bytes)):"—";
+  q("#gcpBillingRows").textContent=String(Number(s.last_rows||0));
+
+  const setIfIdle=(id,value)=>{
+    const el=q(id);
+    if(document.activeElement!==el)el.value=value??"";
+  };
+  setIfIdle("#gcpBillingProjectId",s.bigquery_project_id||"");
+  setIfIdle("#gcpBillingDatasetId",s.dataset_id||"");
+  setIfIdle("#gcpBillingTableId",s.table_id||"");
+  setIfIdle("#gcpBillingCostProjectId",s.cost_project_id||"");
+  setIfIdle("#gcpBillingLookback",String(Number(s.sync_lookback_days||7)));
+  setIfIdle("#gcpBillingMaxMb",String(Math.max(10,Math.round(Number(s.maximum_bytes_billed||268435456)/1024/1024))));
+  setIfIdle("#gcpBillingCurrency",String(s.expected_currency||"JPY"));
+  q("#gcpBillingEnabled").checked=s.enabled===true;
+  q("#gcpBillingBudget").checked=s.sync_budget_external_spend!==false;
+  q("#gcpBillingCalibration").checked=s.auto_calibration_sample!==false;
+  q("#gcpBillingCredentialMeta").textContent=credential
+    ?("CREDENTIAL STORED / "+String(s.service_account_email||"service account"))
+    :"BigQuery Job User + Data Viewer の最小権限。秘密鍵はSupabase Vaultに保存し、画面へ再表示しません。";
+
+  const runs=Array.isArray(g.recent_runs)?g.recent_runs:[];
+  q("#gcpBillingHistory").innerHTML=runs.length?runs.slice(0,12).map(x=>{
+    const cls=String(x.status||"").toLowerCase();
+    const meta=x.status==="success"
+      ?yen(x.mtd_yen||0)+" MTD / "+Number(x.rows_imported||0)+" rows / "+(x.bytes_processed?humanBytes(Number(x.bytes_processed)):"—")
+      :(x.error_code||x.error_message||"—");
+    return '<div class="gcp-sync-row"><span class="gcp-sync-badge '+esc(cls)+'">'+esc(String(x.status||"").toUpperCase())+'</span><div><strong>'+esc(String(x.source||"sync").toUpperCase())+'</strong><small>'+esc(fmt(x.created_at))+' / '+esc(meta)+'</small></div></div>';
+  }).join(""):'<div class="guard-empty">同期履歴なし</div>';
+
+  if(s.last_error){
+    q("#gcpBillingStatus").textContent="LAST ERROR: "+String(s.last_error);
+  }else if(configured){
+    q("#gcpBillingStatus").textContent="6時間ごとに自動同期します。Budgetは内部CU推定とGoogle実費の大きい方を採用します。";
+  }else{
+    q("#gcpBillingStatus").textContent="Google Cloud側のDetailed Billing Exportと資格情報を設定すると同期を開始できます。";
+  }
+}
+async function saveGcpBillingConfig(){
+  const payload={
+    bigquery_project_id:q("#gcpBillingProjectId").value.trim(),
+    dataset_id:q("#gcpBillingDatasetId").value.trim(),
+    table_id:q("#gcpBillingTableId").value.trim(),
+    cost_project_id:q("#gcpBillingCostProjectId").value.trim(),
+    sync_lookback_days:Number(q("#gcpBillingLookback").value||7),
+    maximum_bytes_billed:Math.round(Number(q("#gcpBillingMaxMb").value||256)*1024*1024),
+    expected_currency:q("#gcpBillingCurrency").value.trim().toUpperCase()||"JPY",
+    enabled:q("#gcpBillingEnabled").checked,
+    sync_budget_external_spend:q("#gcpBillingBudget").checked,
+    auto_calibration_sample:q("#gcpBillingCalibration").checked
+  };
+  const btn=q("#gcpBillingSaveButton");btn.disabled=true;
+  try{
+    await statsApi("gcp_billing_save_config",payload);
+    q("#gcpBillingStatus").textContent="BigQuery設定を保存しました。";
+    await loadGuardStats();
+  }catch(e){
+    q("#gcpBillingStatus").textContent="設定保存失敗: "+String(e.message||e);
+  }finally{btn.disabled=false}
+}
+async function storeGcpBillingCredential(){
+  const raw=q("#gcpBillingCredentialJson").value.trim();
+  if(!raw){q("#gcpBillingStatus").textContent="Service Account JSONを貼り付けてください。";return}
+  if(!confirm("Service Account JSONをSupabase Vaultへ暗号化保存します。保存後、秘密鍵は画面へ再表示されません。続行しますか？"))return;
+  const btn=q("#gcpBillingCredentialButton");btn.disabled=true;
+  try{
+    await statsApi("gcp_billing_store_credential",{service_account_json:raw});
+    q("#gcpBillingCredentialJson").value="";
+    q("#gcpBillingStatus").textContent="Service Account credentialをVaultへ保存しました。";
+    await loadGuardStats();
+  }catch(e){
+    q("#gcpBillingStatus").textContent="Credential保存失敗: "+String(e.message||e);
+  }finally{btn.disabled=false}
+}
+async function syncGcpBillingNow(){
+  const btn=q("#gcpBillingSyncButton");btn.disabled=true;
+  q("#gcpBillingStatus").textContent="Google Cloud Billingを同期中…";
+  try{
+    const res=await statsApi("gcp_billing_sync_now");
+    const x=res.sync||{};
+    if(x.skipped){
+      q("#gcpBillingStatus").textContent="SYNC SKIPPED: "+String(x.reason||"not configured");
+    }else{
+      q("#gcpBillingStatus").textContent="SYNC COMPLETE / MTD "+yen(x.mtd_yen||0)+" / "+Number(x.rows_imported||0)+" rows";
+    }
+    await loadGuardStats();
+  }catch(e){
+    q("#gcpBillingStatus").textContent="同期失敗: "+String(e.message||e);
+  }finally{btn.disabled=false}
+}
+
 const chaosLabels={
   full_suite:"FULL SUITE",
   burst_mix_30:"30 USER MIX BURST",
@@ -309,6 +413,7 @@ function renderGuardDashboard(){
 
   q("#guardUpdatedAt").textContent="UPDATED "+fmt(b.generated_at);
   renderCostCalibration();
+  renderGcpBilling();
   renderFailureDrill();
 }
 async function setGuardMode(action,label){
@@ -485,6 +590,9 @@ q("#guardRedButton").onclick=()=>setGuardMode("cost_guard_red","RED").catch(e=>a
 q("#calibrationAddButton").onclick=()=>addCalibrationSample();
 q("#calibrationApplyButton").onclick=()=>applyCalibration();
 q("#calibrationAutoButton").onclick=()=>toggleCalibrationAuto();
+q("#gcpBillingSaveButton").onclick=()=>saveGcpBillingConfig();
+q("#gcpBillingCredentialButton").onclick=()=>storeGcpBillingCredential();
+q("#gcpBillingSyncButton").onclick=()=>syncGcpBillingNow();
 document.querySelectorAll(".chaos-button").forEach(btn=>{
   btn.addEventListener("click",()=>runFailureDrill(btn.dataset.chaosScenario||"full_suite"));
 });
