@@ -68,6 +68,102 @@ function guardLevelLabel(level){return String(level||"green").toUpperCase()}
 function renderGuardRows(root,rows,empty="データなし"){
   root.innerHTML=rows.length?rows.join(""):'<div class="guard-empty">'+empty+'</div>';
 }
+function calibrationMoneyPerCu(v){
+  const n=Number(v);
+  return Number.isFinite(n)?"¥"+n.toFixed(2)+" / CU":"—";
+}
+function renderCostCalibration(){
+  const c=guardStats?.cost_calibration||{};
+  const s=c.snapshot||{};
+  const settings=c.settings||{};
+  const ready=s.ready_to_apply===true;
+  const confidence=String(s.confidence||"insufficient").toUpperCase();
+
+  q("#calibrationCurrent").textContent=calibrationMoneyPerCu(s.current_yen_per_cu);
+  q("#calibrationRaw").textContent=calibrationMoneyPerCu(s.raw_recommended_yen_per_cu);
+  q("#calibrationSafe").textContent=calibrationMoneyPerCu(s.capped_recommended_yen_per_cu);
+
+  const drift=Number(s.drift_percent);
+  q("#calibrationDrift").textContent=Number.isFinite(drift)?(drift>0?"+":"")+drift.toFixed(1)+"%":"—";
+  q("#calibrationConfidence").textContent=confidence;
+  q("#calibrationReadyLabel").textContent=ready?"READY TO APPLY":"WAITING DATA";
+
+  q("#calibrationActualCost").textContent=yen(s.actual_cost_yen||0);
+  q("#calibrationUnits").textContent=Number(s.cost_units||0).toLocaleString()+" CU";
+  q("#calibrationDays").textContent=String(Number(s.sample_days||0));
+  q("#calibrationSamplesCount").textContent=String(Number(s.sample_count||0));
+
+  const byService=s.actual_cost_by_service||{};
+  const labels={cloud_run:"CLOUD RUN",cloud_storage:"CLOUD STORAGE",networking:"NETWORKING",other:"OTHER"};
+  const serviceRows=Object.entries(labels).map(([key,label])=>
+    '<div><span>'+label+'</span><strong>'+yen(byService[key]||0)+'</strong></div>'
+  ).join("");
+  q("#calibrationServiceBreakdown").innerHTML=serviceRows;
+
+  q("#calibrationApplyButton").disabled=!ready;
+  const auto=settings.auto_apply_enabled===true||s.auto_apply_enabled===true;
+  q("#calibrationAutoButton").textContent="AUTO APPLY: "+(auto?"ON":"OFF");
+  q("#calibrationAutoButton").classList.toggle("enabled",auto);
+
+  const today=new Date();
+  const yyyy=today.getFullYear(),mm=String(today.getMonth()+1).padStart(2,"0"),dd=String(today.getDate()).padStart(2,"0");
+  if(!q("#calibrationEnd").value)q("#calibrationEnd").value=yyyy+"-"+mm+"-"+dd;
+  if(!q("#calibrationStart").value)q("#calibrationStart").value=yyyy+"-"+mm+"-01";
+
+  const samples=Array.isArray(c.samples)?c.samples:[];
+  q("#calibrationSamples").innerHTML=samples.slice(0,10).map(x=>
+    '<div class="calibration-sample"><div><strong>'+esc(labels[x.service]||x.service)+'</strong><span>'+esc(x.period_start)+' → '+esc(x.period_end)+'</span></div><div><strong>'+yen(x.actual_cost_yen)+'</strong><span>'+(x.include_in_calibration?"INCLUDED":"EXCLUDED")+'</span></div></div>'
+  ).join("")||'<div class="guard-empty">実コストサンプルなし</div>';
+
+  const history=Array.isArray(c.recent_events)?c.recent_events:[];
+  q("#calibrationHistory").innerHTML=history.slice(0,10).map(x=>{
+    const applied=x.applied_yen_per_cu==null?"":(" → ¥"+Number(x.applied_yen_per_cu).toFixed(2)+"/CU");
+    return '<div class="calibration-sample"><div><strong>'+esc(String(x.action||"event").toUpperCase())+'</strong><span>'+esc(fmt(x.created_at))+'</span></div><div><strong>'+esc(String(x.confidence||"—").toUpperCase())+'</strong><span>'+Number(x.sample_cost_units||0)+' CU'+applied+'</span></div></div>';
+  }).join("")||'<div class="guard-empty">校正履歴なし</div>';
+}
+async function addCalibrationSample(){
+  const service=q("#calibrationService").value;
+  const period_start=q("#calibrationStart").value;
+  const period_end=q("#calibrationEnd").value;
+  const actual_cost_yen=Number(q("#calibrationCost").value);
+  const include_in_calibration=q("#calibrationInclude").checked;
+  if(!period_start||!period_end||!Number.isFinite(actual_cost_yen)||actual_cost_yen<0){
+    q("#calibrationStatus").textContent="期間と実コストを正しく入力してください。";
+    return;
+  }
+  const btn=q("#calibrationAddButton");btn.disabled=true;
+  try{
+    await statsApi("calibration_add_sample",{service,period_start,period_end,actual_cost_yen,include_in_calibration});
+    q("#calibrationCost").value="";
+    q("#calibrationStatus").textContent="実コストを保存しました。";
+    await loadGuardStats();
+  }catch(e){
+    q("#calibrationStatus").textContent="保存失敗: "+String(e.message||e);
+  }finally{btn.disabled=false}
+}
+async function applyCalibration(){
+  const s=guardStats?.cost_calibration?.snapshot||{};
+  if(s.ready_to_apply!==true)return;
+  const current=calibrationMoneyPerCu(s.current_yen_per_cu);
+  const next=calibrationMoneyPerCu(s.capped_recommended_yen_per_cu);
+  if(!confirm("CU単価を "+current+" → "+next+" に更新しますか？\n月額Budget推定にも即反映されます。"))return;
+  const btn=q("#calibrationApplyButton");btn.disabled=true;
+  try{
+    const res=await statsApi("calibration_apply");
+    q("#calibrationStatus").textContent=res?.calibration?.applied?"校正単価を適用しました。":"サンプル不足のため適用されませんでした。";
+    await loadGuardStats();
+  }catch(e){
+    q("#calibrationStatus").textContent="適用失敗: "+String(e.message||e);
+  }
+}
+async function toggleCalibrationAuto(){
+  const current=guardStats?.cost_calibration?.settings?.auto_apply_enabled===true;
+  if(!current&&!confirm("AUTO APPLYをONにしますか？\n十分な実績がある場合、毎日1回、安全幅±25%以内でCU単価を自動校正します。"))return;
+  try{
+    await statsApi("calibration_set_auto",{enabled:!current});
+    await loadGuardStats();
+  }catch(e){alert(e.message||"AUTO設定に失敗しました。")}
+}
 function renderGuardDashboard(){
   if(!guardStats)return;
   const b=guardStats;
@@ -154,6 +250,7 @@ function renderGuardDashboard(){
   ),"直近イベントなし");
 
   q("#guardUpdatedAt").textContent="UPDATED "+fmt(b.generated_at);
+  renderCostCalibration();
 }
 async function setGuardMode(action,label){
   if(action==="cost_guard_red"&&!confirm("Guard ModeをREDにして、新規MIX / MASTER / CONVERTを一時停止しますか？"))return;
@@ -326,6 +423,9 @@ q("#guardWindow").onchange=()=>loadGuardStats();
 q("#guardGreenButton").onclick=()=>setGuardMode("cost_guard_green","GREEN").catch(e=>alert(e.message||"変更失敗"));
 q("#guardYellowButton").onclick=()=>setGuardMode("cost_guard_yellow","YELLOW").catch(e=>alert(e.message||"変更失敗"));
 q("#guardRedButton").onclick=()=>setGuardMode("cost_guard_red","RED").catch(e=>alert(e.message||"変更失敗"));
+q("#calibrationAddButton").onclick=()=>addCalibrationSample();
+q("#calibrationApplyButton").onclick=()=>applyCalibration();
+q("#calibrationAutoButton").onclick=()=>toggleCalibrationAuto();
 q("#budgetResetKillButton").onclick=async()=>{
   if(!confirm("月額予算Killのラッチを解除しますか？ 実コストが閾値以上なら再度REDになります。"))return;
   try{await statsApi("budget_reset_kill");await loadGuardStats()}catch(e){alert(e.message||"解除失敗")}
