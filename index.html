@@ -5,17 +5,44 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#080808">
 <meta name="color-scheme" content="dark">
-<title>ZASU WORKS — Build. Release. Grow.</title>
-<meta name="description" content="ZASU WORKSは、音楽・iOSアプリ・Webサービスを作り、公開し、育てる個人プロダクトスタジオです。">
+<title>ZASU WORKS — ZASU DAW Beta 発売</title>
+<meta name="description" content="迷わず録って、作品にする。歌ってみた制作の録音・編集・自動MIX・自動マスタリングをひとつに。ZASU DAW Beta、macOS / Windows対応。発売記念価格1,980円（税込・買い切り）。">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="https://zasuworks.jp/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="ZASU WORKS">
-<meta property="og:title" content="ZASU WORKS — Build. Release. Grow.">
-<meta property="og:description" content="音楽、アプリ、Web。アイデアを形にして、公開して、育てる。">
+<meta property="og:title" content="ZASU WORKS — ZASU DAW Beta 発売">
+<meta property="og:description" content="迷わず録って、作品にする。自動MIX・自動マスタリング搭載。macOS / Windows対応、発売記念1,980円（税込・買い切り）。">
 <meta property="og:url" content="https://zasuworks.jp/">
 <meta name="twitter:card" content="summary">
 <link rel="stylesheet" href="/assets/site.css?v=20261002">
+<style>
+.daw-hero{min-height:0;padding:calc(var(--header) + 64px) 0 64px}
+.daw-layout{display:grid;grid-template-columns:1fr 1.12fr;gap:40px;align-items:center}
+.daw-hero .eyebrow{font-size:12px;line-height:1.5}
+.daw-hero h1{font-size:clamp(54px,6.3vw,84px);line-height:1;letter-spacing:-.065em;margin:22px 0}
+.daw-hero h1 span{display:inline;color:var(--accent);-webkit-text-stroke:0}
+.daw-tagline{font-size:clamp(29px,3.2vw,44px);font-weight:850;letter-spacing:-.04em;line-height:1.45;margin:0 0 20px}
+.daw-intro{font-size:16px;color:#bcbab3;line-height:1.9;margin:0;max-width:34em}
+.daw-hero .hero-meta span{font-family:inherit;font-size:13px;font-weight:700;line-height:1.4;color:#dedcd4}
+.daw-price{display:flex;align-items:baseline;gap:8px 14px;flex-wrap:wrap;margin-top:24px}
+.daw-price .price-label{font-size:14px;color:var(--accent)}
+.daw-price strong{font-size:42px;letter-spacing:-.045em;line-height:1.2}
+.daw-price small{font-size:14px;color:#bcbab3}
+.daw-hero .btn{font-size:14px;letter-spacing:0;min-height:52px}
+.daw-note{font-size:13px;color:#a7a49d;margin:14px 0 0;line-height:1.7}
+.daw-preview{margin:0;min-width:0;background:#11191c;border:1px solid #3d4933;border-radius:16px;overflow:hidden;box-shadow:0 24px 70px #0008}
+.daw-preview a{display:block}.daw-preview img{width:100%;height:auto}
+.daw-preview figcaption{font-size:12px;line-height:1.6;padding:14px 18px;color:#b9bcb4;border-top:1px solid #2c3634}
+.daw-feature-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:48px;border-top:1px solid #39412a;border-bottom:1px solid #39412a}
+.daw-feature{padding:24px 20px}.daw-feature+.daw-feature{border-left:1px solid #39412a}
+.daw-feature b{display:block;font-size:20px;color:var(--accent);letter-spacing:-.025em}.daw-feature p{font-size:14px;line-height:1.7;color:#bcbab3;margin:8px 0 0}
+.home-products h2{line-height:1.15}.home-products .status{font-size:12px}.home-products .now-card p{font-size:16px}.home-products .now-card .arrow{font-size:14px}
+.brand-story{margin-top:26px;color:#bcbab3;font-size:15px}.brand-story a{color:var(--accent);text-underline-offset:4px}
+a:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:5px}
+@media(max-width:1000px){.daw-layout{grid-template-columns:1fr;gap:32px}.daw-preview{max-width:780px}.daw-hero h1{font-size:clamp(54px,10vw,84px)}}
+@media(max-width:700px){.daw-hero{min-height:0;padding:calc(var(--header) + 36px) 0 40px}.daw-feature-strip{grid-template-columns:1fr;margin-top:30px}.daw-feature{padding:20px 0}.daw-feature+.daw-feature{border-left:0;border-top:1px solid #39412a}.daw-price strong{font-size:38px}.daw-tagline{font-size:32px}.daw-hero .cta{margin-top:22px}.daw-preview{border-radius:10px}}
+</style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"ZASU WORKS","url":"https://zasuworks.jp/","email":"zasuworks@gmail.com","foundingDate":"2026-10-01","founder":{"@type":"Person","name":"Takashi Nose"},"sameAs":["https://x.com/zasuworks","https://apps.apple.com/jp/developer/takashi-nose/id1869272305"]}</script>
 </head>
 <body>
@@ -23,32 +50,50 @@
 <header><div class="shell inner">
   <a class="brand" href="/"><span class="brandmark">ZW</span><span>ZASU WORKS</span></a>
   <nav aria-label="Main navigation">
-    <a href="/products.html">Products</a><a href="/radio.html">Radio</a><a href="/crowdfunding.html" style="color:var(--accent)">Crowdfunding</a><a href="/services.html">Services</a><a href="/about.html">About</a>
+    <a href="/zasu-daw/" style="color:var(--accent)">ZASU DAW</a><a href="/products.html">Products</a><a href="/radio.html">Radio</a><a href="/crowdfunding.html">Crowdfunding</a><a href="/services.html">Services</a><a href="/about.html">About</a>
   </nav>
   <button class="menu" type="button" aria-expanded="false">Menu</button>
 </div></header>
 <div class="mobile-nav" id="mobile-nav">
-  <a href="/products.html">Products</a><a href="/radio.html">ZASU Radio</a><a href="/crowdfunding.html">Crowdfunding</a><a href="/services.html">Services</a><a href="/about.html">About</a><a href="#contact">Contact</a>
+  <a href="/zasu-daw/">ZASU DAW Beta</a><a href="/products.html">Products</a><a href="/radio.html">ZASU Radio</a><a href="/crowdfunding.html">Crowdfunding</a><a href="/services.html">Services</a><a href="/about.html">About</a><a href="#contact">Contact</a>
 </div>
 <main>
-<section class="hero">
+<section class="hero daw-hero" aria-labelledby="daw-heading">
   <div class="shell">
-    <div class="eyebrow">Independent Product Studio / Tokyo</div>
-    <h1>ZASU<span>WORKS</span></h1>
-    <div class="hero-copy"><em>BUILD. RELEASE. GROW.</em><br>音楽、アプリ、Web。アイデアを形にして、公開して、育てる。</div>
-    <div class="hero-meta"><span>iOS Apps</span><span>Web Services</span><span>Music / Audio</span><span>AI-assisted Development</span></div>
-    <div class="cta"><a class="btn primary" href="#now">今のZASU WORKSを見る</a><a class="btn" href="/zasu-daw/">ZASU DAW — 発売記念 1,980円</a><a class="btn" href="/products.html">Products →</a></div>
+    <div class="daw-layout">
+      <div>
+        <div class="eyebrow">ZASU WORKS / ZASU DAW BETA 発売</div>
+        <h1 id="daw-heading">ZASU <span>DAW</span></h1>
+        <p class="daw-tagline">迷わず録って、<br>作品にする。</p>
+        <p class="daw-intro">歌ってみたの録音・編集から、自動MIX・自動マスタリングまで。歌うことに集中できる、ひとつの制作環境。</p>
+        <div class="hero-meta"><span>macOS / Windows</span><span>日本語UI</span><span>買い切り</span></div>
+        <div class="daw-price"><span class="price-label">発売記念価格</span><strong>1,980円</strong><small>（税込）</small></div>
+        <p class="daw-note">通常価格 2,980円。1回の購入でMac版・Windows版の両方を利用できます。</p>
+        <div class="cta"><a class="btn primary" href="/zasu-daw/">ZASU DAWを詳しく見る</a><a class="btn" href="/zasu-daw/#beta">価格・購入案内</a></div>
+        <p class="daw-note">開発中の有料Beta版です。対応環境・注意事項は製品ページをご確認ください。</p>
+      </div>
+      <figure class="daw-preview">
+        <a href="/zasu-daw/" aria-label="ZASU DAWの画面と機能を見る"><img src="/zasu-daw/assets/daw.png" alt="ZASU DAWの日本語画面。インスト、メインボーカル、重ね、ハモリを並べたワークスペース" width="1220" height="860" fetchpriority="high"></a>
+        <figcaption>ZASU DAW 実画面（v0.0.7）／販売中のバージョンとは一部表示が異なります。</figcaption>
+      </figure>
+    </div>
+    <div class="daw-feature-strip">
+      <div class="daw-feature"><b>録音・編集・ボーカルFX</b><p>インストと歌声を並べて、録る・切る・整える。</p></div>
+      <div class="daw-feature"><b>AUTO MIX / 自動MIX</b><p>歌声とインストのバランスを整え、仕上げを支援。</p></div>
+      <div class="daw-feature"><b>AUTO MASTERING</b><p>音圧や音量を整えて、完成音源をWAVで書き出し。</p></div>
+    </div>
   </div>
 </section>
 
-<section id="now">
+<section id="now" class="home-products">
   <div class="shell">
-    <div class="section-head"><div class="section-no">01 / NOW</div><div><div class="eyebrow">Now at ZASU WORKS</div><h2>今、動いている<br>3つの軸。</h2><p class="intro">やっていることを全部並べるのではなく、いま最も力を入れているプロジェクトだけを前に出します。</p></div></div>
+    <div class="section-head"><div class="section-no">01 / PRODUCTS</div><div><div class="eyebrow">More from ZASU WORKS</div><h2>音楽も、日常も。<br>作る人の道具を。</h2><p class="intro">ブラウザで使える音声サービス、DAW用プラグイン、iPhoneアプリ。ZASU WORKSのプロダクトをご紹介します。</p></div></div>
     <div class="now-grid">
       <a class="now-card" href="https://zasumaster.com/" target="_blank" rel="noopener"><span class="status">Live / Improving</span><h3>ZASU<br>AUDIO</h3><p>ブラウザでMIX / MASTER / CONVERT。公開後も処理品質、安定性、使いやすさを継続的に改善しています。</p><span class="arrow">Open ZASU AUDIO ↗</span></a>
       <a class="now-card" href="/products.html#zasu-loud"><span class="status">Building</span><h3>ZASU<br>LOUD</h3><p>DAWで使えるAudio Unit / VSTプラグイン。まずは「動く・使える・音が変わる」MVPから完成を目指しています。</p><span class="arrow">Project details →</span></a>
-      <a class="now-card" href="/radio.html"><span class="status">On Air</span><h3>ZASU<br>RADIO</h3><p>AI、音楽、個人開発。ZASU WORKSの制作過程や考えていることを、音声でも発信しています。</p><span class="arrow">Listen / Details →</span></a>
+      <a class="now-card" href="/products.html"><span class="status">App Storeで公開中</span><h3>iOS<br>APPS</h3><p>音楽、動画、カメラ。iPhoneで使えるアプリも、制作・公開しています。</p><span class="arrow">アプリ・製品一覧を見る</span></a>
     </div>
+    <p class="brand-story">開発の裏側や、ものづくりの話は <a href="/radio.html">ZASU RADIO</a> で発信しています。</p>
   </div>
 </section>
 
@@ -74,7 +119,7 @@
     <div><div class="eyebrow">Studio / What We Do</div><div class="studio-lead">自分たちのプロダクトを作る。<br>必要なら、制作も手伝う。</div></div>
     <div class="studio-copy"><p>ZASU WORKSの中心は、自社プロダクトの企画・開発・公開・改善です。その経験を活かして、iOSアプリ、Webサービス、Music / Audio分野の制作相談も受けています。</p>
       <div class="simple-list">
-        <a href="/products.html"><b>Products</b><strong>ZASU AUDIO / ZASU LOUD / iOS Apps</strong><span>→</span></a>
+        <a href="/products.html"><b>Products</b><strong>ZASU DAW / ZASU AUDIO / Plugins / iOS Apps</strong><span>→</span></a>
         <a href="/services.html"><b>Services</b><strong>iOS / Web / Music & Audio 制作</strong><span>→</span></a>
         <a href="/about.html"><b>About</b><strong>ZASU WORKSについて / Timeline</strong><span>→</span></a>
       </div>
