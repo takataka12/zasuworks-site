@@ -8,7 +8,10 @@
   let orderId = validId(supplied) ? supplied : null;
   try {
     if (orderId) localStorage.setItem(storageKey, orderId);
-    else if (!supplied) orderId = localStorage.getItem(storageKey);
+    else if (!supplied) {
+      orderId = localStorage.getItem(storageKey) || sessionStorage.getItem(storageKey);
+      if (validId(orderId)) localStorage.setItem(storageKey, orderId);
+    }
   } catch { /* Current-page downloads work even if browser storage is blocked. */ }
   if (!validId(orderId)) orderId = null;
   // These identifiers grant access to a purchase. Do not leave them in copied URLs.

@@ -10,7 +10,7 @@ const success = { expiresIn: 600, downloads: [
   { os: 'mac', url: signed('ZASUDAW-0.0.10-macOS-Universal.dmg') },
   { os: 'windows', url: signed('ZASU-DAW-Beta-0.0.10-Windows-x64.zip') },
 ] };
-async function page({ query = '?orderId='+id, code = 200, body = success, stored = null, storageBlocked = false } = {}) {
+async function page({ query = '?orderId='+id, code = 200, body = success, stored = null, sessionStored = null, storageBlocked = false } = {}) {
   const elements = Object.fromEntries(['delivery-title','delivery-message','verify-again','download-mac','download-windows'].map(name => [name, {
     textContent: '', hidden: true, attributes: { 'aria-disabled': 'true' }, events: {},
     setAttribute(k,v) { this.attributes[k] = v; }, getAttribute(k) { return this.attributes[k]; },
@@ -28,6 +28,7 @@ async function page({ query = '?orderId='+id, code = 200, body = success, stored
       setItem(_k,value) { if(storageBlocked) throw Error(); store.value = value; },
       getItem() { if(storageBlocked) throw Error(); return store.value; },
     },
+    sessionStorage: { getItem() { return sessionStored; } },
     document: { getElementById(name) { assert.ok(elements[name]); return elements[name]; } },
     setTimeout(fn,ms) { timers.set(++timerId,{ fn,ms }); return timerId; },
     clearTimeout(timer) { timers.delete(timer); },
@@ -53,6 +54,10 @@ test('verified response enables both files and removes purchase identifier from 
 test('later visit retrieves saved order and blocked browser storage still allows current page', async () => {
   assert.equal((await page({ query:'',stored:id })).called,1);
   assert.equal((await page({ storageBlocked:true })).elements['download-mac'].href,success.downloads[0].url);
+});
+test('purchase stored by the first release is migrated for later downloads', async () => {
+  const app = await page({ query:'',sessionStored:id });
+  assert.equal(app.called,1); assert.equal(app.store.value,id);
 });
 test('pending, rejected and unavailable responses keep both links disabled', async () => {
   for(const code of [400,403,409,429,503]) {
