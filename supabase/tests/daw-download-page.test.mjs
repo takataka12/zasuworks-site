@@ -24,7 +24,7 @@ async function page({ query = '?orderId='+id, code = 200, body = success, stored
     URL, URLSearchParams, AbortController, Date,
     location: { search: query, pathname: '/zasu-daw/download/', hash: '' },
     history: { replaceState(_a,_b,path) { replaced = path; } },
-    sessionStorage: {
+    localStorage: {
       setItem(_k,value) { if(storageBlocked) throw Error(); store.value = value; },
       getItem() { if(storageBlocked) throw Error(); return store.value; },
     },
@@ -50,7 +50,7 @@ test('verified response enables both files and removes purchase identifier from 
   assert.equal(app.elements['download-mac'].href,success.downloads[0].url);
   assert.equal(app.elements['download-windows'].href,success.downloads[1].url);
 });
-test('refresh retrieves session order and blocked browser storage still allows current page', async () => {
+test('later visit retrieves saved order and blocked browser storage still allows current page', async () => {
   assert.equal((await page({ query:'',stored:id })).called,1);
   assert.equal((await page({ storageBlocked:true })).elements['download-mac'].href,success.downloads[0].url);
 });

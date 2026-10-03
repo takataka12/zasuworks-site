@@ -7,8 +7,8 @@
   const supplied = params.get('orderId') || params.get('transactionId');
   let orderId = validId(supplied) ? supplied : null;
   try {
-    if (orderId) sessionStorage.setItem(storageKey, orderId);
-    else if (!supplied) orderId = sessionStorage.getItem(storageKey);
+    if (orderId) localStorage.setItem(storageKey, orderId);
+    else if (!supplied) orderId = localStorage.getItem(storageKey);
   } catch { /* Current-page downloads work even if browser storage is blocked. */ }
   if (!validId(orderId)) orderId = null;
   // These identifiers grant access to a purchase. Do not leave them in copied URLs.
@@ -56,7 +56,7 @@
           link.setAttribute('aria-disabled', 'false'); link.classList.remove('download-disabled'); link.textContent = labels[os];
         }
         expiresAt = Date.now() + 540000;
-        status('ご購入ありがとうございます。', 'Mac版・Windows版の両方をダウンロードできます。リンクの有効期限が切れたら、このページで購入を再確認してください。');
+        status('ご購入ありがとうございます。', 'Mac版・Windows版の両方をダウンロードできます。同じブラウザーでこのページを開けば、後日も再ダウンロードできます。');
         retry.textContent = 'ダウンロードリンクを更新する';
         timer = setTimeout(() => {
           disable(); status('ダウンロードリンクの有効期限が切れました', '「ダウンロードリンクを更新する」を押すと、購入を再確認してリンクを発行します。再購入は不要です。');

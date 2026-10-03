@@ -35,7 +35,8 @@ The validator intentionally rejects unexpected products and totals.
 
 The opaque order ID is a bearer credential, not account authentication: anyone
 given a valid order ID can request the files. The page removes it from the
-visible URL, uses no-referrer, and keeps it only in sessionStorage for the tab.
+visible URL, uses no-referrer, and keeps it in localStorage for later downloads
+from the same browser.
 Do not publish order IDs, signed URLs or payment logs. The file URLs expire, but
 a paid order can request new ones. No DRM or email-based license system is added.
 Downloads already obtained cannot be revoked by a later refund.
@@ -65,13 +66,12 @@ two object paths. After upload and byte comparison, it was replaced by a 410
 response with gateway JWT checking enabled. It grants no further upload access.
 
 Verified: remote file byte equality, private storage, Square merchant/location
-access, local authorization tests, and public unauthenticated denial checks.
-Not yet verified: a real payment through this fixed link followed by download.
-No charge, refund, test order, or email was created. No macOS signing check was
-run on this Linux environment.
+access, local authorization tests, public unauthenticated denial checks, and a
+real JPY 1980 payment through the fixed link followed by successful download on
+2026-10-04 JST. No refund or email was created by this deployment. No macOS
+signing check was run on this Linux environment.
 
 Sales enabled in `zasu-daw/site-config.js` on 2026-10-04 JST at the owner's
 explicit request, to allow purchase-to-download checking before announcement.
-The first real payment followed by download remains unverified. Enabling the
-purchase button is not evidence of successful payment or delivery. No public
-bypass is exposed for testing.
+The first real payment and download were subsequently confirmed by the owner.
+No public bypass is exposed for testing.
