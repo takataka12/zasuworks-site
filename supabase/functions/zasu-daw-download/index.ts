@@ -1,0 +1,41 @@
+import { createClient } from 'npm:@supabase/supabase-js@2.95.0';
+import { createHandler } from './handler.mjs';
+
+const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+  { auth: { persistSession: false, autoRefreshToken: false } });
+const files = [
+  { os: 'mac', filename: 'ZASUDAW-0.0.10-macOS-Universal.dmg' },
+  { os: 'windows', filename: 'ZASU-DAW-Beta-0.0.10-Windows-x64.zip' },
+];
+async function square(path: string) {
+  const token = Deno.env.get('SQUARE_ACCESS_TOKEN');
+  if (!token) throw new Error('Square is not configured');
+  const response = await fetch(`https://connect.squareup.com/v2/${path}`, {
+    headers: { Authorization: `Bearer ${token}`, 'Square-Version': '2026-09-16' },
+    signal: AbortSignal.timeout(12000),
+  });
+  if (response.status === 404) return {};
+  if (!response.ok) throw new Error('Square lookup failed');
+  return await response.json();
+}
+Deno.serve(createHandler({
+  getOrder: async (id: string) => (await square(`orders/${encodeURIComponent(id)}`)).order,
+  getPayment: async (id: string) => (await square(`payments/${encodeURIComponent(id)}`)).payment,
+  rateLimit: async (request: Request) => {
+    const ip = (request.headers.get('x-forwarded-for') || 'unknown').split(',')[0].trim().slice(0, 64);
+    // Namespace the actor so DAW retries do not consume other products' limits.
+    const { data, error } = await supabase.rpc('zasu_rate_limit_check', {
+      p_ip: `daw-download:${ip}`, p_user_agent: '', p_scope: 'daw_download',
+      p_burst_limit: 12, p_burst_seconds: 60, p_hour_limit: 60,
+      p_global_burst_limit: 12, p_global_burst_seconds: 60,
+    });
+    if (error) throw new Error('Rate limit unavailable');
+    return data?.allowed === true;
+  },
+  signDownloads: async () => await Promise.all(files.map(async file => {
+    const { data, error } = await supabase.storage.from('zasu-daw-releases')
+      .createSignedUrl(`0.0.10/${file.filename}`, 600, { download: file.filename });
+    if (error || !data?.signedUrl) throw new Error('File unavailable');
+    return { ...file, url: data.signedUrl };
+  })),
+}));
