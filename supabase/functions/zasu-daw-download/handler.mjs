@@ -67,9 +67,19 @@ export function createHandler({ getOrder, getPayment, signDownloads, rateLimit }
       let body;
       try { body = JSON.parse(new TextDecoder().decode(new Uint8Array(chunks.flatMap(c => [...c])))); }
       catch { return reply(400, { error: 'invalid_request' }); }
-      if (!validId(body?.orderId)) return reply(400, { error: 'invalid_order' });
+      const hasOrderId = body?.orderId !== undefined;
+      const hasPaymentId = body?.paymentId !== undefined;
+      if (hasOrderId === hasPaymentId) return reply(400, { error: 'invalid_purchase_reference' });
+      const purchaseId = hasOrderId ? body.orderId : body.paymentId;
+      if (!validId(purchaseId)) return reply(400, { error: 'invalid_purchase_reference' });
       if (!await rateLimit(request)) return reply(429, { error: 'too_many_requests' });
-      await verifyPurchase(body.orderId, getOrder, getPayment);
+      let orderId = body.orderId;
+      if (hasPaymentId) {
+        const payment = await getPayment(body.paymentId);
+        if (!payment || payment.id !== body.paymentId || !validId(payment.order_id)) bad();
+        orderId = payment.order_id;
+      }
+      await verifyPurchase(orderId, getOrder, getPayment);
       const downloads = await signDownloads();
       return reply(200, { version: '0.0.10', expiresIn: 600, downloads });
     } catch (error) {

@@ -12,7 +12,7 @@
   <link rel="icon" href="../assets/icon.png">
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="download.css">
-  <script src="download.js?v=20261004-redownload" defer></script>
+  <script src="download.js?v=20261004-recovery" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">本文へ移動</a>
@@ -33,6 +33,16 @@
       <p id="delivery-message">Squareでお支払いが完了すると、購入を確認してダウンロードボタンが表示されます。すでにお支払い済みで受け取れない場合は、再購入せずお問い合わせください。</p>
       <button id="verify-again" class="verify-again" type="button" hidden>購入を再確認する</button>
       <a href="mailto:zasuworks@gmail.com?subject=ZASU%20DAW%20Beta%20%E5%8F%97%E3%81%91%E5%8F%96%E3%82%8A%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6">受け取りについて問い合わせる ↗</a></div>
+    </section>
+    <section class="purchase-recovery" aria-labelledby="recovery-title">
+      <div><p class="eyebrow">PURCHASE RECOVERY</p><h2 id="recovery-title">購入済みですか？</h2>
+      <p>Squareから届いた領収書メールの「領収書を表示」のURL、または取引IDを入力すると、購入を再確認してダウンロードを復旧できます。</p></div>
+      <div class="recovery-form">
+        <label for="recovery-id">Square領収書URL または 取引ID</label>
+        <input id="recovery-id" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://squareup.com/receipt/preview/…">
+        <button id="recover-purchase" class="button" type="button">購入を復旧する</button>
+        <p id="recovery-error" class="recovery-error" role="alert"></p>
+      </div>
     </section>
     <noscript><p class="fine">購入確認にはJavaScriptを使用します。ブラウザーでJavaScriptを有効にして、このページを開き直してください。</p></noscript>
 
@@ -80,7 +90,7 @@
 
     <section class="download-help" aria-labelledby="help-title">
       <h2 id="help-title">困ったときは。</h2>
-      <details><summary>あとで再ダウンロードできますか？</summary><p>はい。同じブラウザーでこの受け取りページを開くと、購入を再確認してMac版・Windows版を再ダウンロードできます。ブラウザーのデータを削除した場合や別の端末では購入情報が引き継がれないため、Squareの決済控えを添えてお問い合わせください。再購入は不要です。</p></details>
+      <details><summary>あとで再ダウンロードできますか？</summary><p>はい。同じブラウザーなら保存した購入情報から再確認できます。別の端末やブラウザーのデータを削除した場合も、Squareの領収書URLまたは取引IDを上の「購入を復旧する」に入力してください。再購入は不要です。</p></details>
       <details><summary>購入したのにダウンロードできない場合</summary><p>決済の反映に少し時間がかかる場合があります。「購入を再確認する」が表示されているときは、少し待ってから押してください。解決しない場合は、購入日時とSquareの決済控えを添えてお問い合わせください。再購入は不要です。</p></details>
       <details><summary>Windowsで起動時に警告が出ます</summary><p>公式購入案内から入手したファイルであることを確認し、警告に「詳細情報」と「実行」が表示される場合は、その順に選択してください。実行できない場合や別の検出画面が出た場合は、表示内容を控えてお問い合わせください。保護機能全体を無効にする必要はありません。</p></details>
       <details><summary>音が出ない・録音できない場合</summary><p>「入出力設定」の機器・入力チャンネルと48,000 Hzの設定、WindowsまたはMac側の音量とマイクのアクセス許可をご確認ください。録音するトラックや消音・ソロ、マスター音量も確認してください。</p></details>

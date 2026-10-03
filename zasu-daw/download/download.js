@@ -1,19 +1,26 @@
 (() => {
   'use strict';
   const endpoint = 'https://siwmzradvrtetotakkbi.supabase.co/functions/v1/zasu-daw-download';
-  const storageKey = 'zasu-daw-purchase-order';
+  const orderStorageKey = 'zasu-daw-purchase-order';
+  const paymentStorageKey = 'zasu-daw-purchase-payment';
   const validId = value => typeof value === 'string' && /^[A-Za-z0-9_-]{16,192}$/.test(value);
   const params = new URLSearchParams(location.search);
-  const supplied = params.get('orderId') || params.get('transactionId');
-  let orderId = validId(supplied) ? supplied : null;
+  const suppliedOrder = params.get('orderId');
+  const suppliedPayment = params.get('transactionId');
+  let purchase = validId(suppliedOrder) ? { orderId: suppliedOrder }
+    : validId(suppliedPayment) ? { paymentId: suppliedPayment } : null;
   try {
-    if (orderId) localStorage.setItem(storageKey, orderId);
-    else if (!supplied) {
-      orderId = localStorage.getItem(storageKey) || sessionStorage.getItem(storageKey);
-      if (validId(orderId)) localStorage.setItem(storageKey, orderId);
+    if (purchase?.orderId) localStorage.setItem(orderStorageKey, purchase.orderId);
+    else if (purchase?.paymentId) localStorage.setItem(paymentStorageKey, purchase.paymentId);
+    else if (!suppliedOrder && !suppliedPayment) {
+      const savedOrder = localStorage.getItem(orderStorageKey) || sessionStorage.getItem(orderStorageKey);
+      const savedPayment = localStorage.getItem(paymentStorageKey);
+      if (validId(savedOrder)) {
+        purchase = { orderId: savedOrder };
+        localStorage.setItem(orderStorageKey, savedOrder);
+      } else if (validId(savedPayment)) purchase = { paymentId: savedPayment };
     }
   } catch { /* Current-page downloads work even if browser storage is blocked. */ }
-  if (!validId(orderId)) orderId = null;
   // These identifiers grant access to a purchase. Do not leave them in copied URLs.
   if (params.has('orderId') || params.has('transactionId')) {
     try { history.replaceState(null, '', location.pathname + location.hash); } catch { /* no-op */ }
@@ -21,6 +28,9 @@
   const title = document.getElementById('delivery-title');
   const message = document.getElementById('delivery-message');
   const retry = document.getElementById('verify-again');
+  const recoveryId = document.getElementById('recovery-id');
+  const recover = document.getElementById('recover-purchase');
+  const recoveryError = document.getElementById('recovery-error');
   const links = { mac: document.getElementById('download-mac'), windows: document.getElementById('download-windows') };
   const labels = { mac: 'Mac版をダウンロード ↓', windows: 'Windows版をダウンロード ↓' };
   let busy = false, expiresAt = 0, timer, pendingTries = 0;
@@ -39,8 +49,18 @@
       throw new Error('Invalid download response');
     return url.href;
   }
+  function paymentIdFrom(value) {
+    const text = typeof value === 'string' ? value.trim() : '';
+    if (validId(text)) return text;
+    try {
+      const url = new URL(text);
+      if (!['squareup.com', 'www.squareup.com'].includes(url.hostname)) return null;
+      const match = url.pathname.match(/^\/receipt\/preview\/([A-Za-z0-9_-]{16,192})\/?$/);
+      return match?.[1] || null;
+    } catch { return null; }
+  }
   async function verify() {
-    if (!orderId || busy) return;
+    if (!purchase || busy) return;
     busy = true; clearTimeout(timer); disable();
     retry.hidden = false; retry.disabled = true;
     status('購入を確認しています…', 'Squareの決済状況を確認しています。このまま少しお待ちください。');
@@ -48,7 +68,7 @@
     const timeout = setTimeout(() => controller.abort(), 40000);
     try {
       const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderId }), cache: 'no-store', credentials: 'omit', signal: controller.signal });
+        body: JSON.stringify(purchase), cache: 'no-store', credentials: 'omit', signal: controller.signal });
       const data = await response.json();
       if (response.ok) {
         if (!Array.isArray(data.downloads) || data.downloads.length !== 2 || data.expiresIn !== 600) throw new Error('Invalid response');
@@ -59,7 +79,7 @@
           link.setAttribute('aria-disabled', 'false'); link.classList.remove('download-disabled'); link.textContent = labels[os];
         }
         expiresAt = Date.now() + 540000;
-        status('ご購入ありがとうございます。', 'Mac版・Windows版の両方をダウンロードできます。同じブラウザーでこのページを開けば、後日も再ダウンロードできます。');
+        status('ご購入ありがとうございます。', 'Mac版・Windows版の両方をダウンロードできます。購入情報をこのブラウザーに保存しました。');
         retry.textContent = 'ダウンロードリンクを更新する';
         timer = setTimeout(() => {
           disable(); status('ダウンロードリンクの有効期限が切れました', '「ダウンロードリンクを更新する」を押すと、購入を再確認してリンクを発行します。再購入は不要です。');
@@ -78,9 +98,22 @@
   }
   for (const link of Object.values(links)) link.addEventListener('click', event => {
     if (link.getAttribute('aria-disabled') === 'true' || Date.now() >= expiresAt) {
-      event.preventDefault(); if (orderId) verify();
+      event.preventDefault(); if (purchase) verify();
     }
   });
   retry.addEventListener('click', () => { pendingTries = 0; verify(); });
-  if (orderId) verify();
+  recover.addEventListener('click', event => {
+    event.preventDefault();
+    const paymentId = paymentIdFrom(recoveryId.value);
+    if (!paymentId) {
+      recoveryError.textContent = 'Squareの領収書URL、または取引IDを正しく入力してください。';
+      return;
+    }
+    purchase = { paymentId };
+    recoveryError.textContent = '';
+    try { localStorage.setItem(paymentStorageKey, paymentId); } catch { /* Current page can still verify. */ }
+    pendingTries = 0;
+    verify();
+  });
+  if (purchase) verify();
 })();

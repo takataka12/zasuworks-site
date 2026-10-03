@@ -49,6 +49,18 @@ test('paid product grants both OS downloads without exposing order or customer d
   assert.equal(JSON.stringify(result).includes(orderId), false);
   assert.equal(res.headers.get('cache-control'), 'no-store');
 });
+test('paid Square transaction ID recovers its order and grants both downloads', async () => {
+  const data = fixture(); let paymentLookups = 0, orderLookups = 0;
+  const app = setup(data, {
+    getPayment: async id => { paymentLookups++; assert.equal(id, paymentId); return data.payment; },
+    getOrder: async id => { orderLookups++; assert.equal(id, orderId); return data.order; },
+  });
+  const res = await app.handler(request({ paymentId }));
+  assert.equal(res.status, 200);
+  assert.deepEqual((await res.json()).downloads.map(d => d.os), ['mac', 'windows']);
+  assert.equal(paymentLookups, 2);
+  assert.equal(orderLookups, 1);
+});
 test('paid OPEN order is accepted while digital fulfillment remains open', async () => {
   const data = fixture(); data.order.state = 'OPEN';
   assert.equal((await setup(data).handler(request())).status, 200);
@@ -90,6 +102,7 @@ test('bad origin and malformed order ID fail before contacting Square', async ()
   const app = setup(undefined, { getOrder: async () => { throw new Error('must not call'); } });
   assert.equal((await app.handler(request({}, 'https://evil.invalid'))).status, 403);
   assert.equal((await app.handler(request({ orderId: '../payments' }))).status, 400);
+  assert.equal((await app.handler(request({ paymentId: '../payments' }))).status, 400);
   assert.equal(app.signed(), 0);
 });
 test('rate limit blocks Square lookups and downloads', async () => {
