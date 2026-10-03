@@ -70,7 +70,8 @@ Not yet verified: a real payment through this fixed link followed by download.
 No charge, refund, test order, or email was created. No macOS signing check was
 run on this Linux environment.
 
-Sales remain disabled in `zasu-daw/site-config.js` pending the first real
-purchase-to-download check. The original Square link is available for that
-owner-performed check. After success, set `salesEnabled: true` and update sales
-page copy to match. Do not expose a public bypass for testing.
+Sales enabled in `zasu-daw/site-config.js` on 2026-10-04 JST at the owner's
+explicit request, to allow purchase-to-download checking before announcement.
+The first real payment followed by download remains unverified. Enabling the
+purchase button is not evidence of successful payment or delivery. No public
+bypass is exposed for testing.
