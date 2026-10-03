@@ -42,10 +42,14 @@
   }
   function status(heading, detail) { title.textContent = heading; message.textContent = detail; }
   function signedFile(value, os) {
-    const expected = os === 'mac' ? 'ZASUDAW-0.0.10-macOS-Universal.dmg' : 'ZASU-DAW-Beta-0.0.10-Windows-x64.zip';
+    // Keep the previous Mac path valid for rollout and rollback. Purchases are
+    // still verified server-side; only the server selects the current release.
+    const allowed = os === 'mac'
+      ? ['0.0.11/ZASUDAW-0.0.11-macOS-Universal.dmg', '0.0.10/ZASUDAW-0.0.10-macOS-Universal.dmg']
+      : ['0.0.10/ZASU-DAW-Beta-0.0.10-Windows-x64.zip'];
     const url = new URL(value);
     if (url.origin !== 'https://siwmzradvrtetotakkbi.supabase.co' ||
-        url.pathname !== '/storage/v1/object/sign/zasu-daw-releases/0.0.10/' + expected || !url.searchParams.get('token'))
+        !allowed.some(path => url.pathname === '/storage/v1/object/sign/zasu-daw-releases/' + path) || !url.searchParams.get('token'))
       throw new Error('Invalid download response');
     return url.href;
   }

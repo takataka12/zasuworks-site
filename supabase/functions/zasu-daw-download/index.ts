@@ -4,8 +4,8 @@ import { createHandler } from './handler.mjs';
 const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   { auth: { persistSession: false, autoRefreshToken: false } });
 const files = [
-  { os: 'mac', filename: 'ZASUDAW-0.0.10-macOS-Universal.dmg' },
-  { os: 'windows', filename: 'ZASU-DAW-Beta-0.0.10-Windows-x64.zip' },
+  { os: 'mac', version: '0.0.11', filename: 'ZASUDAW-0.0.11-macOS-Universal.dmg' },
+  { os: 'windows', version: '0.0.10', filename: 'ZASU-DAW-Beta-0.0.10-Windows-x64.zip' },
 ];
 async function square(path: string) {
   const token = Deno.env.get('SQUARE_ACCESS_TOKEN');
@@ -34,7 +34,7 @@ Deno.serve(createHandler({
   },
   signDownloads: async () => await Promise.all(files.map(async file => {
     const { data, error } = await supabase.storage.from('zasu-daw-releases')
-      .createSignedUrl(`0.0.10/${file.filename}`, 600, { download: file.filename });
+      .createSignedUrl(`${file.version}/${file.filename}`, 600, { download: file.filename });
     if (error || !data?.signedUrl) throw new Error('File unavailable');
     return { ...file, url: data.signedUrl };
   })),

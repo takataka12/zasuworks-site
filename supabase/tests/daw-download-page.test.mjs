@@ -6,9 +6,9 @@ import { readFileSync } from 'node:fs';
 const script = readFileSync(new URL('../../zasu-daw/download/download.js', import.meta.url), 'utf8');
 const id = 'OrderForDownload0123456789';
 const paymentId = 'PaymentForDownload0123456789';
-const signed = name => `https://siwmzradvrtetotakkbi.supabase.co/storage/v1/object/sign/zasu-daw-releases/0.0.10/${name}?token=fixture-only`;
+const signed = (name, version = '0.0.10') => `https://siwmzradvrtetotakkbi.supabase.co/storage/v1/object/sign/zasu-daw-releases/${version}/${name}?token=fixture-only`;
 const success = { expiresIn: 600, downloads: [
-  { os: 'mac', url: signed('ZASUDAW-0.0.10-macOS-Universal.dmg') },
+  { os: 'mac', url: signed('ZASUDAW-0.0.11-macOS-Universal.dmg', '0.0.11') },
   { os: 'windows', url: signed('ZASU-DAW-Beta-0.0.10-Windows-x64.zip') },
 ] };
 async function page({ query = '?orderId='+id, code = 200, body = success, stored = null, paymentStored = null, sessionStored = null, storageBlocked = false } = {}) {
@@ -98,4 +98,21 @@ test('expiry disables stale links while preserving a refresh action', async () =
   assert.equal(app.elements['download-mac'].href,undefined);
   assert.equal(app.elements['download-windows'].href,undefined);
   assert.equal(app.elements['verify-again'].disabled,false);
+});
+test('previous Mac release remains usable during rollout or rollback', async () => {
+  const mac = { os: 'mac', url: signed('ZASUDAW-0.0.10-macOS-Universal.dmg') };
+  const app = await page({body:{expiresIn:600,downloads:[mac,success.downloads[1]]}});
+  assert.equal(app.elements['download-mac'].href,mac.url);
+  assert.equal(app.elements['download-windows'].href,success.downloads[1].url);
+});
+test('Mac-only update does not accept a changed Windows release or arbitrary Mac path', async () => {
+  const changes = [
+    [success.downloads[0], {os:'windows',url:signed('ZASU-DAW-Beta-0.0.11-Windows-x64.zip','0.0.11')}],
+    [{os:'mac',url:signed('ZASUDAW-0.0.12-macOS-Universal.dmg','0.0.12')},success.downloads[1]],
+  ];
+  for(const downloads of changes) {
+    const app = await page({body:{expiresIn:600,downloads}});
+    assert.equal(app.elements['download-mac'].href,undefined);
+    assert.equal(app.elements['download-windows'].href,undefined);
+  }
 });

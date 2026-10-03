@@ -81,7 +81,7 @@ export function createHandler({ getOrder, getPayment, signDownloads, rateLimit }
       }
       await verifyPurchase(orderId, getOrder, getPayment);
       const downloads = await signDownloads();
-      return reply(200, { version: '0.0.10', expiresIn: 600, downloads });
+      return reply(200, { version: '0.0.11', expiresIn: 600, downloads });
     } catch (error) {
       if (error instanceof AccessError) return reply(error.status, { error: error.code });
       // Provider messages may contain identifiers or credentials. Never return/log them.
