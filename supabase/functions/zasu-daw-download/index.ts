@@ -5,7 +5,7 @@ const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPAB
   { auth: { persistSession: false, autoRefreshToken: false } });
 const files = [
   { os: 'mac', version: '0.0.11', filename: 'ZASUDAW-0.0.11-macOS-Universal.dmg' },
-  { os: 'windows', version: '0.0.10', filename: 'ZASU-DAW-Beta-0.0.10-Windows-x64.zip' },
+  { os: 'windows', version: '0.0.11', filename: 'ZASU-DAW-v0.0.11-Windows-Setup.exe' },
 ];
 async function square(path: string) {
   const token = Deno.env.get('SQUARE_ACCESS_TOKEN');

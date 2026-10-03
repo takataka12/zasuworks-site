@@ -6,8 +6,9 @@ After-payment page: https://zasuworks.jp/zasu-daw/download/
 
 One purchase provides both macOS and Windows. Binaries are never committed to
 this public repository. Supabase private bucket `zasu-daw-releases` contains versioned releases.
-Mac 0.0.11 is current; Windows remains 0.0.10. See
-[Mac 0.0.11 release record](releases/zasu-daw-mac-0.0.11.md) for hashes, verification and rollback.
+Mac and Windows 0.0.11 are current. Windows uses the unsigned Setup.exe installer. See
+[Mac 0.0.11 release record](releases/zasu-daw-mac-0.0.11.md) and
+[Windows 0.0.11 release record](releases/zasu-daw-windows-0.0.11.md) for hashes, verification and rollback.
 
 The initial 0.0.10 files below are retained:
 
