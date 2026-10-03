@@ -44,11 +44,11 @@ function updatePurchase() {
   const url = config.checkoutUrls?.[os] || '';
   let valid = false;
   try { valid = new URL(url).protocol === 'https:'; } catch {}
-  const ready = valid && Boolean(config.priceLabel?.trim());
+  const ready = config.salesEnabled !== false && valid && Boolean(config.priceLabel?.trim());
   document.getElementById('price-label').textContent = config.priceLabel || '価格準備中';
   document.getElementById('regular-price').textContent = `通常価格 ${config.regularPriceLabel || '未定'}`;
   document.getElementById('purchase-note').textContent = ready ? (config.purchaseNote || '購入先で価格・利用条件をご確認ください。') : '購入受付の開始をお待ちください。';
-  checkout.textContent = ready ? `${os === 'mac' ? 'Mac' : 'Windows'}版を購入する` : '購入受付準備中';
+  checkout.textContent = ready ? 'ZASU DAW Betaを購入する' : '購入受付準備中';
   checkout.setAttribute('aria-disabled', String(!ready)); checkout.tabIndex = ready ? 0 : -1;
   if (ready) checkout.href = url; else checkout.removeAttribute('href');
 }
