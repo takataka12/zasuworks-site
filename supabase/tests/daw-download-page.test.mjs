@@ -9,7 +9,7 @@ const paymentId = 'PaymentForDownload0123456789';
 const signed = (name, version = '0.0.10') => `https://siwmzradvrtetotakkbi.supabase.co/storage/v1/object/sign/zasu-daw-releases/${version}/${name}?token=fixture-only`;
 const success = { expiresIn: 600, downloads: [
   { os: 'mac', url: signed('ZASUDAW-0.0.11-macOS-Universal.dmg', '0.0.11') },
-  { os: 'windows', url: signed('ZASU-DAW-Beta-0.0.10-Windows-x64.zip') },
+  { os: 'windows', url: signed('ZASU-DAW-v0.0.11-Windows-Setup.exe', '0.0.11') },
 ] };
 async function page({ query = '?orderId='+id, code = 200, body = success, stored = null, paymentStored = null, sessionStored = null, storageBlocked = false } = {}) {
   const elements = Object.fromEntries(['delivery-title','delivery-message','verify-again','download-mac','download-windows','recovery-id','recover-purchase','recovery-error'].map(name => [name, {
@@ -105,7 +105,7 @@ test('previous Mac release remains usable during rollout or rollback', async () 
   assert.equal(app.elements['download-mac'].href,mac.url);
   assert.equal(app.elements['download-windows'].href,success.downloads[1].url);
 });
-test('Mac-only update does not accept a changed Windows release or arbitrary Mac path', async () => {
+test('update does not accept an unknown Windows artifact or arbitrary Mac path', async () => {
   const changes = [
     [success.downloads[0], {os:'windows',url:signed('ZASU-DAW-Beta-0.0.11-Windows-x64.zip','0.0.11')}],
     [{os:'mac',url:signed('ZASUDAW-0.0.12-macOS-Universal.dmg','0.0.12')},success.downloads[1]],
@@ -115,4 +115,11 @@ test('Mac-only update does not accept a changed Windows release or arbitrary Mac
     assert.equal(app.elements['download-mac'].href,undefined);
     assert.equal(app.elements['download-windows'].href,undefined);
   }
+});
+
+test('previous Windows ZIP remains usable for rollout and rollback', async () => {
+  const win = { os: 'windows', url: signed('ZASU-DAW-Beta-0.0.10-Windows-x64.zip') };
+  const app = await page({body:{expiresIn:600,downloads:[success.downloads[0],win]}});
+  assert.equal(app.elements['download-windows'].href,win.url);
+  assert.equal(app.elements['download-mac'].href,success.downloads[0].url);
 });

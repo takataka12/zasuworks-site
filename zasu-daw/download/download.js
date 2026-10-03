@@ -42,11 +42,11 @@
   }
   function status(heading, detail) { title.textContent = heading; message.textContent = detail; }
   function signedFile(value, os) {
-    // Keep the previous Mac path valid for rollout and rollback. Purchases are
+    // Keep previous release paths valid for rollout and rollback. Purchases are
     // still verified server-side; only the server selects the current release.
     const allowed = os === 'mac'
       ? ['0.0.11/ZASUDAW-0.0.11-macOS-Universal.dmg', '0.0.10/ZASUDAW-0.0.10-macOS-Universal.dmg']
-      : ['0.0.10/ZASU-DAW-Beta-0.0.10-Windows-x64.zip'];
+      : ['0.0.11/ZASU-DAW-v0.0.11-Windows-Setup.exe', '0.0.10/ZASU-DAW-Beta-0.0.10-Windows-x64.zip'];
     const url = new URL(value);
     if (url.origin !== 'https://siwmzradvrtetotakkbi.supabase.co' ||
         !allowed.some(path => url.pathname === '/storage/v1/object/sign/zasu-daw-releases/' + path) || !url.searchParams.get('token'))
