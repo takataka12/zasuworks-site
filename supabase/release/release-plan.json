@@ -1,0 +1,18 @@
+{
+  "version": "0.0.14",
+  "build": "0.0.15",
+  "repository": "takataka12/zasuworks-site",
+  "base_commit": "97b3678bf3b44b0a51f91560828c895216164625",
+  "project": "siwmzradvrtetotakkbi",
+  "bucket": "zasu-daw-releases",
+  "function": "zasu-daw-download",
+  "helper": "zasu-daw-release-transfer",
+  "old": [
+    {"path":"0.0.11/ZASUDAW-0.0.11-macOS-Universal.dmg","sha256":"4b7fd3e1fafbd545b87921374a42c8a39d6ca5823004af1b4cc6ff1bdedab7e4","size":7451400,"upload":false},
+    {"path":"0.0.11/ZASU-DAW-v0.0.11-Windows-Setup.exe","sha256":"339f06b7420e958095347c3bf9cc8d0f436cf10ca22d1d0fa68bacffa64528f0","size":4857114,"upload":false}
+  ],
+  "frontend_files": ["zasu-daw/download/download.js", "zasu-daw/download/index.html"],
+  "marketing_files": ["index.html","products.html","zasu-daw/index.html","zasu-daw/main.js","zasu-daw/site-config.js","zasu-daw/download/index.html"],
+  "function_files": ["index.ts","handler.mjs"],
+  "purchase_test": "Owner-supplied test order only; no searches of customer payments. Without it record NOT RUN."
+}

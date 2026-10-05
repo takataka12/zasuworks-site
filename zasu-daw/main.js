@@ -1,6 +1,6 @@
 const steps = [
   { en: 'RECORD YOUR VOICE', title: 'まずは、あなたの声から。', description: 'インストを読み込み、歌を録音。録音済みのボーカルも取り込めます。テイクを聴き比べて、好きな歌を選びましょう。', tags: ['インスト・歌の読み込み', '録音・テイク選択'] },
-  { en: 'SHAPE YOUR VOCAL', title: '歌の表情を、もう少しだけ。', description: '歌のすき間のノイズを抑え、ピッチやタイミングを簡易調整。プリセットと内蔵FXで、曲に合う声の質感を探せます。', tags: ['ノイズ低減・簡易補正', '5種類のボーカルプリセット'] },
+  { en: 'ANALYZE VOCAL → AUTO FIX', title: '気になる音だけ、あなたの手で。', description: '歌声を解析してノートごとに表示。AUTO FIXは自然20%・標準50%・強め70%から選択し、必要な音だけ上下ドラッグで調整。原音と聴き比べて仕上げます。', tags: ['Pitch Editor・ノート単位編集', 'ノイズ低減・ボーカルFX'] },
   { en: 'FIND YOUR BALANCE', title: '歌も、伴奏も、ひとつの音楽に。', description: 'インスト、メインボーカル、重ね、ハモリ。それぞれの役割をもとに自動MIX。聴き比べながら、気になるバランスは自分で調整できます。', tags: ['役割に合わせた自動MIX', 'コーラスの音量連動'] },
   { en: 'FINISH YOUR TRACK', title: '最後のひと仕上げを、一緒に。', description: '標準・高音圧の自動マスタリングを聴き比べ。再生バーで気になる箇所を確認し、完成した一曲をWAVで書き出しましょう。', tags: ['自動マスタリング', '途中からA/B試聴・WAV書き出し'] }
 ];
@@ -48,7 +48,7 @@ function updatePurchase() {
   document.getElementById('price-label').textContent = config.priceLabel || '価格準備中';
   document.getElementById('regular-price').textContent = `通常価格 ${config.regularPriceLabel || '未定'}`;
   document.getElementById('purchase-note').textContent = ready ? (config.purchaseNote || '購入先で価格・利用条件をご確認ください。') : '購入受付の開始をお待ちください。';
-  checkout.textContent = ready ? 'ZASU DAW Betaを購入する' : '購入受付準備中';
+  checkout.textContent = ready ? 'ZASU DAWを購入する' : '購入受付準備中';
   checkout.setAttribute('aria-disabled', String(!ready)); checkout.tabIndex = ready ? 0 : -1;
   if (ready) checkout.href = url; else checkout.removeAttribute('href');
 }

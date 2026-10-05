@@ -1,0 +1,32 @@
+{
+  "checked_utc": "2026-10-05T07:57:58.967690+00:00",
+  "status": "PREPARED_NOT_PUBLISHED",
+  "public_main": "97b3678bf3b44b0a51f91560828c895216164625",
+  "download_function_version": 5,
+  "private_bucket": true,
+  "file_size_limit": 52428800,
+  "actual_network_downloads": [
+    {
+      "path": "0.0.11/ZASUDAW-0.0.11-macOS-Universal.dmg",
+      "sha256": "4b7fd3e1fafbd545b87921374a42c8a39d6ca5823004af1b4cc6ff1bdedab7e4",
+      "size": 7451400,
+      "private": true
+    },
+    {
+      "path": "0.0.11/ZASU-DAW-v0.0.11-Windows-Setup.exe",
+      "sha256": "339f06b7420e958095347c3bf9cc8d0f436cf10ca22d1d0fa68bacffa64528f0",
+      "size": 4857114,
+      "private": true
+    }
+  ],
+  "public_checks": {
+    "preflight": 204,
+    "no_purchase": 400,
+    "bad_origin": 403,
+    "disabled_transfer_unauthenticated": 401
+  },
+  "native_mac": "NOT RUN",
+  "native_windows": "NOT RUN",
+  "new_014_upload_and_publication": "NOT RUN; native artifacts not received",
+  "paid_customer_e2e": "NOT RUN; no owner-supplied test reference"
+}

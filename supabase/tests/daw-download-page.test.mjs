@@ -8,8 +8,8 @@ const id = 'OrderForDownload0123456789';
 const paymentId = 'PaymentForDownload0123456789';
 const signed = (name, version = '0.0.10') => `https://siwmzradvrtetotakkbi.supabase.co/storage/v1/object/sign/zasu-daw-releases/${version}/${name}?token=fixture-only`;
 const success = { expiresIn: 600, downloads: [
-  { os: 'mac', url: signed('ZASUDAW-0.0.11-macOS-Universal.dmg', '0.0.11') },
-  { os: 'windows', url: signed('ZASU-DAW-v0.0.11-Windows-Setup.exe', '0.0.11') },
+  { os: 'mac', url: signed('ZASUDAW-0.0.14-macOS-Universal.dmg', '0.0.14') },
+  { os: 'windows', url: signed('ZASU-DAW-v0.0.14-Windows-Setup.exe', '0.0.14') },
 ] };
 async function page({ query = '?orderId='+id, code = 200, body = success, stored = null, paymentStored = null, sessionStored = null, storageBlocked = false } = {}) {
   const elements = Object.fromEntries(['delivery-title','delivery-message','verify-again','download-mac','download-windows','recovery-id','recover-purchase','recovery-error'].map(name => [name, {
@@ -98,6 +98,13 @@ test('expiry disables stale links while preserving a refresh action', async () =
   assert.equal(app.elements['download-mac'].href,undefined);
   assert.equal(app.elements['download-windows'].href,undefined);
   assert.equal(app.elements['verify-again'].disabled,false);
+});
+test('0.0.11 Mac and Windows releases remain usable during rollout or rollback', async () => {
+  const mac = { os: 'mac', url: signed('ZASUDAW-0.0.11-macOS-Universal.dmg', '0.0.11') };
+  const win = { os: 'windows', url: signed('ZASU-DAW-v0.0.11-Windows-Setup.exe', '0.0.11') };
+  const app = await page({body:{expiresIn:600,downloads:[mac,win]}});
+  assert.equal(app.elements['download-mac'].href,mac.url);
+  assert.equal(app.elements['download-windows'].href,win.url);
 });
 test('previous Mac release remains usable during rollout or rollback', async () => {
   const mac = { os: 'mac', url: signed('ZASUDAW-0.0.10-macOS-Universal.dmg') };

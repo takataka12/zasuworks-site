@@ -43,6 +43,8 @@ test('paid product grants both OS downloads without exposing order or customer d
   const app = setup(); const res = await app.handler(request());
   assert.equal(res.status, 200);
   const result = await res.json();
+  assert.equal(result.version, '0.0.14');
+  assert.equal(result.expiresIn, 600);
   assert.deepEqual(result.downloads.map(d => d.os), ['mac', 'windows']);
   assert.equal(app.signed(), 1);
   assert.equal(JSON.stringify(result).includes('private@'), false);
