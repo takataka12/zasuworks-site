@@ -26,4 +26,10 @@ Use CHROME_PATH for an existing Chromium executable if needed; CAPTURE_DIR optio
 
 ## Limits
 
+## Post-publication compatibility correction
+
+GitHub Pages deployment of `8dc478250ffbb2df37bef96a7d8e148a16234349` succeeded. Public browser confirmed the new page and Square's current title: `ZASU DAW v1.4 正式版｜FOUNDING USER｜Mac・Windows対応` at ¥1,980. The existing Edge Function v6 accepted only the historical Beta title. A narrowly scoped exact-title allowlist now accepts these two titles, without changing payment/refund/location checks, response shape, storage paths or saved buyer identifiers. Edge Function v7 is ACTIVE. Both legacy and formal receipt fixtures pass; updated unit suite: 42/42. Production OPTIONS 204, malformed POST 400, disallowed-origin POST 403. No new live charge or paid-customer E2E was performed.
+
+The local browser's direct public network requests returned ERR_EMPTY_RESPONSE. Local responsive checks pass; public visual/navigation checks use the separate cloud browser. Do not report the failed network run as a successful production browser suite.
+
 Automated browser checks do not submit a payment or impersonate a buyer. Paid end-to-end redownload must be distinguished from the unit tests and unauthenticated recovery UI checks. This change does not enforce a new ten-buyer quota in Square, change existing licenses or alter the published Mac/Windows files. Windows remains Unsigned, tested in Windows 11 ARM + x64 emulation, not native x64 hardware.

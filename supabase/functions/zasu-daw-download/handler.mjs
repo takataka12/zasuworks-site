@@ -1,7 +1,11 @@
 const ORIGINS = new Set(['https://zasuworks.jp', 'https://www.zasuworks.jp']);
 const LOCATION = 'LTF93YQYAF2MF';
-const PRODUCT = 'ZASU DAW Beta｜Mac・Windows対応';
 const cleanName = value => typeof value === 'string' ? value.normalize('NFKC').replace(/\s/g, '') : '';
+// Exact Square product titles only. Retain the original title for past receipts.
+const PRODUCTS = new Set([
+  'ZASU DAW Beta｜Mac・Windows対応',
+  'ZASU DAW v1.4 正式版｜FOUNDING USER｜Mac・Windows対応',
+].map(cleanName));
 const validId = value => typeof value === 'string' && /^[A-Za-z0-9_-]{16,192}$/.test(value);
 const yen = money => money?.currency === 'JPY' && Number.isSafeInteger(money.amount) && money.amount >= 0;
 const bad = () => { throw new AccessError(403, 'purchase_not_verified'); };
@@ -17,7 +21,7 @@ async function verifyPurchase(orderId, getOrder, getPayment) {
       !['OPEN', 'COMPLETED'].includes(order.state)) bad();
   if (!Array.isArray(order.line_items) || order.line_items.length !== 1) bad();
   const item = order.line_items[0];
-  if (cleanName(item.name) !== cleanName(PRODUCT) || Number(item.quantity) !== 1 ||
+  if (!PRODUCTS.has(cleanName(item.name)) || Number(item.quantity) !== 1 ||
       !yen(item.base_price_money) || ![1980, 2980].includes(item.base_price_money.amount) ||
       !yen(order.total_money) || order.total_money.amount !== item.base_price_money.amount) bad();
   if (order.returns?.length || order.refunds?.length) bad();

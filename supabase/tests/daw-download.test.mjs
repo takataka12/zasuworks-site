@@ -61,6 +61,26 @@ test('paid Square transaction ID recovers its order and grants both downloads', 
   assert.equal(paymentLookups, 2);
   assert.equal(orderLookups, 1);
 });
+test('paid current formal Square product grants both downloads and old receipts still work', async () => {
+  for (const name of ['ZASU DAW Beta｜Mac・Windows対応', 'ZASU DAW v1.4 正式版｜FOUNDING USER｜Mac・Windows対応']) {
+    const data = fixture(); data.order.line_items[0].name = name;
+    const app = setup(data);
+    assert.equal((await app.handler(request())).status, 200);
+    assert.equal(app.signed(), 1);
+  }
+});
+test('formal product does not weaken payment, refund or exact-name verification', async () => {
+  for (const mutate of [
+    d => d.order.line_items[0].name += ' OTHER PRODUCT',
+    d => d.payment.status = 'APPROVED',
+    d => d.payment.refunded_money.amount = 1980,
+    d => d.order.location_id = 'OTHER',
+    d => d.payment.amount_money.amount = 1,
+  ]) {
+    const data = fixture(); data.order.line_items[0].name = 'ZASU DAW v1.4 正式版｜FOUNDING USER｜Mac・Windows対応'; mutate(data);
+    const app = setup(data); assert.ok((await app.handler(request())).status >= 400); assert.equal(app.signed(), 0);
+  }
+});
 test('paid OPEN order is accepted while digital fulfillment remains open', async () => {
   const data = fixture(); data.order.state = 'OPEN';
   assert.equal((await setup(data).handler(request())).status, 200);
