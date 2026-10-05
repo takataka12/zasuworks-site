@@ -1,0 +1,52 @@
+{
+  "version": "0.0.14",
+  "build": "0.0.15",
+  "files": [
+    {
+      "os": "mac",
+      "version": "0.0.14",
+      "build": "0.0.15",
+      "filename": "ZASUDAW-0.0.14-macOS-Universal.dmg",
+      "sha256": "dfe55d2cc27c87a45cb9b304be4a48798bf499871533a7d956c4330dd30673ef",
+      "size": 7792225
+    },
+    {
+      "os": "windows",
+      "version": "0.0.14",
+      "build": "0.0.15",
+      "filename": "ZASU-DAW-v0.0.14-Windows-Setup.exe",
+      "sha256": "c292cbd1b7b20775c72060d71b027f1de290def417766239d9a1ac591e9b919a",
+      "size": 4935938
+    }
+  ],
+  "previous": [
+    {
+      "path": "0.0.11/ZASUDAW-0.0.11-macOS-Universal.dmg",
+      "sha256": "4b7fd3e1fafbd545b87921374a42c8a39d6ca5823004af1b4cc6ff1bdedab7e4",
+      "size": 7451400,
+      "upload": false
+    },
+    {
+      "path": "0.0.11/ZASU-DAW-v0.0.11-Windows-Setup.exe",
+      "sha256": "339f06b7420e958095347c3bf9cc8d0f436cf10ca22d1d0fa68bacffa64528f0",
+      "size": 4857114,
+      "upload": false
+    }
+  ],
+  "verified_at": "2026-10-05T09:56:50.619Z",
+  "purchase_e2e": "NOT RUN: owner-specified test purchase not supplied",
+  "inspection": {
+    "mac": {
+      "container": "PASS (7-Zip)",
+      "identity": "PASS",
+      "architectures": [
+        "arm64",
+        "x86_64"
+      ],
+      "native_signature": "Native receipt; Apple tools not rerun on Linux"
+    },
+    "windows": {
+      "architecture": "x64 PE checked; installer execution is in native receipt"
+    }
+  }
+}

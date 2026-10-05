@@ -4,8 +4,8 @@ import { createHandler } from './handler.mjs';
 const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   { auth: { persistSession: false, autoRefreshToken: false } });
 const files = [
-  { os: 'mac', version: '0.0.11', filename: 'ZASUDAW-0.0.11-macOS-Universal.dmg' },
-  { os: 'windows', version: '0.0.11', filename: 'ZASU-DAW-v0.0.11-Windows-Setup.exe' },
+  { os: 'mac', version: '0.0.14', filename: 'ZASUDAW-0.0.14-macOS-Universal.dmg' },
+  { os: 'windows', version: '0.0.14', filename: 'ZASU-DAW-v0.0.14-Windows-Setup.exe' },
 ];
 async function square(path: string) {
   const token = Deno.env.get('SQUARE_ACCESS_TOKEN');
