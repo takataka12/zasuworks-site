@@ -44,7 +44,7 @@ async function verifyPurchase(orderId, getOrder, getPayment) {
   if (paid !== order.total_money.amount) bad();
 }
 
-export function createHandler({ getOrder, getPayment, signDownloads, rateLimit }) {
+export function createHandler({ getOrder, getPayment, findPaymentByReceiptUrl, signDownloads, rateLimit }) {
   return async request => {
     const origin = request.headers.get('Origin');
     const headers = { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store',
@@ -71,16 +71,23 @@ export function createHandler({ getOrder, getPayment, signDownloads, rateLimit }
       let body;
       try { body = JSON.parse(new TextDecoder().decode(new Uint8Array(chunks.flatMap(c => [...c])))); }
       catch { return reply(400, { error: 'invalid_request' }); }
-      const hasOrderId = body?.orderId !== undefined;
-      const hasPaymentId = body?.paymentId !== undefined;
-      if (hasOrderId === hasPaymentId) return reply(400, { error: 'invalid_purchase_reference' });
-      const purchaseId = hasOrderId ? body.orderId : body.paymentId;
-      if (!validId(purchaseId)) return reply(400, { error: 'invalid_purchase_reference' });
+      const references = ['orderId', 'paymentId', 'receiptUrl'].filter(key => body?.[key] !== undefined);
+      if (references.length !== 1) return reply(400, { error: 'invalid_purchase_reference' });
+      const reference = references[0];
+      if (reference === 'receiptUrl') {
+        if (typeof body.receiptUrl !== 'string' ||
+            !/^https:\/\/squareup\.com\/r\/[A-Za-z0-9_-]{16,192}$/.test(body.receiptUrl))
+          return reply(400, { error: 'invalid_purchase_reference' });
+      } else if (!validId(body[reference])) return reply(400, { error: 'invalid_purchase_reference' });
       if (!await rateLimit(request)) return reply(429, { error: 'too_many_requests' });
       let orderId = body.orderId;
-      if (hasPaymentId) {
+      if (reference === 'paymentId') {
         const payment = await getPayment(body.paymentId);
         if (!payment || payment.id !== body.paymentId || !validId(payment.order_id)) bad();
+        orderId = payment.order_id;
+      } else if (reference === 'receiptUrl') {
+        const payment = await findPaymentByReceiptUrl(body.receiptUrl);
+        if (!payment || !validId(payment.id) || !validId(payment.order_id)) bad();
         orderId = payment.order_id;
       }
       await verifyPurchase(orderId, getOrder, getPayment);

@@ -29,6 +29,7 @@ function setup(data = fixture(), overrides = {}) {
     getOrder: async (id) => { assert.equal(id, orderId); return data.order; },
     getPayment: async (id) => { assert.equal(id, paymentId); return data.payment; },
     rateLimit: async () => true,
+    findPaymentByReceiptUrl: async () => data.payment,
     signDownloads: async () => { signed++; return [{ os: 'mac', url: 'https://files.invalid/mac' }, { os: 'windows', url: 'https://files.invalid/win' }]; },
     ...overrides,
   });
@@ -60,6 +61,16 @@ test('paid Square transaction ID recovers its order and grants both downloads', 
   assert.deepEqual((await res.json()).downloads.map(d => d.os), ['mac', 'windows']);
   assert.equal(paymentLookups, 2);
   assert.equal(orderLookups, 1);
+});
+test('current Square short receipt URL recovers its payment and grants both downloads', async () => {
+  const data = fixture();
+  const receiptUrl = 'https://squareup.com/r/r07529c23fd48405d9d3605159ae23f05';
+  let received;
+  const app = setup(data, { findPaymentByReceiptUrl: async value => { received = value; return data.payment; } });
+  const res = await app.handler(request({ receiptUrl }));
+  assert.equal(res.status, 200);
+  assert.equal(received, receiptUrl);
+  assert.deepEqual((await res.json()).downloads.map(d => d.os), ['mac', 'windows']);
 });
 test('paid current formal Square product grants both downloads and old receipts still work', async () => {
   for (const name of ['ZASU DAW Beta｜Mac・Windows対応', 'ZASU DAW v1.4 正式版｜FOUNDING USER｜Mac・Windows対応']) {
@@ -123,6 +134,7 @@ test('bad origin and malformed order ID fail before contacting Square', async ()
   assert.equal((await app.handler(request({}, 'https://evil.invalid'))).status, 403);
   assert.equal((await app.handler(request({ orderId: '../payments' }))).status, 400);
   assert.equal((await app.handler(request({ paymentId: '../payments' }))).status, 400);
+  assert.equal((await app.handler(request({ receiptUrl: 'https://evil.invalid/r/token0123456789012345' }))).status, 400);
   assert.equal(app.signed(), 0);
 });
 test('rate limit blocks Square lookups and downloads', async () => {

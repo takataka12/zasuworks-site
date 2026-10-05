@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.95.0';
 import { createHandler } from './handler.mjs';
+import { findPaymentForReceipt } from './receipt.mjs';
 
 const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   { auth: { persistSession: false, autoRefreshToken: false } });
@@ -21,6 +22,20 @@ async function square(path: string) {
 Deno.serve(createHandler({
   getOrder: async (id: string) => (await square(`orders/${encodeURIComponent(id)}`)).order,
   getPayment: async (id: string) => (await square(`payments/${encodeURIComponent(id)}`)).payment,
+  findPaymentByReceiptUrl: async (receiptUrl: string) => await findPaymentForReceipt(receiptUrl, {
+    fetchReceipt: async (url: string) => await fetch(url, {
+      redirect: 'error',
+      headers: { 'User-Agent': 'ZASU-WORKS-Purchase-Recovery/1.0' },
+      signal: AbortSignal.timeout(12000),
+    }),
+    listPayments: async (cursor: string | null) => {
+      const params = new URLSearchParams({
+        location_id: 'LTF93YQYAF2MF', sort_order: 'DESC', limit: '100',
+      });
+      if (cursor) params.set('cursor', cursor);
+      return await square(`payments?${params.toString()}`);
+    },
+  }),
   rateLimit: async (request: Request) => {
     const ip = (request.headers.get('x-forwarded-for') || 'unknown').split(',')[0].trim().slice(0, 64);
     // Namespace the actor so DAW retries do not consume other products' limits.

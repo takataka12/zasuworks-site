@@ -21,14 +21,14 @@ async function page({ query = '?orderId='+id, code = 200, body = success, stored
   }]));
   let called = 0, replaced = null;
   const timers = new Map(); let timerId = 0;
-  const store = { value: stored, payment: paymentStored };
+  const store = { value: stored, payment: paymentStored, receipt: null };
   vm.runInNewContext(script, {
     URL, URLSearchParams, AbortController, Date,
     location: { search: query, pathname: '/zasu-daw/download/', hash: '' },
     history: { replaceState(_a,_b,path) { replaced = path; } },
     localStorage: {
-      setItem(k,value) { if(storageBlocked) throw Error(); if(k.endsWith('payment')) store.payment=value; else store.value=value; },
-      getItem(k) { if(storageBlocked) throw Error(); return k.endsWith('payment') ? store.payment : store.value; },
+      setItem(k,value) { if(storageBlocked) throw Error(); if(k.endsWith('payment')) store.payment=value; else if(k.endsWith('receipt')) store.receipt=value; else store.value=value; },
+      getItem(k) { if(storageBlocked) throw Error(); return k.endsWith('payment') ? store.payment : k.endsWith('receipt') ? store.receipt : store.value; },
     },
     sessionStorage: { getItem() { return sessionStored; } },
     document: { getElementById(name) { assert.ok(elements[name]); return elements[name]; } },
@@ -36,7 +36,8 @@ async function page({ query = '?orderId='+id, code = 200, body = success, stored
     clearTimeout(timer) { timers.delete(timer); },
     fetch: async (_url,options) => {
       called++; const requestBody=JSON.parse(options.body);
-      if (query.includes('transactionId=') || store.payment) assert.equal(requestBody.paymentId,paymentId);
+      if (store.receipt) assert.equal(requestBody.receiptUrl,store.receipt);
+      else if (query.includes('transactionId=') || store.payment) assert.equal(requestBody.paymentId,paymentId);
       else assert.equal(requestBody.orderId,id);
       return { ok: code === 200, status: code, json: async () => body };
     },
@@ -75,6 +76,16 @@ test('buyer can recover access by entering a Square receipt URL containing the t
   app.elements['recover-purchase'].events.click({ preventDefault(){} });
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(app.called,1); assert.equal(app.store.payment,paymentId);
+  assert.equal(app.elements['download-mac'].href,success.downloads[0].url);
+});
+test('buyer can recover access from the current Square short receipt URL', async () => {
+  const app = await page({ query:'' });
+  const receiptUrl = 'https://squareup.com/r/r07529c23fd48405d9d3605159ae23f05';
+  app.elements['recovery-id'].value = receiptUrl;
+  app.elements['recover-purchase'].events.click({ preventDefault(){} });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(app.called,1);
+  assert.equal(app.store.receipt,receiptUrl);
   assert.equal(app.elements['download-mac'].href,success.downloads[0].url);
 });
 test('pending, rejected and unavailable responses keep both links disabled', async () => {

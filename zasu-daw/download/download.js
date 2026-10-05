@@ -3,6 +3,7 @@
   const endpoint = 'https://siwmzradvrtetotakkbi.supabase.co/functions/v1/zasu-daw-download';
   const orderStorageKey = 'zasu-daw-purchase-order';
   const paymentStorageKey = 'zasu-daw-purchase-payment';
+  const receiptStorageKey = 'zasu-daw-purchase-receipt';
   const validId = value => typeof value === 'string' && /^[A-Za-z0-9_-]{16,192}$/.test(value);
   const params = new URLSearchParams(location.search);
   const suppliedOrder = params.get('orderId');
@@ -15,10 +16,12 @@
     else if (!suppliedOrder && !suppliedPayment) {
       const savedOrder = localStorage.getItem(orderStorageKey) || sessionStorage.getItem(orderStorageKey);
       const savedPayment = localStorage.getItem(paymentStorageKey);
+      const savedReceipt = localStorage.getItem(receiptStorageKey);
       if (validId(savedOrder)) {
         purchase = { orderId: savedOrder };
         localStorage.setItem(orderStorageKey, savedOrder);
       } else if (validId(savedPayment)) purchase = { paymentId: savedPayment };
+      else if (receiptReference(savedReceipt)) purchase = { receiptUrl: receiptReference(savedReceipt) };
     }
   } catch { /* Current-page downloads work even if browser storage is blocked. */ }
   // These identifiers grant access to a purchase. Do not leave them in copied URLs.
@@ -53,14 +56,27 @@
       throw new Error('Invalid download response');
     return url.href;
   }
-  function paymentIdFrom(value) {
+  function receiptReference(value) {
     const text = typeof value === 'string' ? value.trim() : '';
-    if (validId(text)) return text;
+    try {
+      const url = new URL(text);
+      if (!['squareup.com', 'www.squareup.com'].includes(url.hostname)) return null;
+      if (url.search || url.hash) return null;
+      const current = url.pathname.match(/^\/r\/([A-Za-z0-9_-]{16,192})\/?$/);
+      if (current) return 'https://squareup.com/r/' + current[1];
+      return null;
+    } catch { return null; }
+  }
+  function purchaseReferenceFrom(value) {
+    const text = typeof value === 'string' ? value.trim() : '';
+    if (validId(text)) return { paymentId: text };
     try {
       const url = new URL(text);
       if (!['squareup.com', 'www.squareup.com'].includes(url.hostname)) return null;
       const match = url.pathname.match(/^\/receipt\/preview\/([A-Za-z0-9_-]{16,192})\/?$/);
-      return match?.[1] || null;
+      if (match) return { paymentId: match[1] };
+      const receiptUrl = receiptReference(text);
+      return receiptUrl ? { receiptUrl } : null;
     } catch { return null; }
   }
   async function verify() {
@@ -108,14 +124,17 @@
   retry.addEventListener('click', () => { pendingTries = 0; verify(); });
   recover.addEventListener('click', event => {
     event.preventDefault();
-    const paymentId = paymentIdFrom(recoveryId.value);
-    if (!paymentId) {
+    const reference = purchaseReferenceFrom(recoveryId.value);
+    if (!reference) {
       recoveryError.textContent = 'Squareの領収書URL、または取引IDを正しく入力してください。';
       return;
     }
-    purchase = { paymentId };
+    purchase = reference;
     recoveryError.textContent = '';
-    try { localStorage.setItem(paymentStorageKey, paymentId); } catch { /* Current page can still verify. */ }
+    try {
+      if (reference.paymentId) localStorage.setItem(paymentStorageKey, reference.paymentId);
+      else localStorage.setItem(receiptStorageKey, reference.receiptUrl);
+    } catch { /* Current page can still verify. */ }
     pendingTries = 0;
     verify();
   });
