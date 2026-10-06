@@ -11,8 +11,8 @@
   let purchase = validId(suppliedOrder) ? { orderId: suppliedOrder }
     : validId(suppliedPayment) ? { paymentId: suppliedPayment } : null;
   try {
-    if (purchase?.orderId) localStorage.setItem(orderStorageKey, purchase.orderId);
-    else if (purchase?.paymentId) localStorage.setItem(paymentStorageKey, purchase.paymentId);
+    if (purchase?.orderId) rememberPurchase(purchase);
+    else if (purchase?.paymentId) rememberPurchase(purchase);
     else if (!suppliedOrder && !suppliedPayment) {
       const savedOrder = localStorage.getItem(orderStorageKey) || sessionStorage.getItem(orderStorageKey);
       const savedPayment = localStorage.getItem(paymentStorageKey);
@@ -37,6 +37,12 @@
   const links = { mac: document.getElementById('download-mac'), windows: document.getElementById('download-windows') };
   const labels = { mac: 'Mac版をダウンロード ↓', windows: 'Windows版をダウンロード ↓' };
   let busy = false, expiresAt = 0, timer, pendingTries = 0;
+  function rememberPurchase(reference) {
+    for (const key of [orderStorageKey, paymentStorageKey, receiptStorageKey]) { localStorage.removeItem(key); sessionStorage.removeItem(key); }
+    if (reference.orderId) localStorage.setItem(orderStorageKey, reference.orderId);
+    else if (reference.paymentId) localStorage.setItem(paymentStorageKey, reference.paymentId);
+    else if (reference.receiptUrl) localStorage.setItem(receiptStorageKey, reference.receiptUrl);
+  }
   function disable() {
     for (const link of Object.values(links)) {
       link.removeAttribute('href'); link.setAttribute('aria-disabled', 'true');
@@ -132,8 +138,7 @@
     purchase = reference;
     recoveryError.textContent = '';
     try {
-      if (reference.paymentId) localStorage.setItem(paymentStorageKey, reference.paymentId);
-      else localStorage.setItem(receiptStorageKey, reference.receiptUrl);
+      rememberPurchase(reference);
     } catch { /* Current page can still verify. */ }
     pendingTries = 0;
     verify();
