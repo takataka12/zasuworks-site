@@ -9,5 +9,5 @@ window.ZASU_VOCAL_RELEASE = Object.freeze({
   screenshotAlt: "ZASU VOCALのPitch / Note / Blob表示を含む実機画面",
   ogImageUrl: null, // OGPは公開前にindex.htmlのmetaへ静的に設定
   macNotarized: false,
-  windowsUnsigned: null
+  windowsUnsigned: true
 });
