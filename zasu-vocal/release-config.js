@@ -1,7 +1,7 @@
-// 実購入テストのみ有効。正式販売開始のフラグと検証結果は未完了のまま保持。
+// 2026-10-07: 製品所有者の正式販売開始承認により販売ON。署名状態は保持。
 window.ZASU_VOCAL_RELEASE = Object.freeze({
-  salesEnabled: false,
-  purchaseTestEnabled: true,
+  salesEnabled: true,
+  purchaseTestEnabled: false,
   purchaseTestVerified: false,
   legalVerified: false,
   releaseAssetsVerified: false,
