@@ -1,6 +1,7 @@
-// 公開ページは実購入検証・正式素材・規約・Mac署名確認が揃うまで販売OFFです。
+// 実購入テストのみ有効。正式販売開始のフラグと検証結果は未完了のまま保持。
 window.ZASU_VOCAL_RELEASE = Object.freeze({
   salesEnabled: false,
+  purchaseTestEnabled: true,
   purchaseTestVerified: false,
   legalVerified: false,
   releaseAssetsVerified: false,
