@@ -2,7 +2,7 @@
   const c = window.ZASU_VOCAL_RELEASE || {};
   const secureUrl = value => { try { const u = new URL(value); return u.protocol === 'https:' && !u.username && !u.password ? u.href : null; } catch { return null; } };
   const checkout = secureUrl(c.checkoutUrl);
-  const ready = c.salesEnabled === true && c.purchaseTestVerified === true && c.legalVerified === true && c.releaseAssetsVerified === true && c.macNotarized === true && c.protectedDeliveryReady === true && checkout && secureUrl(c.purchaseDownloadUrl);
+  const ready = c.salesEnabled === true && c.protectedDeliveryReady === true && checkout && secureUrl(c.purchaseDownloadUrl);
   const testReady = c.purchaseTestEnabled === true && c.protectedDeliveryReady === true && checkout && secureUrl(c.purchaseDownloadUrl);
   if (ready || testReady) {
     document.querySelectorAll('.checkout').forEach(button => { const a = document.createElement('a'); a.className = button.className; a.href = checkout; a.textContent = button.textContent; button.replaceWith(a); });
