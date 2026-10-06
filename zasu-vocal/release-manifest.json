@@ -1,0 +1,24 @@
+{
+  "product": "ZASU VOCAL",
+  "version": "1.0.0",
+  "priceJPY": 3980,
+  "checkoutUrl": "https://square.link/u/0CAFezE1",
+  "salesEnabled": false,
+  "files": [
+    {
+      "os": "mac",
+      "filename": "ZASU-VOCAL-v1.0.0-macOS-Universal.dmg",
+      "bytes": 50328061,
+      "sha256": "24819de09df41738897bc9c21aa72edc2ef8d402dde1a0a02985ac605c37158c"
+    },
+    {
+      "os": "windows",
+      "filename": "ZASU-VOCAL-v1.0.0-Windows-Setup.exe",
+      "bytes": 5358290,
+      "sha256": "b24cf49bfa3b18fd9d1be9a8d8eaca757a42a5be0fe05c585713191a53924363"
+    }
+  ],
+  "macSigningStatus": "not verified on Linux",
+  "windowsInstallerSigned": false,
+  "deliveryStatus": "private delivery URLs not provisioned"
+}
