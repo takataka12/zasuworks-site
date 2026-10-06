@@ -1,13 +1,14 @@
-// 正式URLと署名状態を確認してから設定。配布導線が未設定の間は購入できません。
+// 公開ページは実購入検証・正式素材・規約・Mac署名確認が揃うまで販売OFFです。
 window.ZASU_VOCAL_RELEASE = Object.freeze({
   salesEnabled: false,
-  checkoutUrl: "https://square.link/u/0CAFezE1", // ユーザー指定の正式決済URL
-  purchaseDownloadUrl: "https://zasuworks.jp/zasu-vocal/download/", // 購入者確認付きダウンロード案内ページ
-  macDmgUrl: null,
-  windowsSetupUrl: null,
+  purchaseTestVerified: false,
+  legalVerified: false,
+  releaseAssetsVerified: false,
+  checkoutUrl: "https://square.link/u/0CAFezE1",
+  purchaseDownloadUrl: "https://zasuworks.jp/zasu-vocal/download/",
+  protectedDeliveryReady: true,
   screenshotUrl: null,
   screenshotAlt: "ZASU VOCALのPitch / Note / Blob表示を含む実機画面",
-  ogImageUrl: null, // OGPは公開前にindex.htmlのmetaへ静的に設定
   macNotarized: false,
   windowsUnsigned: true
 });
