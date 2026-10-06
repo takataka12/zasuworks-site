@@ -2,7 +2,7 @@
 window.ZASU_VOCAL_RELEASE = Object.freeze({
   salesEnabled: false,
   checkoutUrl: "https://square.link/u/0CAFezE1", // ユーザー指定の正式決済URL
-  purchaseDownloadUrl: null, // 購入者確認付きダウンロード案内ページ
+  purchaseDownloadUrl: "https://zasuworks.jp/zasu-vocal/download/", // 購入者確認付きダウンロード案内ページ
   macDmgUrl: null,
   windowsSetupUrl: null,
   screenshotUrl: null,
