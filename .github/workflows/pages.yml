@@ -49,6 +49,9 @@ jobs:
           <meta name="twitter:description" content="ZASU DAW、ZASU AUDIO、ZASU LOUD。音楽制作をもっとシンプルにするクリエイターツールを開発・提供しています。">
           <meta name="twitter:image" content="https://zasuworks.jp/assets/ogp-brand.png">
           <meta name="twitter:image:alt" content="ZASU WORKS。音楽制作ツール ZASU DAW / ZASU AUDIO / ZASU LOUD。">'''
+          if '<meta property="og:image" ' in s and '<meta name="twitter:image" ' in s:
+              print("Social card metadata already present in source; keeping it unchanged")
+              raise SystemExit(0)
           if old not in s:
               raise SystemExit("social metadata anchor not found")
           p.write_text(s.replace(old, new), encoding="utf-8")
