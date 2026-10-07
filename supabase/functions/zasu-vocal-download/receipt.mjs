@@ -9,7 +9,7 @@ export async function findPaymentForReceipt(receiptUrl, { fetchReceipt, getPayme
   if (!response?.ok || !String(response.headers?.get('content-type') || '').toLowerCase().includes('text/html')) return null;
   const html = await response.text();
   if (html.length === 0 || html.length > MAX_HTML_BYTES ||
-      !html.includes('ZASU WORKS') || !html.includes(PRODUCT_VOCAL)) return null;
+      !html.includes('ZASU WORKS') || (!html.includes(PRODUCT_VOCAL) && !html.includes('ZASU 歌ってみた制作セット'))) return null;
   const ids = new Set([...html.matchAll(/href\s*=\s*["']https:\/\/squareup\.com\/receipts\/pt\/([A-Za-z0-9_-]{16,192})(?=[?\/"'])/gi)].map(match => match[1]));
   if (ids.size !== 1) {
     const error = new Error('receipt_lookup_incomplete');

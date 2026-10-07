@@ -34,3 +34,8 @@ test('wrong merchant, product or footer host fails closed',async()=>{
   assert.equal(calls,0);
  }
 });
+
+test('bundle receipt resolves full payment binding for loud',async()=>{
+ const found=await resolve(url,{fetchReceipt:async()=>response(html.replace(/ZASU LOUD[^<]*/,'ZASU 歌ってみた制作セット')),getPayment:async()=>payment});
+ assert.equal(found,payment);
+});

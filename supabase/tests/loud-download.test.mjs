@@ -161,3 +161,28 @@ test('incomplete receipt scan requests a direct transaction ID without granting 
   const res=await app.handler(request({receiptUrl:'https://squareup.com/r/Receipt0123456789abcdef'}));
   assert.equal(res.status,422);assert.equal((await res.json()).error,'receipt_lookup_incomplete');assert.equal(app.signed(),0);
 });
+
+// These cases catch bundle rejection and accidental cross-product/price grants.
+function bundleFixture() {
+ const d=fixture(); d.order.line_items[0].name='ZASU 歌ってみた制作セット';
+ d.order.line_items[0].base_price_money.amount=5980; d.order.line_items[0].total_money.amount=5980;
+ d.order.total_money.amount=5980; d.payment.amount_money.amount=5980; d.payment.total_money.amount=5980;
+ return d;
+}
+test('completed bundle grants both OS files and can be reverified', async()=>{
+ const app=setup(bundleFixture());
+ for(const body of [{orderId},{paymentId},{receiptUrl:'https://squareup.com/r/Receipt0123456789abcdef'}]) {
+  const res=await app.handler(request(body)); assert.equal(res.status,200);
+  assert.deepEqual((await res.json()).downloads.map(x=>x.os),['mac','windows']);
+ }
+});
+for(const [label,mutate] of [
+ ['wrong bundle price',d=>{d.order.line_items[0].base_price_money.amount=2980;d.order.total_money.amount=2980;d.payment.amount_money.amount=2980;}],
+ ['bundle-looking unrelated product',d=>d.order.line_items[0].name+=' OTHER'],
+ ['DAW at bundle price',d=>d.order.line_items[0].name='ZASU DAW'],
+ ['AUDIO at bundle price',d=>d.order.line_items[0].name='ZASU AUDIO'],
+ ['refunded bundle',d=>d.payment.refunded_money.amount=1],
+ ['pending bundle',d=>d.payment.status='APPROVED'],
+ ['wrong merchant bundle',d=>d.order.location_id='OTHER'],
+ ['multiple bundle quantity',d=>d.order.line_items[0].quantity='2'],
+]) test(label+' cannot sign files',async()=>{const d=bundleFixture();mutate(d);const app=setup(d);assert.ok((await app.handler(request())).status>=400);assert.equal(app.signed(),0);});
