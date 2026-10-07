@@ -1,9 +1,9 @@
 (() => {
   'use strict';
-  const endpoint = 'https://siwmzradvrtetotakkbi.supabase.co/functions/v1/zasu-vocal-download';
-  const orderStorageKey = 'zasu-vocal-purchase-order';
-  const paymentStorageKey = 'zasu-vocal-purchase-payment';
-  const receiptStorageKey = 'zasu-vocal-purchase-receipt';
+  const endpoint = 'https://siwmzradvrtetotakkbi.supabase.co/functions/v1/zasu-loud-download';
+  const orderStorageKey = 'zasu-loud-purchase-order';
+  const paymentStorageKey = 'zasu-loud-purchase-payment';
+  const receiptStorageKey = 'zasu-loud-purchase-receipt';
   const validId = value => typeof value === 'string' && /^[A-Za-z0-9_-]{16,192}$/.test(value);
   const params = new URLSearchParams(location.search);
   const suppliedOrder = params.get('orderId');
@@ -54,11 +54,11 @@
     // Keep previous release paths valid for rollout and rollback. Purchases are
     // still verified server-side; only the server selects the current release.
     const allowed = os === 'mac'
-      ? ['1.0.0/ZASU-VOCAL-v1.0.0-macOS-Universal.dmg']
-      : ['1.0.0/ZASU-VOCAL-v1.0.0-Windows-Setup.exe'];
+      ? ['2.0.0/ZASU-LOUD-v2.0.0-macOS-Universal.dmg']
+      : ['2.0.0/ZASU-LOUD-v2.0.0-Windows-Setup.exe'];
     const url = new URL(value);
     if (url.origin !== 'https://siwmzradvrtetotakkbi.supabase.co' ||
-        !allowed.some(path => url.pathname === '/storage/v1/object/sign/zasu-vocal-releases/' + path) || !url.searchParams.get('token'))
+        !allowed.some(path => url.pathname === '/storage/v1/object/sign/zasu-loud-releases/' + path) || !url.searchParams.get('token'))
       throw new Error('Invalid download response');
     return url.href;
   }
@@ -116,7 +116,7 @@
       } else if (response.status === 429) {
         status('少し時間をおいてお試しください', '確認が続いたため一時的に待機しています。1分ほど待ってから再確認してください。');
       } else if (response.status === 422 && data.error === 'receipt_lookup_incomplete') {
-        status('取引IDで購入を確認してください', '領収書URLからの決済IDを確認できませんでした。Squareの取引IDを入力してください。分からない場合は決済控えを添えてお問い合わせください。再購入は不要です。');
+        status('取引IDで購入を確認してください', '領収書URLからの検索を完了できませんでした。Squareの取引IDを入力すると、購入を直接確認できます。取引IDが分からない場合は決済控えを添えてお問い合わせください。再購入は不要です。');
       } else if ([400, 403].includes(response.status)) {
         status('購入情報を確認できませんでした', 'お支払い済みの場合は、購入日時とSquareの決済控えを添えてお問い合わせください。再購入は不要です。');
       } else throw new Error('Unavailable');

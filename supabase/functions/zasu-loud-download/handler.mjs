@@ -3,7 +3,8 @@ const LOCATION = 'LTF93YQYAF2MF';
 const cleanName = value => typeof value === 'string' ? value.normalize('NFKC').replace(/\s/g, '') : '';
 // Exact Square product titles only. Retain the original title for past receipts.
 const PRODUCTS = new Set([
-  'ZASU VOCAL v1.0.0',
+  'ZASU LOUD v1.1.2 for macOS',
+  'ZASU LOUD v2.0.0',
 ].map(cleanName));
 const validId = value => typeof value === 'string' && /^[A-Za-z0-9_-]{16,192}$/.test(value);
 const yen = money => money?.currency === 'JPY' && Number.isSafeInteger(money.amount) && money.amount >= 0;
@@ -21,7 +22,7 @@ async function verifyPurchase(orderId, getOrder, getPayment) {
   if (!Array.isArray(order.line_items) || order.line_items.length !== 1) bad();
   const item = order.line_items[0];
   if (!PRODUCTS.has(cleanName(item.name)) || Number(item.quantity) !== 1 ||
-      !yen(item.base_price_money) || ![3980].includes(item.base_price_money.amount) ||
+      !yen(item.base_price_money) || ![2980].includes(item.base_price_money.amount) ||
       !yen(order.total_money) || order.total_money.amount !== item.base_price_money.amount) bad();
   if (order.returns?.length || order.refunds?.length) bad();
   if (order.net_amount_due_money && (!yen(order.net_amount_due_money) || order.net_amount_due_money.amount !== 0))
@@ -91,7 +92,7 @@ export function createHandler({ getOrder, getPayment, findPaymentByReceiptUrl, s
       }
       await verifyPurchase(orderId, getOrder, getPayment);
       const downloads = await signDownloads();
-      return reply(200, { version: '1.0.0', expiresIn: 600, downloads });
+      return reply(200, { version: '2.0.0', expiresIn: 600, downloads });
     } catch (error) {
       if (error instanceof AccessError) return reply(error.status, { error: error.code });
       if (error?.code === 'receipt_lookup_incomplete') return reply(422, { error: 'receipt_lookup_incomplete' });

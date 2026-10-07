@@ -5,8 +5,8 @@ import { findPaymentForReceipt } from './receipt.mjs';
 const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   { auth: { persistSession: false, autoRefreshToken: false } });
 const files = [
-  { os: 'mac', version: '1.0.0', filename: 'ZASU-VOCAL-v1.0.0-macOS-Universal.dmg' },
-  { os: 'windows', version: '1.0.0', filename: 'ZASU-VOCAL-v1.0.0-Windows-Setup.exe' },
+  { os: 'mac', version: '2.0.0', filename: 'ZASU-LOUD-v2.0.0-macOS-Universal.dmg' },
+  { os: 'windows', version: '2.0.0', filename: 'ZASU-LOUD-v2.0.0-Windows-Setup.exe' },
 ];
 async function square(path: string) {
   const token = Deno.env.get('SQUARE_ACCESS_TOKEN');
@@ -38,7 +38,7 @@ Deno.serve(createHandler({
     const ip = (request.headers.get('x-forwarded-for') || 'unknown').split(',')[0].trim().slice(0, 64);
     // Namespace the actor so DAW retries do not consume other products' limits.
     const { data, error } = await supabase.rpc('zasu_rate_limit_check', {
-      p_ip: `vocal-download:${ip}`, p_user_agent: '', p_scope: 'vocal_download',
+      p_ip: `loud-download:${ip}`, p_user_agent: '', p_scope: 'loud_download',
       p_burst_limit: 12, p_burst_seconds: 60, p_hour_limit: 60,
       p_global_burst_limit: 12, p_global_burst_seconds: 60,
     });
@@ -46,7 +46,7 @@ Deno.serve(createHandler({
     return data?.allowed === true;
   },
   signDownloads: async () => await Promise.all(files.map(async file => {
-    const { data, error } = await supabase.storage.from('zasu-vocal-releases')
+    const { data, error } = await supabase.storage.from('zasu-loud-releases')
       .createSignedUrl(`${file.version}/${file.filename}`, 600, { download: file.filename });
     if (error || !data?.signedUrl) throw new Error('File unavailable');
     return { ...file, url: data.signedUrl };
