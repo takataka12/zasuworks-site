@@ -60,6 +60,20 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - name: Verify homepage routes and responsive layout
+        run: |
+          npm install --prefix /tmp/zasu-home-check playwright@1.56.1
+          /tmp/zasu-home-check/node_modules/.bin/playwright install --with-deps chromium
+          NODE_PATH=/tmp/zasu-home-check/node_modules CAPTURE_DIR=/tmp/zasu-home-shots node --test tests/home.test.cjs
+
+      - name: Save homepage screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: homepage-screenshots
+          path: /tmp/zasu-home-shots
+          if-no-files-found: ignore
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:

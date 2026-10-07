@@ -1,0 +1,74 @@
+/* Homepage only: approved photographic C composition with B spacing. */
+.brand-home .brand-hero{position:relative;isolation:isolate;padding:150px 0 36px;min-height:680px;background:#090b0a;overflow:hidden}
+.brand-home .hero-photo{position:absolute;z-index:-2;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
+.brand-home .brand-hero:after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(90deg,#080808eb,#08080870 55%,#08080815),linear-gradient(0deg,#080808,transparent 55%)}
+.brand-home .hero-brand{font-size:13px;letter-spacing:.3em;color:#b6beb9;margin:18px 0 28px}
+.brand-home .brand-hero .eyebrow{color:#afbab2;font-weight:500}
+.brand-home .brand-hero h1{font-size:clamp(38px,5vw,64px);line-height:1.45;letter-spacing:-.04em;white-space:normal;font-weight:500;margin:0 0 24px}
+.brand-home .hero-subtitle{font-size:15px;color:#c1c8c3;line-height:1.9;max-width:480px}
+.brand-home .hero-subtitle span:first-child{color:#64e597}.brand-home .hero-subtitle span:nth-child(2){color:#ffda54}
+.brand-home .product-jump{margin-top:45px;border-color:#ffffff20;background:transparent}
+.brand-home .product-jump a{padding-block:16px;border-color:#ffffff20}.brand-home .product-jump b{font-weight:500;font-size:20px}.brand-home .product-jump small{display:none}
+.brand-home .primary-products{padding:0 0 64px}
+.brand-home .flagship-pair{display:block}
+.brand-home .flagship{display:grid;grid-template-columns:1fr 1.25fr;align-items:center;gap:40px;padding:80px 0;border:0;border-bottom:1px solid #ffffff15;border-radius:0;background:transparent;overflow:visible}
+.brand-home .flagship .product-copy{padding:0;min-width:0}
+.brand-home .flagship .eyebrow{font-weight:500;color:#9ba79f;margin-bottom:14px}
+.brand-home .flagship .release-label{border:0;padding:0;font-size:12px;letter-spacing:.03em}
+.brand-home .flagship h2{font-size:clamp(36px,4vw,52px);font-weight:500;letter-spacing:-.04em;margin:18px 0 10px}
+.brand-home .plugin-tagline{font-weight:500;font-size:12px;margin-bottom:16px}
+.brand-home .flagship .product-tagline{font-size:23px;font-weight:500;line-height:1.6;min-height:0}
+.brand-home .flagship .product-price{font-weight:500;font-size:32px;margin:24px 0 12px}
+.brand-home .flagship .environment{font-size:13px;color:#b0b8b2}
+.brand-home .flagship .cta{margin:22px 0;align-items:flex-start;flex-direction:column;gap:14px}
+.brand-home .flagship .cta .btn{width:auto;min-width:220px;background:transparent;border-color:#ffffff45;color:#f5f4ef;font-weight:500;border-radius:6px}
+.brand-home .flagship .text-link{font-size:12px;color:#a9b2ac}
+.brand-home .flagship .product-description{font-size:13px;line-height:1.9;color:#a9b2ac;max-width:420px;margin-bottom:12px}
+.brand-home .formats{font-size:12px;color:#89968e}
+.brand-home .flagship-visual{margin:0;min-width:0;padding:28px 0}
+.brand-home .flagship-visual img{width:100%;height:auto;border-radius:8px;box-shadow:0 20px 70px #0009;border:1px solid #ffffff18}
+.brand-home .flagship-visual figcaption{margin:14px 0 0;font-size:11px;line-height:1.6;color:#8f9993}
+.brand-home .bundle-product{padding:56px 40px;margin:24px 0 80px;gap:32px;grid-template-columns:1.4fr 1fr;background:linear-gradient(135deg,#64e59706,#ffda5406);border:1px solid #ffffff1b;border-radius:12px}
+.brand-home .bundle-art{grid-column:1/-1;margin:0 auto 10px;max-width:920px;width:100%}
+.brand-home .bundle-art img{width:100%;height:auto;border-radius:6px}
+.brand-home .bundle-art figcaption{font-size:11px;color:#929c94;margin-top:10px}
+.brand-home .bundle-product h2{font-weight:500;font-size:clamp(26px,3vw,34px);line-height:1.55}
+.brand-home .bundle-product .product-tagline{font-weight:500;font-size:19px;line-height:1.8}
+.brand-home .bundle-product .product-description{font-size:13px;line-height:1.9}
+.brand-home .bundle-flow{margin:24px 0 0}.brand-home .bundle-flow b{font-weight:500}
+.brand-home .bundle-offer{padding-left:32px;border-color:#ffffff20}
+.brand-home .bundle-offer .product-price{font-weight:500;font-size:42px}
+.brand-home .bundle-regular{text-decoration:line-through;color:#959e94}
+.brand-home .bundle-checkout{border-radius:6px;background:#e4cf72;border-color:#e4cf72;font-weight:500}
+.brand-home .product-redownload{display:inline-block;font-size:12px;color:#afb9ad;text-underline-offset:5px;margin-top:20px;line-height:1.8}
+.brand-home .secondary-products{gap:64px}.brand-home .secondary-products>.product{border-color:#ffffff18;background:#101210;border-radius:12px}
+.brand-home .secondary-products h2,.brand-home .secondary-products .product-tagline,.brand-home .brand-motto,.brand-home .more-section h2,.brand-home .brand-contact h2{font-weight:500}
+.brand-home .secondary-products .audio-product{background:#0c1114}.brand-home .audio-product h2{color:#64d6e8}
+@media(max-width:1000px){.brand-home .flagship{gap:24px;grid-template-columns:1fr 1fr}.brand-home .bundle-product{grid-template-columns:1fr}.brand-home .bundle-offer{border-left:0;border-top:1px solid #ffffff20;padding:26px 0 0}}
+@media(max-width:700px){
+.brand-home .shell{padding-inline:24px}
+.brand-home .brand-hero{min-height:0;padding:calc(var(--header) + 48px) 0 22px}
+.brand-home .hero-photo{object-position:68% center}
+.brand-home .brand-hero:after{background:linear-gradient(0deg,#080808,#08080830 80%),linear-gradient(90deg,#080808c9,#08080820)}
+.brand-home .hero-brand{margin:16px 0 25px;font-size:11px}
+.brand-home .brand-hero h1{font-size:clamp(31px,8vw,40px);line-height:1.5;margin-bottom:20px}
+.brand-home .hero-subtitle{font-size:12px;margin-bottom:0}
+.brand-home .product-jump{margin-top:32px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.brand-home .product-jump a{padding:12px 8px!important}.brand-home .product-jump span{font-size:9px}.brand-home .product-jump b{font-size:16px;margin:4px 0 0}
+.brand-home .product-jump a:nth-child(n+3){display:none}
+.brand-home .flagship{grid-template-columns:1fr;gap:0;padding:38px 0 32px}
+.brand-home .flagship h2{font-size:34px;margin:12px 0 8px}
+.brand-home .flagship .eyebrow{font-size:10px;margin-bottom:8px}.brand-home .flagship .release-label{font-size:11px}
+.brand-home .flagship .product-tagline{font-size:18px;line-height:1.6;margin-bottom:0}.brand-home .flagship .plugin-tagline{font-size:11px;margin-bottom:10px}
+.brand-home .flagship .product-price{font-size:28px;margin:16px 0 8px}.brand-home .flagship .environment{font-size:11px;line-height:1.7}
+.brand-home .flagship .cta{gap:13px;margin:18px 0}.brand-home .flagship .cta .btn{min-width:0;width:100%;min-height:46px;font-size:13px}
+.brand-home .flagship .product-description{font-size:12px;line-height:1.8;margin-bottom:10px}.brand-home .formats{font-size:11px;line-height:1.7}
+.brand-home .flagship-visual{padding:22px 0 0}.brand-home .flagship-visual figcaption{margin-top:10px;font-size:11px}
+.brand-home .bundle-product{margin:32px -8px 52px;padding:24px 20px;gap:24px;border-radius:8px}
+.brand-home .bundle-art{margin:0 -12px;width:calc(100% + 24px);max-width:none}
+.brand-home .bundle-product h2{font-size:25px;margin:12px 0 18px}.brand-home .bundle-product .product-tagline{font-size:18px;line-height:1.7}
+.brand-home .bundle-product .product-description{font-size:12px;line-height:1.9}.brand-home .bundle-flow{gap:12px;margin-top:24px}.brand-home .bundle-flow b{font-size:14px}
+.brand-home .bundle-offer .product-price{font-size:38px}.brand-home .product-price small{font-size:12px}.brand-home .bundle-offer{padding-top:24px}.brand-home .bundle-checkout{min-height:50px}
+.brand-home .secondary-products{gap:32px}.brand-home .featured h2{font-size:42px}.brand-home .featured .product-copy{padding:24px 20px}
+.brand-home .more-section h2{font-size:30px}.brand-home .brand-motto{font-size:24px}
+}

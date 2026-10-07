@@ -8,7 +8,7 @@ before(async()=>{
  if(!origin){const root=path.resolve(__dirname,'..');server=createServer(async(req,res)=>{
   const p=new URL(req.url,'http://localhost').pathname;const file=path.resolve(root,'.'+p+(p.endsWith('/')?'index.html':''));
   if(!file.startsWith(root+'/'))return res.writeHead(403).end();
-  try{const data=await fs.readFile(file);res.setHeader('Content-Type',({'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml'})[path.extname(file)]||'application/octet-stream');res.end(data);}catch{res.writeHead(404).end();}
+  try{const data=await fs.readFile(file);res.setHeader('Content-Type',({'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml'})[path.extname(file)]||'application/octet-stream');res.end(data);}catch{res.writeHead(404).end();}
  });await new Promise(r=>server.listen(0,'127.0.0.1',r));origin='http://127.0.0.1:'+server.address().port;}
  browser=await chromium.launch({headless:true,args:['--no-sandbox'],...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
 });
@@ -17,10 +17,10 @@ for(const width of [375,390,768,1440])test(`brand home preserves product hierarc
  const page=await browser.newPage({viewport:{width,height:844}});page.setDefaultTimeout(3000);
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(origin+'/');
  assert.equal(await page.title(),'ZASU WORKS | 歌ってみた制作ツール・ボーカルプラグイン');
- assert.match(await page.locator('h1').innerText(),/ZASU WORKS/);
+ assert.match(await page.locator('h1').innerText(),/歌を整えて、\s*音圧を仕上げて、\s*完成。/);
  assert.deepEqual(await page.locator('[data-product]').evaluateAll(es=>es.map(e=>e.dataset.product)),['vocal','loud','daw','audio']);
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
- assert.ok((await page.locator('.product-jump').boundingBox()).y<650);
+ assert.ok((await page.locator('.product-jump').boundingBox()).y<844);
  const primary=page.locator('[data-product="daw"]');
  for(const s of ['v1.4','正式版','1,980','先着10名','2,980','Pitch Editor','ANALYZE VOCAL','AUTO FIX'])assert.ok((await primary.innerText()).includes(s));
  assert.equal(await page.getByRole('link',{name:'ZASU DAWを見る',exact:true}).getAttribute('href'),'/zasu-daw/');
@@ -30,10 +30,11 @@ for(const width of [375,390,768,1440])test(`brand home preserves product hierarc
   for(const token of [version,price,'税込・買い切り','macOS Universal','Apple Silicon / Intel','Windows x64','AU / VST3 / Standalone'])assert.ok(text.includes(token));
   assert.equal(await card.getByRole('link',{name:'購入済みの方・再ダウンロード',exact:true}).getAttribute('href'),'/zasu-'+product+'/download/');
  }
- assert.equal(await page.locator('#bundle-checkout').getAttribute('aria-disabled'),'true');
- assert.equal(await page.locator('#bundle-checkout').getAttribute('href'),null);
- for(const token of ['¥6,960','¥5,980','¥980','セット販売準備中'])assert.ok((await page.locator('#vocal-loud-set').innerText()).includes(token));
- if(width<600)assert.ok((await page.locator('#loud .product-price').boundingBox()).y<844*2);
+ assert.equal(await page.locator('#bundle-checkout').getAttribute('aria-disabled'),null);
+ assert.equal(await page.locator('#bundle-checkout').getAttribute('href'),'https://square.link/u/nVlHbpUy');
+ for(const token of ['¥6,960','¥5,980','¥980','制作セットを購入'])assert.ok((await page.locator('#vocal-loud-set').innerText()).includes(token));
+ assert.equal(await page.locator('.product-redownload').getAttribute('href'),'/vocal-loud-set/download/');
+ if(width<600){assert.ok((await page.locator('#loud .product-price').boundingBox()).y<844*2);assert.ok((await page.locator('.bundle-art').boundingBox()).y<844*3);}
 
  assert.equal(await page.getByRole('link',{name:'ZASU AUDIOを使う',exact:true}).getAttribute('href'),'https://zasumaster.com/');
  assert.equal(await page.getByRole('link',{name:'ZASU LOUDを見る',exact:true}).getAttribute('href'),'/zasu-loud/');
