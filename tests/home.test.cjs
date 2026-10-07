@@ -73,6 +73,11 @@ for(const width of [320,375,390,768,1440])test(`brand home preserves product hie
  assert.match(await page.locator('body').innerText(),/Built & Released/i);
  assert.doesNotMatch(await page.locator('body').innerText(),/Beta|β版|開発中/);
  for(const img of await page.locator('img').all()){if(!await img.isVisible())continue;await img.scrollIntoViewIfNeeded();await img.evaluate(e=>e.decode());assert.ok(await img.evaluate(e=>e.complete&&e.naturalWidth>0));}
+ for(const img of await page.locator('.loud-reference-ui img').all()){
+  const dimensions=await img.evaluate(e=>{const r=e.getBoundingClientRect();return {width:r.width,height:r.height,naturalWidth:e.naturalWidth,naturalHeight:e.naturalHeight};});
+  const expectedHeight=dimensions.width*dimensions.naturalHeight/dimensions.naturalWidth;
+  assert.ok(Math.abs(dimensions.height-expectedHeight)<1,`LOUD image keeps original aspect ratio at ${width}px: ${JSON.stringify(dimensions)}`);
+ }
  if(width<600){await page.getByRole('button',{name:'メニュー'}).click();assert.equal(await page.getByRole('button',{name:'メニュー'}).getAttribute('aria-expanded'),'true');await page.getByRole('button',{name:'メニュー'}).click();}
  assert.deepEqual(await page.evaluate(()=>[...document.querySelectorAll('a[href^="#"]')].filter(a=>!document.getElementById(a.hash.slice(1))).map(a=>a.hash)),[]);
  if(process.env.CAPTURE_DIR){await fs.mkdir(process.env.CAPTURE_DIR,{recursive:true});await page.evaluate(()=>{document.activeElement.blur();scrollTo(0,0)});await page.screenshot({path:path.resolve(process.env.CAPTURE_DIR,`home-${width}.png`)});if(width===390||width===1440)await page.screenshot({path:path.resolve(process.env.CAPTURE_DIR,`home-${width}-full.png`),fullPage:true});if(width===390)for(const id of ['vocal','loud','vocal-loud-set'])await page.locator('#'+id).screenshot({path:path.resolve(process.env.CAPTURE_DIR,`mobile-${id}.png`)});}
