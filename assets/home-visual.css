@@ -1,4 +1,5 @@
 /* Homepage only: approved photographic C composition with B spacing. */
+.brand-home{font-family:Inter,-apple-system,BlinkMacSystemFont,"Helvetica Neue","Hiragino Sans","Yu Gothic",Meiryo,"Noto Sans CJK JP","IPA Gothic",Arial,sans-serif}
 .brand-home .brand-hero{position:relative;isolation:isolate;padding:150px 0 36px;min-height:680px;background:#090b0a;overflow:hidden}
 .brand-home .hero-photo{position:absolute;z-index:-2;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
 .brand-home .brand-hero:after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(90deg,#080808eb,#08080870 55%,#08080815),linear-gradient(0deg,#080808,transparent 55%)}
@@ -60,6 +61,7 @@
 .brand-home .flagship h2{font-size:34px;margin:12px 0 8px}
 .brand-home .flagship .eyebrow{font-size:10px;margin-bottom:8px}.brand-home .flagship .release-label{font-size:11px}
 .brand-home .flagship .product-tagline{font-size:18px;line-height:1.6;margin-bottom:0}.brand-home .flagship .plugin-tagline{font-size:11px;margin-bottom:10px}
+.brand-home .flagship .product-tagline br{display:block}
 .brand-home .flagship .product-price{font-size:28px;margin:16px 0 8px}.brand-home .flagship .environment{font-size:11px;line-height:1.7}
 .brand-home .flagship .cta{gap:13px;margin:18px 0}.brand-home .flagship .cta .btn{min-width:0;width:100%;min-height:46px;font-size:13px}
 .brand-home .flagship .product-description{font-size:12px;line-height:1.8;margin-bottom:10px}.brand-home .formats{font-size:11px;line-height:1.7}
