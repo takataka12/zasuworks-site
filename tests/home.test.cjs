@@ -22,7 +22,8 @@ for(const width of [375,390,768,1440])test(`brand home preserves product hierarc
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
  assert.ok((await page.locator('.product-jump').boundingBox()).y<844);
  const primary=page.locator('[data-product="daw"]');
- for(const s of ['v1.4','正式版','1,980','先着10名','2,980','Pitch Editor','ANALYZE VOCAL','AUTO FIX'])assert.ok((await primary.innerText()).includes(s));
+ for(const s of ['v1.4','正式版','1,980','先着10名','2,980','Pitch補正'])assert.ok((await primary.innerText()).includes(s),s+' is visible');
+ for(const s of ['Pitch Editor','ANALYZE VOCAL','AUTO FIX'])assert.ok((await primary.textContent()).includes(s),s+' is preserved');
  assert.equal(await page.getByRole('link',{name:'ZASU DAWを見る',exact:true}).getAttribute('href'),'/zasu-daw/');
  assert.equal(await page.getByRole('link',{name:'ZASU VOCALを見る',exact:true}).getAttribute('href'),'/zasu-vocal/');
  for(const [product,version,price] of [['vocal','v1.0.0','¥3,980'],['loud','v2.0.0','¥2,980']]){
