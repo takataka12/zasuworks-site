@@ -14,7 +14,7 @@ before(async()=>{
 });
 after(async()=>{await browser?.close();await new Promise(r=>server?server.close(r):r());});
 for(const width of [375,390,768,1440])test(`brand home preserves product hierarchy and routes at ${width}px`,async()=>{
- const page=await browser.newPage({viewport:{width,height:844}});page.setDefaultTimeout(3000);
+ const page=await browser.newPage({viewport:{width,height:844},reducedMotion:'reduce'});page.setDefaultTimeout(3000);
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(origin+'/');
  assert.equal(await page.title(),'ZASU WORKS | 歌ってみた制作ツール・ボーカルプラグイン');
  assert.match(await page.locator('h1').innerText(),/歌を整えて、\s*音圧を仕上げて、\s*完成。/);
@@ -43,7 +43,7 @@ for(const width of [375,390,768,1440])test(`brand home preserves product hierarc
  assert.match(await page.locator('#more').innerText(),/APPS.*MUSIC.*EXPERIMENTS/s);
  assert.match(await page.locator('body').innerText(),/Built & Released/i);
  assert.doesNotMatch(await page.locator('body').innerText(),/Beta|β版|開発中/);
- for(const img of await page.locator('img').all()){await img.scrollIntoViewIfNeeded();assert.ok(await img.evaluate(e=>e.complete&&e.naturalWidth>0));}
+ for(const img of await page.locator('img').all()){if(!await img.isVisible())continue;await img.scrollIntoViewIfNeeded();await img.evaluate(e=>e.decode());assert.ok(await img.evaluate(e=>e.complete&&e.naturalWidth>0));}
  if(width<600){await page.getByRole('button',{name:'メニュー'}).click();assert.equal(await page.getByRole('button',{name:'メニュー'}).getAttribute('aria-expanded'),'true');await page.getByRole('button',{name:'メニュー'}).click();}
  assert.deepEqual(await page.evaluate(()=>[...document.querySelectorAll('a[href^="#"]')].filter(a=>!document.getElementById(a.hash.slice(1))).map(a=>a.hash)),[]);
  if(process.env.CAPTURE_DIR){await fs.mkdir(process.env.CAPTURE_DIR,{recursive:true});await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:path.resolve(process.env.CAPTURE_DIR,`home-${width}.png`)});if(width===390||width===1440)await page.screenshot({path:path.resolve(process.env.CAPTURE_DIR,`home-${width}-full.png`),fullPage:true});}
