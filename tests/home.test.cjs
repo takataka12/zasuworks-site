@@ -52,6 +52,8 @@ for(const width of [320,375,390,768,1440])test(`brand home preserves product hie
  }
  assert.equal(await page.locator('.bundle-flow').count(),1);
  assert.equal(await page.locator('.bundle-flow img').count(),2);
+ assert.equal(await page.locator('.bundle-flow .flow-step').nth(1).locator('img').getAttribute('src'),'/assets/zasu-loud-v112.png');
+ assert.match(await page.locator('.bundle-flow .flow-caption').innerText(),/旧版参考画面 v1\.1\.2/);
  assert.ok((await page.locator('#vocal-loud-set').boundingBox()).y>(await page.locator('#loud').boundingBox()).y);
  assert.ok((await page.locator('#daw').boundingBox()).y>(await page.locator('#vocal-loud-set').boundingBox()).y);
  for(const product of ['vocal','loud']){

@@ -188,3 +188,5 @@
 
 /* User-selected clean screenshot; version is identified in the caption. */
 .brand-home .loud-reference-ui img{display:block;border:0;border-radius:0;box-shadow:none}
+
+.brand-home .flow-step .flow-caption{grid-column:1/-1;font-size:10px;line-height:1.5;color:#9ca69e}
