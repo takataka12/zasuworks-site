@@ -58,7 +58,8 @@ for(const width of [320,375,390,768,1440])test(`brand home preserves product hie
   const price=await page.locator('#'+product+' .product-price').boundingBox(),cta=await page.locator('#'+product+' .cta').boundingBox();
   assert.ok(cta.y>=price.y+price.height,product+' price and CTA do not overlap');
  }
- assert.equal(await page.locator('#loud .flagship-visual img').getAttribute('src'),'/assets/zasu-loud-v200-live.webp');
+ assert.equal(await page.locator('#loud .flagship-visual img').getAttribute('src'),'/assets/zasu-loud-v112.png');
+ assert.match(await page.locator('#loud .flagship-visual figcaption').innerText(),/旧版参考画面.*v1\.1\.2.*v2\.0\.0/);
  await page.keyboard.press('Tab');
  assert.equal(await page.evaluate(()=>document.activeElement.matches('a,button')),true);
  await page.keyboard.press('Enter');assert.equal(new URL(page.url()).hash,'#products');

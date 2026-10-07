@@ -185,3 +185,6 @@
 .brand-home .bundle-flow .flow-step .loud-ui{aspect-ratio:1040/615}
 }
 @media(prefers-reduced-motion:reduce){.brand-home *, .brand-home *:before, .brand-home *:after{scroll-behavior:auto;animation:none;transition:none}}
+
+/* User-selected clean screenshot; version is identified in the caption. */
+.brand-home .loud-reference-ui img{display:block;border:0;border-radius:0;box-shadow:none}
