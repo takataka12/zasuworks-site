@@ -20,3 +20,21 @@ test('logout all revokes all sessions',async()=>{const s=setup();assert.equal((a
 test('account closure without fresh OTP proof is denied',async()=>{const s=setup();assert.equal((await s.handler(req({action:'close'},{token:true}))).status,400);assert.equal(s.calls.length,0)});
 test('server errors never expose credentials or internals',async()=>{const s=setup({profile:async()=>{throw Error('service_role=secret')}});const r=await s.handler(req({action:'me'},{token:true}));assert.equal(r.status,503);assert.doesNotMatch(await r.text(),/secret|service_role/)});
 test('oversized and malformed request fail closed',async()=>{const s=setup();assert.equal((await s.handler(req({action:'request',email:'x'.repeat(5000)}))).status,413);assert.equal(s.calls.length,0)});
+
+test('commerce actions require the existing verified account session',async()=>{
+ const handler=createHandler({authenticate:async()=>null,commerce:{purchases:async()=>{throw Error('must not read')}}});
+ const r=await handler(new Request('https://example.test',{method:'POST',headers:{origin:'https://zasuworks.jp','content-type':'application/json'},body:JSON.stringify({action:'purchases'})}));
+ assert.equal(r.status,401);
+});
+test('commerce claim ignores no browser-supplied purchaser email or user ID',async()=>{
+ let invoked=false;
+ const handler=createHandler({authenticate:async()=>({id:'own',sessionId:'session'}),commerce:{claimRequest:async()=>{invoked=true;return {}}}});
+ const r=await handler(new Request('https://example.test',{method:'POST',headers:{origin:'https://zasuworks.jp','content-type':'application/json',authorization:'Bearer token'},body:JSON.stringify({action:'claim_request',orderId:'Order12345678901234567890',email:'attacker@example.test',userId:'other'})}));
+ assert.equal(r.status,400);assert.equal(invoked,false);
+});
+test('commerce purchase list receives server-authenticated owner',async()=>{
+ let owner;
+ const handler=createHandler({authenticate:async()=>({id:'own',sessionId:'session'}),commerce:{purchases:async user=>{owner=user;return {purchases:[]}}}});
+ const r=await handler(new Request('https://example.test',{method:'POST',headers:{origin:'https://zasuworks.jp','content-type':'application/json',authorization:'Bearer token'},body:'{"action":"purchases"}'}));
+ assert.equal(r.status,200);assert.equal(owner.id,'own');
+});

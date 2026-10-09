@@ -30,11 +30,30 @@ export function createHandler(deps){return async(req)=>{
    const session=await deps.verify(b.challengeId,b.code);
    return session?reply(200,{session}):reply(400,{error:'invalid_code'});
   }
-  if(!['me','update','logout','close'].includes(b.action))return reply(400,{error:'invalid_request'});
+  if(!['me','update','logout','close','purchases','claim_request','claim_verify','download'].includes(b.action))return reply(400,{error:'invalid_request'});
   const token=req.headers.get('authorization')?.match(/^Bearer (\S+)$/i)?.[1];
   const user=token?await deps.authenticate(token):null;
   if(!user)return reply(401,{error:'authentication_required'});
-  if(b.action==='me')return reply(200,{user:{id:user.id,email:user.email},profile:await deps.profile(user),purchasesIntegrated:false});
+  if(b.action==='me')return reply(200,{user:{id:user.id,email:user.email},profile:await deps.profile(user),purchasesIntegrated:!!deps.commerce});
+  if(['purchases','claim_request','claim_verify','download'].includes(b.action)){
+   if(!deps.commerce)return reply(503,{error:'temporarily_unavailable'});
+   const allowed={purchases:['action'],claim_request:['action','orderId','paymentId','receiptUrl'],claim_verify:['action','challengeId','code'],download:['action','orderId','product']}[b.action];
+   if(Object.keys(b).some(k=>!allowed.includes(k)))return reply(400,{error:'invalid_request'});
+   if(b.action==='purchases')return reply(200,await deps.commerce.purchases(user));
+   if(b.action==='claim_request'){
+    const refs=['orderId','paymentId','receiptUrl'].filter(k=>b[k]!==undefined);
+    if(refs.length!==1)return reply(400,{error:'invalid_purchase_reference'});
+    const k=refs[0];
+    if(typeof b[k]!=='string'||!(k==='receiptUrl'?/^https:\/\/squareup\.com\/r\/[A-Za-z0-9_-]{16,192}$/:/^[A-Za-z0-9_-]{16,192}$/).test(b[k]))return reply(400,{error:'invalid_purchase_reference'});
+    return reply(200,await deps.commerce.claimRequest(user,{[k]:b[k]}));
+   }
+   if(b.action==='claim_verify'){
+    if(!UUID.test(b.challengeId||'')||!/^\d{8}$/.test(b.code||''))return reply(400,{error:'invalid_code'});
+    return reply(200,await deps.commerce.claimVerify(user,b));
+   }
+   if(!UUID.test(b.orderId||'')||!['vocal','loud','daw'].includes(b.product))return reply(400,{error:'invalid_request'});
+   return reply(200,await deps.commerce.download(user,b));
+  }
   if(b.action==='update'){
    if(Object.keys(b).some(k=>!['action','display_name','locale'].includes(k)))return reply(400,{error:'invalid_request'});
    if(typeof b.display_name!=='string'||b.display_name.trim().length>80||/[\u0000-\u001f\u007f]/.test(b.display_name)||!['ja','en'].includes(b.locale))return reply(400,{error:'invalid_profile'});
@@ -48,5 +67,5 @@ export function createHandler(deps){return async(req)=>{
   if(!await deps.limit(req,'verify'))return reply(429,{error:'rate_limited'});
   const closed=await deps.close(user,b.challengeId,b.code,token);
   return closed?reply(200,{ok:true}):reply(400,{error:'invalid_code'});
- }catch(e){if(e?.message==='rate_limited')return reply(429,{error:'rate_limited'});return reply(503,{error:'temporarily_unavailable'})}
+ }catch(e){if(e?.message==='rate_limited')return reply(429,{error:'rate_limited'});const codes={authentication_required:401,invalid_code:400,purchase_not_verified:403,purchase_not_available:403,purchase_support_required:409,receipt_lookup_incomplete:422};if(codes[e?.code])return reply(codes[e.code],{error:e.code});return reply(503,{error:'temporarily_unavailable'})}
 };}

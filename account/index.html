@@ -14,7 +14,7 @@
 <header><a class="brand" href="/"><span class="mark" aria-hidden="true">ZW</span>ZASU WORKS</a><a class="back" href="/">公式サイトへ ↗</a></header>
 <main id="main">
 <div class="layout">
-<aside><p class="eyebrow">YOUR CREATIVE HOME</p><p class="wordmark">ZASU<br><span>ACCOUNT.</span></p><p class="tagline">ONE ACCOUNT.<br>ALL ZASU PRODUCTS.</p><p class="aside-note">創作の道具を、ひとつの場所へ。</p><nav id="account-nav" aria-label="アカウントナビゲーション" hidden><button type="button" data-view="dashboard" aria-current="page">マイページ <span aria-hidden="true">↗</span></button><button type="button" data-view="settings">アカウント設定 <span aria-hidden="true">↗</span></button></nav><div class="optional"><span class="dot"></span> 登録は任意です<p>アカウントがなくても、これまでどおり購入・ダウンロードできます。</p></div></aside>
+<aside><p class="eyebrow">YOUR CREATIVE HOME</p><p class="wordmark">ZASU<br><span>ACCOUNT.</span></p><p class="tagline">ONE ACCOUNT.<br>ALL ZASU PRODUCTS.</p><p class="aside-note">創作の道具を、ひとつの場所へ。</p><nav id="account-nav" aria-label="アカウントナビゲーション" hidden><button type="button" data-view="dashboard" aria-current="page">マイページ <span aria-hidden="true">↗</span></button><button id="commerce-nav" type="button" data-view="purchases" hidden>購入管理 <span aria-hidden="true">↗</span></button><button type="button" data-view="settings">アカウント設定 <span aria-hidden="true">↗</span></button></nav><div class="optional"><span class="dot"></span> 登録は任意です<p>アカウントがなくても、これまでどおり購入・ダウンロードできます。</p></div></aside>
 <div class="content">
 <p id="notice" role="status" aria-live="polite" hidden></p>
 <section id="loading" hidden><p class="eyebrow">PLEASE WAIT</p><h1>アカウントを確認しています。</h1></section>
@@ -28,10 +28,19 @@
 <section id="dashboard" hidden>
 <p class="eyebrow">YOUR ACCOUNT</p><h1>マイページ</h1><p class="lead"><span id="user-name"></span><span id="greeting">、こんにちは。</span></p>
 <div class="identity"><span class="avatar" aria-hidden="true">ZW</span><div><p id="user-email"></p><p class="fine">メール認証済み <span class="verified">✓</span></p></div></div>
-<div class="section-title"><h2>購入した製品</h2><span class="pill">準備中</span></div>
-<div class="empty"><span class="empty-symbol" aria-hidden="true">＋</span><h3>購入履歴の連携は準備中です。</h3><p>この画面には、まだ購入済み製品は表示されません。<br>購入済み製品のダウンロードは、下の専用ページをご利用ください。</p><p class="fine">既存の購入権利やオフラインでの利用は、これまでどおりです。</p></div>
+<div class="section-title"><h2>購入した製品</h2><span id="purchase-pill" class="pill">準備中</span></div>
+<div id="purchase-placeholder" class="empty"><span class="empty-symbol" aria-hidden="true">＋</span><h3>購入履歴の連携は準備中です。</h3><p>この画面には、まだ購入済み製品は表示されません。<br>購入済み製品のダウンロードは、下の専用ページをご利用ください。</p><p class="fine">既存の購入権利やオフラインでの利用は、これまでどおりです。</p></div>
+<div id="purchase-summary" class="empty" hidden><h3>購入した製品を、ここに。</h3><p>領収書・取引IDから購入を追加できます。購入時のメールへの確認が必要です。</p><button class="primary" type="button" data-view="purchases">購入を管理する →</button></div>
 <h2 class="download-title">購入済みの方・再ダウンロード</h2><div class="downloads"><a href="/zasu-vocal/download/">VOCALを再ダウンロード <span>↗</span></a><a href="/zasu-loud/download/">LOUDを再ダウンロード <span>↗</span></a><a href="/zasu-daw/download/">DAWを再ダウンロード <span>↗</span></a><a href="/vocal-loud-set/download/">制作セットを再ダウンロード <span>↗</span></a></div>
 <div class="coming"><p class="eyebrow">NEXT CHAPTER</p><p>購入履歴・更新情報・ZASU AUDIOの処理履歴を、順次この場所へ。</p><a href="https://zasumaster.com/" target="_blank" rel="noopener">ZASU AUDIOを使う ↗</a></div>
+</section>
+<section id="purchases" hidden>
+<p class="eyebrow">YOUR PRODUCTS</p><h1>購入管理</h1><p class="lead">購入済み製品と、いつでも再ダウンロード。</p>
+<div class="purchase-add"><h2>購入を追加する</h2><p class="fine">Squareの領収書URL・注文ID・決済IDを入力してください。購入時のメールに届く確認コードで紐づけます。メールの一致だけでは追加しません。</p>
+<form id="purchase-reference-form"><label for="purchase-reference-type">購入参照の種類</label><select id="purchase-reference-type"><option value="receiptUrl">Squareの領収書URL</option><option value="orderId">注文ID</option><option value="paymentId">決済ID</option></select><label for="purchase-reference">購入参照</label><input id="purchase-reference" type="text" maxlength="254" autocomplete="off" required placeholder="https://squareup.com/r/…"><button id="purchase-send" class="primary" type="submit">購入先メールへコードを送る</button></form>
+<form id="purchase-code-form" hidden><p class="fine">購入時に記録されたメールをご確認ください。有効期限は10分、同じログイン・同じ画面で入力してください。</p><label for="purchase-code">購入確認コード</label><input id="purchase-code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{8}" minlength="8" maxlength="8" required placeholder="12345678"><button class="primary" type="submit">確認して購入を追加</button></form>
+<p class="fine">コードが届かない、購入時のメールが使えない、すでに紐づけ済みの場合は <a href="mailto:zasuworks@gmail.com">サポート</a> へ。ゲスト用ダウンロードは引き続き利用できます。</p></div>
+<div class="section-title"><h2>購入履歴・製品</h2><button id="purchase-reload" class="secondary" type="button">履歴を更新</button></div><p class="fine">履歴は最後に確認した決済状態を表示します。ダウンロード時にSquareへ再確認します。部分返金は製品の割り当てを確認するためサポート対応となります。</p><div id="purchase-list" aria-live="polite"></div>
 </section>
 <section id="settings" hidden>
 <p class="eyebrow">ACCOUNT SETTINGS</p><h1>アカウント設定</h1><p class="lead">あなたの情報と、ログインの管理。</p>

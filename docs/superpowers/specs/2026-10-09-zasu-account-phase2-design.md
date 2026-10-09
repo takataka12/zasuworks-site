@@ -1,0 +1,19 @@
+# ZASU ACCOUNT Phase 2 design
+
+Phase 1 is deployed at main 62b7464c, tree 91c4cec1. Its Auth, profile/session proofs, UI and 208 passing tests are retained. This phase adds optional purchase ownership without touching DSP, release files, fixed Square links, AUDIO credits or guest download APIs.
+
+Purchase verification and ownership proof are separate. Server retrieves exact merchant/location Order and every tender Payment, verifies supported historical title/price, JPY, total, completed payment and refund state. A purchase reference never grants account ownership. A code goes only to the email recorded on the Square payment (all tenders must agree), without a fulfillment-recipient fallback. No email search/import, customer-profile-email fallback or browser-specified destination. Missing/conflicting email is a support case.
+
+Claims bind UID, session, order and buyer email digest; 10-minute expiry, five attempts, one use, resend invalidates earlier claim. Verified payment is re-read at completion. Row locks and one owner per provider order prevent races; bundle grants VOCAL + LOUD atomically. A second user cannot claim an owned order. Ownership survives account stop; manual audited transfer is an administrative operation, never exposed to browsers.
+
+Minimal storage: commerce_orders with immutable offer/purchase snapshot and nullable owner; commerce_payments linked to parent; commerce_entitlements per order/product; private purchase_claims; private commerce_event_tasks for independent ACCOUNT webhook processing. Profiles remain Phase 1. Catalog/release mapping is code owned and aligns with existing private buckets. No fake license strings or AUDIO job duplication.
+
+All tables RLS; client roles cannot write purchases/claims/tasks. Own order/payment/entitlement SELECT additionally requires account_self_active(), retaining session proof. Server revalidates active session and parent ownership on every account action. Orders are checked against Square immediately before download; provider unavailable means retry, never unchecked signed URL. URLs expire in 600 seconds and use existing files.
+
+Refund COMPLETED revokes affected order grants; PENDING temporarily suspends; FAILED/REJECTED does not permanently revoke. Partial bundle refund suspends both for support review because no reliable item allocation is known. Other valid standalone grants continue. Older webhook delivery never reactivates a refund: fetch authoritative current Square state instead of trusting event snapshot. Existing webhook signature remains raw body + configured notification URL HMAC, constant-time comparison.
+
+ACCOUNT webhook processing is independent of legacy fulfillment. Durable event tasks have a lease, attempt/error state and idempotent provider-order updates. Duplicate receipt retries unfinished ACCOUNT tasks. Guest fulfillment must still run on account failure. Live download reconciliation ensures late/missed refund notification never authorizes a stale download. Purchase list shows its last checked status; it does not synchronously reconcile all orders. Scheduled recovery must use an authenticated service path; do not create public replay endpoint. Existing subscription must be inspected for refund.created/updated before claiming automatic refund notification coverage.
+
+UI extends account purchases and products sections with purchase reference + emailed code, history/status, release versions and Mac/Windows downloads. Purchase may be added by existing or new buyer voluntarily. Existing guest links remain. AUDIO and FINISH are explicitly future phases.
+
+Rollout: local behavioral tests → staging additive schema/functions + synthetic transaction tests → whole change review → production additive schema → API → static UI. No schema rollback DROP/delete; disable new account commerce only on rollback. No customer purchase or identity fixture writes in production tests.

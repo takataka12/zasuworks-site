@@ -1,3 +1,4 @@
+import {createAccountWebhook} from '../zasu-account/webhook.mjs';
 import { createClient } from "npm:@supabase/supabase-js@2.95.0";
 import { fulfillZasuLoudPurchase, type FulfillmentDeps } from "./zasu_loud_fulfillment.ts";
 import { buildZasuLoudOwnerNotification, extractDeliveryEmail, type EmailMessage } from "./zasu_loud_core.ts";
@@ -281,7 +282,7 @@ function makeZasuLoudDeps(supabase: any): FulfillmentDeps {
   };
 }
 
-Deno.serve(async (req: Request) => {
+async function legacyHandler(req: Request) {
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
   const rawBody = await req.text();
@@ -577,4 +578,17 @@ Deno.serve(async (req: Request) => {
     // Returning 200 prevents endless retries for permanent matching errors.
     return json({ ok: true, processed: false, reason: message });
   }
-});
+ }
+// Reuse unchanged legacy fulfillment; ACCOUNT gets an independent durable consumer.
+Deno.serve(createAccountWebhook({
+ verifySignature:verifySquare,
+ legacyHandler,
+ processEvent:async(event:any)=>{
+  if(!['payment.created','payment.updated','refund.created','refund.updated'].includes(event?.type))return;
+  const response=await fetch(Deno.env.get('SUPABASE_URL')+'/functions/v1/zasu-account',{
+   method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')},
+   body:JSON.stringify({action:'commerce_event',event}),signal:AbortSignal.timeout(45000)
+  });
+  if(!response.ok)throw new Error('account_commerce_retry_required');
+ }
+}));
