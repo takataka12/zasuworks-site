@@ -14,7 +14,7 @@
 <header><a class="brand" href="/"><span class="mark" aria-hidden="true">ZW</span>ZASU WORKS</a><a class="back" href="/">公式サイトへ ↗</a></header>
 <main id="main">
 <div class="layout">
-<aside><p class="eyebrow">YOUR CREATIVE HOME</p><p class="wordmark">ZASU<br><span>ACCOUNT.</span></p><p class="tagline">ONE ACCOUNT.<br>ALL ZASU PRODUCTS.</p><p class="aside-note">創作の道具を、ひとつの場所へ。</p><nav id="account-nav" aria-label="アカウントナビゲーション" hidden><button type="button" data-view="dashboard" aria-current="page">マイページ <span aria-hidden="true">↗</span></button><button id="commerce-nav" type="button" data-view="purchases" hidden>購入管理 <span aria-hidden="true">↗</span></button><button type="button" data-view="settings">アカウント設定 <span aria-hidden="true">↗</span></button></nav><div class="optional"><span class="dot"></span> 登録は任意です<p>アカウントがなくても、これまでどおり購入・ダウンロードできます。</p></div></aside>
+<aside><p class="eyebrow">YOUR CREATIVE HOME</p><p class="wordmark">ZASU<br><span>ACCOUNT.</span></p><p class="tagline">ONE ACCOUNT.<br>ALL ZASU PRODUCTS.</p><p class="aside-note">創作の道具を、ひとつの場所へ。</p><nav id="account-nav" aria-label="アカウントナビゲーション" hidden><button type="button" data-view="dashboard" aria-current="page">マイページ <span aria-hidden="true">↗</span></button><button id="commerce-nav" type="button" data-view="purchases" hidden>購入管理 <span aria-hidden="true">↗</span></button><button id="audio-nav" type="button" data-view="audio" hidden>AUDIO履歴 <span aria-hidden="true">↗</span></button><button type="button" data-view="settings">アカウント設定 <span aria-hidden="true">↗</span></button></nav><div class="optional"><span class="dot"></span> 登録は任意です<p>アカウントがなくても、これまでどおり購入・ダウンロードできます。</p></div></aside>
 <div class="content">
 <p id="notice" role="status" aria-live="polite" hidden></p>
 <section id="loading" hidden><p class="eyebrow">PLEASE WAIT</p><h1>アカウントを確認しています。</h1></section>
@@ -26,13 +26,14 @@
 <div class="auth-foot"><p>初めての方は「アカウントを作成」を選んでください。</p><p>認証メールは ZASU WORKS から送信します。<br><span class="sender">accounts@alerts.zasumaster.com</span></p><a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a></div>
 </section>
 <section id="dashboard" hidden>
-<p class="eyebrow">YOUR ACCOUNT</p><h1>マイページ</h1><p class="lead"><span id="user-name"></span><span id="greeting">、こんにちは。</span></p>
+<p class="eyebrow">MY PRODUCTS · MY AUDIO · MY ACCOUNT</p><h1>マイページ</h1><p class="lead"><span id="user-name"></span><span id="greeting">、こんにちは。</span></p>
 <div class="identity"><span class="avatar" aria-hidden="true">ZW</span><div><p id="user-email"></p><p class="fine">メール認証済み <span class="verified">✓</span></p></div></div>
 <div class="section-title"><h2>購入した製品</h2><span id="purchase-pill" class="pill">準備中</span></div>
 <div id="purchase-placeholder" class="empty"><span class="empty-symbol" aria-hidden="true">＋</span><h3>購入履歴の連携は準備中です。</h3><p>この画面には、まだ購入済み製品は表示されません。<br>購入済み製品のダウンロードは、下の専用ページをご利用ください。</p><p class="fine">既存の購入権利やオフラインでの利用は、これまでどおりです。</p></div>
 <div id="purchase-summary" class="empty" hidden><h3>購入した製品を、ここに。</h3><p>領収書・取引IDから購入を追加できます。購入時のメールへの確認が必要です。</p><button class="primary" type="button" data-view="purchases">購入を管理する →</button></div>
 <h2 class="download-title">購入済みの方・再ダウンロード</h2><div class="downloads"><a href="/zasu-vocal/download/">VOCALを再ダウンロード <span>↗</span></a><a href="/zasu-loud/download/">LOUDを再ダウンロード <span>↗</span></a><a href="/zasu-daw/download/">DAWを再ダウンロード <span>↗</span></a><a href="/vocal-loud-set/download/">制作セットを再ダウンロード <span>↗</span></a></div>
-<div class="coming"><p class="eyebrow">NEXT CHAPTER</p><p>購入履歴・更新情報・ZASU AUDIOの処理履歴を、順次この場所へ。</p><a href="https://zasumaster.com/" target="_blank" rel="noopener">ZASU AUDIOを使う ↗</a></div>
+<div id="audio-connect-panel" class="empty" hidden><p class="eyebrow">CONNECT ZASU AUDIO</p><h2>AUDIOをこのアカウントに接続</h2><p>これから作るジョブを共通アカウントで管理します。匿名利用も引き続き利用できます。</p><button id="audio-connect-confirm" class="primary" type="button">このアカウントで接続する</button></div>
+<div id="phase3-dashboard" hidden><div class="section-title"><h2>MY PRODUCTS</h2></div><div id="owned-summary"></div><div class="section-title"><h2>UPDATES</h2></div><div id="updates-list"></div><div class="coming"><p class="eyebrow">MY AUDIO</p><p>処理履歴と、保存期限内の完成ファイル。</p><button type="button" data-view="audio" class="secondary">AUDIO履歴を見る</button><a href="https://zasumaster.com/" target="_blank" rel="noopener">ZASU AUDIOを使う ↗</a></div></div>
 </section>
 <section id="purchases" hidden>
 <p class="eyebrow">YOUR PRODUCTS</p><h1>購入管理</h1><p class="lead">購入済み製品と、いつでも再ダウンロード。</p>
@@ -42,6 +43,7 @@
 <p class="fine">コードが届かない、購入時のメールが使えない、すでに紐づけ済みの場合は <a href="mailto:zasuworks@gmail.com">サポート</a> へ。ゲスト用ダウンロードは引き続き利用できます。</p></div>
 <div class="section-title"><h2>購入履歴・製品</h2><button id="purchase-reload" class="secondary" type="button">履歴を更新</button></div><p class="fine">履歴は最後に確認した決済状態を表示します。ダウンロード時にSquareへ再確認します。部分返金は製品の割り当てを確認するためサポート対応となります。</p><div id="purchase-list" aria-live="polite"></div>
 </section>
+<section id="audio" hidden><p class="eyebrow">MY AUDIO</p><h1>AUDIO履歴</h1><p class="lead">MIX・MASTER・CONVERTの処理履歴。</p><p class="fine">ファイルの保存は原則24時間です。期限後も履歴を確認できます。アカウントへの接続後に作成したジョブ、またはジョブ専用トークンで確認した履歴を表示します。過去のMASTERはサポートで本人確認が必要です。</p><button id="audio-reload" class="secondary" type="button">処理履歴を更新</button><div id="audio-list" aria-live="polite"></div><a href="https://zasumaster.com/" target="_blank" rel="noopener">ZASU AUDIOで作る ↗</a></section>
 <section id="settings" hidden>
 <p class="eyebrow">ACCOUNT SETTINGS</p><h1>アカウント設定</h1><p class="lead">あなたの情報と、ログインの管理。</p>
 <form id="profile-form"><label for="display-name">表示名</label><input id="display-name" maxlength="80" autocomplete="nickname"><label for="locale">言語設定</label><select id="locale"><option value="ja">日本語</option><option value="en">English</option></select><p class="fine">言語設定を保存します。現在の画面は日本語で提供しています。</p><button class="primary" type="submit">変更を保存</button></form>

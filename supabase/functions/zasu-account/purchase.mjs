@@ -1,24 +1,17 @@
+import {PURCHASE_OFFERS as offers} from '../../../account/catalog.mjs';
 // Account ownership requires an independent email challenge after this verification.
 const LOCATION='LTF93YQYAF2MF';
 const normalize=s=>typeof s==='string'?s.normalize('NFKC').replace(/\s/g,''):'';
-const offers=[
- ['ZASU VOCAL v1.0.0',[3980],['vocal'],'1.0.0'],
- ['ZASU LOUD v1.1.2 for macOS',[2980],['loud'],'1.1.2'],
- ['ZASU LOUD v2.0.0',[2980],['loud'],'2.0.0'],
- ['ZASU DAW Beta｜Mac・Windows対応',[1980,2980],['daw'],'Beta'],
- ['ZASU DAW v1.4 正式版｜FOUNDING USER｜Mac・Windows対応',[1980,2980],['daw'],'1.4'],
- ['ZASU 歌ってみた制作セット',[5980],['vocal','loud'],'VOCAL 1.0.0 / LOUD 2.0.0'],
-];
 const catalog=new Map(offers.map(([title,prices,products,version])=>[normalize(title),{title,prices,products,version}]));
 export const validSquareId=s=>typeof s==='string'&&/^[A-Za-z0-9_-]{16,192}$/.test(s);
 const yen=m=>m?.currency==='JPY'&&Number.isSafeInteger(m.amount)&&m.amount>=0;
 const email=s=>typeof s==='string'&&s.length<=254&&/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(s.trim())?s.trim().toLowerCase():null;
 const bad=()=>{const e=new Error('purchase_not_verified');e.code='purchase_not_verified';throw e;};
-export async function verifySquarePurchase(orderId,{getOrder,getPayment,getRefund}){
+export async function verifySquarePurchase(orderId,{getOrder,getPayment,getRefund},allowedOffers=null){
  if(!validSquareId(orderId))bad();
  const order=await getOrder(orderId);
  if(!order||order.id!==orderId||order.location_id!==LOCATION||!['OPEN','COMPLETED','CANCELED'].includes(order.state)||!Array.isArray(order.line_items)||order.line_items.length!==1)bad();
- const item=order.line_items[0],offer=catalog.get(normalize(item.name));
+ const item=order.line_items[0],offer=(allowedOffers?new Map(allowedOffers.map(([title,prices,products,version])=>[normalize(title),{title,prices,products,version}])):catalog).get(normalize(item.name));
  if(!offer||Number(item.quantity)!==1||!yen(item.base_price_money)||!offer.prices.includes(item.base_price_money.amount)||!yen(order.total_money)||order.total_money.amount!==item.base_price_money.amount)bad();
  const ids=order.tenders?.map(t=>t.payment_id||t.id);
  if(!Array.isArray(ids)||!ids.length||ids.length>5||ids.some(id=>!validSquareId(id))||new Set(ids).size!==ids.length)bad();
