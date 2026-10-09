@@ -64,7 +64,9 @@ for(const width of [320,375,390,768,1440])test(`brand home preserves product hie
  assert.match(await page.locator('#loud .flagship-visual figcaption').innerText(),/旧版参考画面.*v1\.1\.2.*v2\.0\.0/);
  await page.keyboard.press('Tab');
  assert.equal(await page.evaluate(()=>document.activeElement.matches('a,button')),true);
- await page.keyboard.press('Enter');assert.equal(new URL(page.url()).hash,'#products');
+ await page.keyboard.press('Enter');
+ // Keyboard input completion does not guarantee same-document navigation completion.
+ await page.waitForURL(url=>url.hash==='#products');assert.equal(new URL(page.url()).hash,'#products');
 
  assert.equal(await page.getByRole('link',{name:'ZASU AUDIOを使う',exact:true}).getAttribute('href'),'https://zasumaster.com/');
  assert.equal(await page.getByRole('link',{name:'ZASU LOUDを見る',exact:true}).getAttribute('href'),'/zasu-loud/');
