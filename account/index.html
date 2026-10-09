@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src https://siwmzradvrtetotakkbi.supabase.co; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<title>ZASU ACCOUNT | ZASU WORKS</title>
+<meta name="description" content="ZASU WORKSの共通アカウント。メール確認コードでログインできます。アカウント登録は任意です。">
+<link rel="canonical" href="https://zasuworks.jp/account/"><link rel="stylesheet" href="./account.css">
+<script type="module" src="./account.mjs"></script>
+</head>
+<body>
+<a class="skip" href="#main">本文へ</a>
+<header><a class="brand" href="/"><span class="mark" aria-hidden="true">ZW</span>ZASU WORKS</a><a class="back" href="/">公式サイトへ ↗</a></header>
+<main id="main">
+<div class="layout">
+<aside><p class="eyebrow">YOUR CREATIVE HOME</p><p class="wordmark">ZASU<br><span>ACCOUNT.</span></p><p class="tagline">ONE ACCOUNT.<br>ALL ZASU PRODUCTS.</p><p class="aside-note">創作の道具を、ひとつの場所へ。</p><nav id="account-nav" aria-label="アカウントナビゲーション" hidden><button type="button" data-view="dashboard" aria-current="page">マイページ <span aria-hidden="true">↗</span></button><button type="button" data-view="settings">アカウント設定 <span aria-hidden="true">↗</span></button></nav><div class="optional"><span class="dot"></span> 登録は任意です<p>アカウントがなくても、これまでどおり購入・ダウンロードできます。</p></div></aside>
+<div class="content">
+<p id="notice" role="status" aria-live="polite" hidden></p>
+<section id="loading" hidden><p class="eyebrow">PLEASE WAIT</p><h1>アカウントを確認しています。</h1></section>
+<section id="auth">
+<p class="eyebrow">WELCOME TO ZASU ACCOUNT</p><h1 id="auth-title">おかえりなさい。</h1><p class="lead">メールに届く確認コードでログイン。<br>パスワードは必要ありません。</p>
+<div class="tabs" aria-label="ログイン・新規登録"><button type="button" id="login-tab" aria-pressed="true">ログイン</button><button type="button" id="signup-tab" aria-pressed="false">アカウントを作成</button></div>
+<form id="email-form"><label for="email">メールアドレス</label><input id="email" type="email" autocomplete="email" maxlength="254" required placeholder="you@example.com"><div id="consent-row" hidden><label class="check"><input id="consent" type="checkbox">プライバシーポリシーに同意する</label></div><button class="primary" type="submit">確認コードを送る <span aria-hidden="true">→</span></button></form>
+<form id="code-form" hidden><p id="code-destination"></p><label for="code">確認コード</label><input id="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" minlength="6" maxlength="10" required placeholder="123456"><p class="fine">有効期限は10分です。迷惑メールフォルダーもご確認ください。</p><button class="primary" type="submit">確認してログイン <span aria-hidden="true">→</span></button><div class="code-actions"><button id="resend" type="button">再送する</button><button id="change-email" type="button">メールアドレスを変更</button></div></form>
+<div class="auth-foot"><p>初めての方は「アカウントを作成」を選んでください。</p><p>認証メールは ZASU WORKS から送信します。<br><span class="sender">accounts@alerts.zasumaster.com</span></p><a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a></div>
+</section>
+<section id="dashboard" hidden>
+<p class="eyebrow">YOUR ACCOUNT</p><h1>マイページ</h1><p class="lead"><span id="user-name"></span><span id="greeting">、こんにちは。</span></p>
+<div class="identity"><span class="avatar" aria-hidden="true">ZW</span><div><p id="user-email"></p><p class="fine">メール認証済み <span class="verified">✓</span></p></div></div>
+<div class="section-title"><h2>購入した製品</h2><span class="pill">準備中</span></div>
+<div class="empty"><span class="empty-symbol" aria-hidden="true">＋</span><h3>購入履歴の連携は準備中です。</h3><p>この画面には、まだ購入済み製品は表示されません。<br>購入済み製品のダウンロードは、下の専用ページをご利用ください。</p><p class="fine">既存の購入権利やオフラインでの利用は、これまでどおりです。</p></div>
+<h2 class="download-title">購入済みの方・再ダウンロード</h2><div class="downloads"><a href="/zasu-vocal/download/">VOCALを再ダウンロード <span>↗</span></a><a href="/zasu-loud/download/">LOUDを再ダウンロード <span>↗</span></a><a href="/zasu-daw/download/">DAWを再ダウンロード <span>↗</span></a><a href="/vocal-loud-set/download/">制作セットを再ダウンロード <span>↗</span></a></div>
+<div class="coming"><p class="eyebrow">NEXT CHAPTER</p><p>購入履歴・更新情報・ZASU AUDIOの処理履歴を、順次この場所へ。</p><a href="https://zasumaster.com/" target="_blank" rel="noopener">ZASU AUDIOを使う ↗</a></div>
+</section>
+<section id="settings" hidden>
+<p class="eyebrow">ACCOUNT SETTINGS</p><h1>アカウント設定</h1><p class="lead">あなたの情報と、ログインの管理。</p>
+<form id="profile-form"><label for="display-name">表示名</label><input id="display-name" maxlength="80" autocomplete="nickname"><label for="locale">言語設定</label><select id="locale"><option value="ja">日本語</option><option value="en">English</option></select><p class="fine">言語設定を保存します。現在の画面は日本語で提供しています。</p><button class="primary" type="submit">変更を保存</button></form>
+<dl class="details"><dt>メールアドレス</dt><dd id="settings-email"></dd><dt>共通ユーザーID</dt><dd id="settings-id" class="mono"></dd><dt>登録日</dt><dd id="settings-created"></dd></dl><p class="fine">メールアドレスの変更は <a href="mailto:zasuworks@gmail.com">サポート</a> へご連絡ください。</p>
+<div class="security"><h2>ログインの管理</h2><p>ログインはこのタブに保存します。24時間を超えると、再度メール認証が必要です。</p><button id="logout-local" class="secondary" type="button">この端末からログアウト</button><button id="logout-global" class="secondary" type="button">すべての端末からログアウト</button></div>
+<div class="closure"><h2>アカウントを停止する</h2><p>確認コードで本人確認を行い、すべての端末で利用を停止します。既存製品の購入権利は失われません。再開・個人情報の削除はサポートへお問い合わせください。</p><label class="check"><input id="close-consent" type="checkbox">アカウント停止の説明を確認した</label><button id="request-close" class="secondary" type="button">停止用コードを送る</button><form id="close-form" hidden><label for="close-code">停止確認コード</label><input id="close-code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" minlength="6" maxlength="10" required><button class="danger" type="submit">確認してアカウントを停止</button></form></div>
+</section>
+<noscript><p>ログインにはJavaScriptが必要です。購入・ダウンロードは各製品ページをご利用ください。</p></noscript>
+</div></div>
+</main>
+<footer><span>© ZASU WORKS</span><div><a href="/privacy.html">Privacy Policy</a><a href="mailto:zasuworks@gmail.com">サポート</a></div></footer>
+</body></html>

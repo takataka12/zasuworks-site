@@ -64,7 +64,7 @@ jobs:
         run: |
           npm install --prefix /tmp/zasu-home-check playwright@1.56.1
           /tmp/zasu-home-check/node_modules/.bin/playwright install --with-deps chromium
-          NODE_PATH=/tmp/zasu-home-check/node_modules CAPTURE_DIR=/tmp/zasu-home-shots node --test tests/home.test.cjs
+          NODE_PATH=/tmp/zasu-home-check/node_modules CAPTURE_DIR=/tmp/zasu-home-shots node --test tests/*.test.cjs supabase/tests/*.test.mjs
 
       - name: Save homepage screenshots
         if: always()
