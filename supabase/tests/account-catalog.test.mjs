@@ -1,0 +1,4 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {CATALOG,RELEASES,ownedUpdates} from '../../account/catalog.mjs';
+test('verified distribution versions and legacy offline use stay explicit',()=>{assert.equal(RELEASES.daw.version,'0.0.14');assert.equal(CATALOG.daw.salesVersion,'1.4');for(const key of ['vocal','loud','daw']){assert.equal(CATALOG[key].offline,true);assert.equal(RELEASES[key].files.length,2);}});
+test('FINISH has no invented download or entitlement',()=>{assert.equal(CATALOG.finish.status,'unverified');assert.equal(RELEASES.finish,undefined);});
+test('updates include only owned active desktop products without duplicate bundle entries',()=>{const updates=ownedUpdates([{status:'paid',products:[{key:'vocal'},{key:'loud'}]},{status:'paid',products:[{key:'vocal'}]},{status:'refunded',products:[{key:'daw'}]}]);assert.deepEqual(updates.map(x=>x.key),['vocal','loud']);});

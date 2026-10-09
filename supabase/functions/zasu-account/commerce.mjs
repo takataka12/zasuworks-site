@@ -1,8 +1,4 @@
-const RELEASES={
- vocal:{bucket:'zasu-vocal-releases',version:'1.0.0',files:[['mac','ZASU-VOCAL-v1.0.0-macOS-Universal.dmg'],['windows','ZASU-VOCAL-v1.0.0-Windows-Setup.exe']]},
- loud:{bucket:'zasu-loud-releases',version:'2.0.0',files:[['mac','ZASU-LOUD-v2.0.0-macOS-Universal.dmg'],['windows','ZASU-LOUD-v2.0.0-Windows-Setup.exe']]},
- daw:{bucket:'zasu-daw-releases',version:'0.0.14',files:[['mac','ZASUDAW-0.0.14-macOS-Universal.dmg'],['windows','ZASU-DAW-v0.0.14-Windows-Setup.exe']]},
-};
+import {RELEASES} from '../../../account/catalog.mjs';
 export class CommerceError extends Error{constructor(code,status=400){super(code);this.code=code;this.status=status;}}
 const fail=(code,status)=>{throw new CommerceError(code,status)};
 export function createCommerce({db,key,getVerifiedPurchase,resolveOrder,fetchMail=fetch}){
