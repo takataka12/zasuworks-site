@@ -14,4 +14,6 @@
   <url><loc>https://zasuworks.jp/services.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://zasuworks.jp/about.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://zasuworks.jp/privacy.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://zasuworks.jp/zasu-vocal/</loc></url>
+  <url><loc>https://zasuworks.jp/sales.html</loc></url>
 </urlset>

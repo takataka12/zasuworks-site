@@ -248,6 +248,14 @@
       footer{flex-direction:column}
     }
   </style>
+<link rel="stylesheet" href="/assets/site-improvements.css?v=20261011">
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+<meta property="og:site_name" content="ZASU WORKS">
+<meta property="og:image" content="https://zasuworks.jp/assets/ogp-products-20261011.png">
+<meta property="og:image:alt" content="ZASU WORKS — 音楽制作ツール">
+<meta name="twitter:image" content="https://zasuworks.jp/assets/ogp-products-20261011.png">
 </head>
 <body>
   <main class="wrap">
@@ -279,8 +287,8 @@
       </div>
 
       <figure style="margin:0;min-width:0">
-        <img src="/assets/zasu-loud-v112.png" width="1840" height="1040" alt="ZASU LOUD v1.1.2の実装UI。LOUD、PUNCH、TONE、OUTPUT、MATCH" style="display:block;width:100%;height:auto;border:1px solid #39393f;border-radius:12px">
-        <figcaption style="font-size:11px;color:#98989f;margin-top:12px">v1.1.2 実装UI（リリースソースから描画）。macOSホスト上のキャプチャとは異なります。</figcaption>
+        <img src="/assets/zasu-loud-v200-live.webp" width="1080" height="1440" alt="ZASU LOUD v2.0.0のWindows実機写真。LOUD、PUNCH、TONE、OUTPUT、MATCH" style="display:block;width:100%;height:auto;border:1px solid #39393f;border-radius:12px">
+        <figcaption style="font-size:11px;color:#98989f;margin-top:12px">ZASU LOUD v2.0.0 / Windowsで使用した実機写真（画面を撮影）。</figcaption>
       </figure>
     </header>
 
@@ -362,12 +370,12 @@
     </section>
 
 
-    <section class="block" id="demo" hidden>
+    <section class="block" id="demo">
       <div class="section-top">
         <div class="n">04 / HEAR IT</div>
         <div>
           <h2>同じ場所を、<br>何度も切り替えて聴く。</h2>
-          <p>MASTERプリセットの実演です。まずRAW A/Bで音圧・密度・前への出方を、そのあとLEVEL MATCHEDで音量差を減らした質感の変化を確認できます。</p>
+          <p>旧版で収録したMASTERプリセットの参考音源です（2026年10月1日作成）。現行v2.0.0そのものの録音ではありません。まずRAW A/Bで音圧・密度・前への出方を、そのあとLEVEL MATCHEDで音量差を減らした質感の変化を確認できます。</p>
         </div>
       </div>
       <div class="demo-grid">
@@ -375,8 +383,8 @@
           <div class="demo-kicker">MAIN DEMO / RAW A/B</div>
           <h3>BEFORE ↔ MASTER</h3>
           <p>同一フレーズをBEFORE → AFTER → BEFORE → AFTERで比較。ZASU LOUDを通した時の変化をそのまま聴けます。</p>
-          <audio controls preload="none" id="demoRaw">
-            <source src="https://siwmzradvrtetotakkbi.supabase.co/storage/v1/object/public/zasu-loud-media/ZASU_LOUD_CLEAR_RAW_AB.m4a" type="audio/mp4">
+          <audio controls preload="none" id="demoRaw" aria-label="LOUD 処理前後の試聴">
+            <source src="/zasu-loud/assets/ZASU_LOUD_CLEAR_RAW_AB.m4a" type="audio/mp4">
           </audio>
           <div class="demo-flow"><span>BEFORE</span><span class="after">MASTER</span><span>BEFORE</span><span class="after">MASTER</span></div>
           <div class="demo-note">MASTER preset / same source section / raw output level</div>
@@ -385,8 +393,8 @@
           <div class="demo-kicker">FAIR CHECK / LEVEL MATCHED</div>
           <h3>音量を揃えて確認。</h3>
           <p>MASTER後を約5.18 dB下げて、BEFOREと平均レベルを合わせた比較です。単なる音量差ではなく、密度や質感をチェックできます。</p>
-          <audio controls preload="none" id="demoMatched">
-            <source src="https://siwmzradvrtetotakkbi.supabase.co/storage/v1/object/public/zasu-loud-media/ZASU_LOUD_CLEAR_LEVEL_MATCHED_AB.m4a" type="audio/mp4">
+          <audio controls preload="none" id="demoMatched" aria-label="LOUD 音量を揃えた処理前後の試聴">
+            <source src="/zasu-loud/assets/ZASU_LOUD_CLEAR_LEVEL_MATCHED_AB.m4a" type="audio/mp4">
           </audio>
           <div class="demo-flow"><span>BEFORE</span><span class="after">MATCHED</span><span>BEFORE</span><span class="after">MATCHED</span></div>
           <div class="demo-note">Level matched by integrated RMS / approximately -5.18 dB on AFTER</div>
@@ -410,6 +418,7 @@
       </div>
     </section>
 
+<aside class="bundle-recommendation" aria-label="制作セットのご案内"><h3>歌声の補正も、音圧の仕上げも。</h3><p>ZASU VOCAL + ZASU LOUDの制作セットは<strong>5,980円（税込・買い切り）</strong>。単品合計6,960円より980円お得です。両製品のMac版・Windows版を取得できます。ZASU DAWは含みません。</p><a href="https://checkout.square.site/merchant/ML4WFCYYG84WZ/checkout/KCX5YJTJVCYOP6RC4AFYRQ5X">VOCAL + LOUD セットを購入 — 5,980円</a><a href="/#vocal-loud-set">セットの詳細・返金条件</a></aside>
     <section class="buy" id="buy">
       <div class="buy-in">
         <div class="mini">INTRODUCTORY LAUNCH PRICE</div>
@@ -446,18 +455,19 @@
     <footer>
       <span>© <span id="year"></span> ZASU WORKS — TOKYO, JAPAN</span>
       <span><a href="terms.html" style="color:#77777d">利用規約</a> · <a href="tokushoho.html" style="color:#77777d">特商法</a> · <a href="privacy.html" style="color:#77777d">プライバシー</a> · ZASU LOUD v2.0.0</span>
-    </footer>
+    <nav class="common-support" aria-label="サポート・販売条件"><a href="mailto:zasuworks@gmail.com">お問い合わせ</a><a href="/account/">ZASU ACCOUNT</a><a href="/sales.html">販売条件・利用規約・特商法</a><a href="/privacy.html">プライバシーポリシー</a><a href="/products.html">製品一覧</a></nav></footer>
   </main>
   <script>
     document.getElementById('year').textContent=new Date().getFullYear();
-    (async()=>{
-      const base='https://siwmzradvrtetotakkbi.supabase.co/storage/v1/object/public/zasu-loud-media/';
-      const files=['ZASU_LOUD_CLEAR_RAW_AB.m4a','ZASU_LOUD_CLEAR_LEVEL_MATCHED_AB.m4a'];
-      try{
-        const checks=await Promise.all(files.map(name=>fetch(base+name,{method:'HEAD',cache:'no-store'})));
-        if(checks.every(r=>r.ok)) document.getElementById('demo').hidden=false;
-      }catch(e){}
-    })();
+    document.querySelectorAll('#demo audio').forEach(audio=>{
+      const status=document.createElement('p'); status.className='demo-load-status'; status.setAttribute('role','status'); status.hidden=true;
+      const retry=document.createElement('button'); retry.type='button'; retry.textContent='試聴音源を再読み込み'; retry.className='demo-retry'; retry.hidden=true;
+      audio.after(status,retry);
+      const failed=()=>{status.hidden=false;status.textContent='試聴音源を読み込めませんでした。通信状態をご確認のうえ、再読み込みしてください。';retry.hidden=false;};
+      audio.addEventListener('error',failed);audio.querySelector('source').addEventListener('error',failed);
+      audio.addEventListener('canplay',()=>{status.hidden=true;retry.hidden=true;});
+      retry.addEventListener('click',()=>{status.hidden=false;status.textContent='試聴音源を読み込んでいます…';retry.hidden=true;audio.load();});
+    });
   </script>
 </body>
 </html>

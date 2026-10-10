@@ -8,6 +8,10 @@
 <meta name="description" content="ZASU WORKSの共通アカウント。メール確認コードでログインできます。アカウント登録は任意です。">
 <link rel="canonical" href="https://zasuworks.jp/account/"><link rel="stylesheet" href="./account.css">
 <script type="module" src="./account.mjs"></script>
+<link rel="stylesheet" href="/assets/site-improvements.css?v=20261011">
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
 </head>
 <body>
 <a class="skip" href="#main">本文へ</a>
@@ -23,7 +27,7 @@
 <div class="tabs" aria-label="ログイン・新規登録"><button type="button" id="login-tab" aria-pressed="true">ログイン</button><button type="button" id="signup-tab" aria-pressed="false">アカウントを作成</button></div>
 <form id="email-form"><label for="email">メールアドレス</label><input id="email" type="email" autocomplete="email" maxlength="254" required placeholder="you@example.com"><div id="consent-row" hidden><label class="check"><input id="consent" type="checkbox">プライバシーポリシーに同意する</label></div><button class="primary" type="submit">確認コードを送る <span aria-hidden="true">→</span></button></form>
 <form id="code-form" hidden><p id="code-destination"></p><label for="code">確認コード</label><input id="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" minlength="6" maxlength="10" required placeholder="123456"><p class="fine">有効期限は10分です。迷惑メールフォルダーもご確認ください。</p><button class="primary" type="submit">確認してログイン <span aria-hidden="true">→</span></button><div class="code-actions"><button id="resend" type="button">再送する</button><button id="change-email" type="button">メールアドレスを変更</button></div></form>
-<div class="auth-foot"><p>初めての方は「アカウントを作成」を選んでください。</p><p>認証メールは ZASU WORKS から送信します。<br><span class="sender">accounts@alerts.zasumaster.com</span></p><a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a></div>
+<div class="auth-foot"><p>購入済み製品をまとめたい方は、ログイン後の「購入管理」で領収書・取引IDを追加できます。購入時のメールで確認します。</p><p>登録しない方は<a href="/vocal-loud-set/download/">制作セット</a>・<a href="/zasu-vocal/download/">VOCAL</a>・<a href="/zasu-loud/download/">LOUD</a>・<a href="/zasu-daw/download/">DAW</a>のページで再ダウンロードできます。</p><p>初めての方は「アカウントを作成」を選んでください。</p><p>認証メールは ZASU WORKS から送信します。<br><span class="sender">accounts@alerts.zasumaster.com</span></p><a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a></div>
 </section>
 <section id="dashboard" hidden>
 <p class="eyebrow">MY PRODUCTS · MY AUDIO · MY ACCOUNT</p><h1>マイページ</h1><p class="lead"><span id="user-name"></span><span id="greeting">、こんにちは。</span></p>
@@ -54,5 +58,5 @@
 <noscript><p>ログインにはJavaScriptが必要です。購入・ダウンロードは各製品ページをご利用ください。</p></noscript>
 </div></div>
 </main>
-<footer><span>© ZASU WORKS</span><div><a href="/privacy.html">Privacy Policy</a><a href="mailto:zasuworks@gmail.com">サポート</a></div></footer>
+<footer><span>© ZASU WORKS</span><div><a href="/privacy.html">Privacy Policy</a><a href="mailto:zasuworks@gmail.com">サポート</a></div><nav class="common-support" aria-label="サポート・販売条件"><a href="mailto:zasuworks@gmail.com">お問い合わせ</a><a href="/account/">ZASU ACCOUNT</a><a href="/sales.html">販売条件・利用規約・特商法</a><a href="/privacy.html">プライバシーポリシー</a><a href="/products.html">製品一覧</a></nav></footer>
 </body></html>

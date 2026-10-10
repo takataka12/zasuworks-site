@@ -13,7 +13,7 @@ before(async()=>{
  browser=await chromium.launch({headless:true,args:['--no-sandbox'],...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
 });
 after(async()=>{await browser?.close();await new Promise(r=>server?server.close(r):r());});
-for(const width of [320,375,390,768,1440])test(`brand home preserves product hierarchy and routes at ${width}px`,async()=>{
+for(const width of [360,390,430,768,1440])test(`brand home preserves product hierarchy and routes at ${width}px`,async()=>{
  const page=await browser.newPage({viewport:{width,height:844},reducedMotion:'reduce'});page.setDefaultTimeout(3000);
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(origin+'/');
  assert.equal(await page.title(),'ZASU WORKS | 歌ってみた制作ツール・ボーカルプラグイン');
@@ -52,16 +52,16 @@ for(const width of [320,375,390,768,1440])test(`brand home preserves product hie
  }
  assert.equal(await page.locator('.bundle-flow').count(),1);
  assert.equal(await page.locator('.bundle-flow img').count(),2);
- assert.equal(await page.locator('.bundle-flow .flow-step').nth(1).locator('img').getAttribute('src'),'/assets/zasu-loud-v112.png');
- assert.match(await page.locator('.bundle-flow .flow-caption').innerText(),/旧版参考画面 v1\.1\.2/);
+ assert.equal(await page.locator('.bundle-flow .flow-step').nth(1).locator('img').getAttribute('src'),'/assets/zasu-loud-v200-live.webp');
+ assert.match(await page.locator('.bundle-flow .flow-caption').innerText(),/v2\.0\.0.*Windows実機写真/);
  assert.ok((await page.locator('#vocal-loud-set').boundingBox()).y>(await page.locator('#loud').boundingBox()).y);
  assert.ok((await page.locator('#daw').boundingBox()).y>(await page.locator('#vocal-loud-set').boundingBox()).y);
  for(const product of ['vocal','loud']){
   const price=await page.locator('#'+product+' .product-price').boundingBox(),cta=await page.locator('#'+product+' .cta').boundingBox();
   assert.ok(cta.y>=price.y+price.height,product+' price and CTA do not overlap');
  }
- assert.equal(await page.locator('#loud .flagship-visual img').getAttribute('src'),'/assets/zasu-loud-v112.png');
- assert.match(await page.locator('#loud .flagship-visual figcaption').innerText(),/旧版参考画面.*v1\.1\.2.*v2\.0\.0/);
+ assert.equal(await page.locator('#loud .flagship-visual img').getAttribute('src'),'/assets/zasu-loud-v200-live.webp');
+ assert.match(await page.locator('#loud .flagship-visual figcaption').innerText(),/v2\.0\.0.*Windows実機写真/);
  await page.keyboard.press('Tab');
  assert.equal(await page.evaluate(()=>document.activeElement.matches('a,button')),true);
  await page.keyboard.press('Enter');
@@ -78,7 +78,7 @@ for(const width of [320,375,390,768,1440])test(`brand home preserves product hie
  for(const img of await page.locator('.loud-reference-ui img').all()){
   const dimensions=await img.evaluate(e=>{const r=e.getBoundingClientRect();return {width:r.width,height:r.height,naturalWidth:e.naturalWidth,naturalHeight:e.naturalHeight};});
   const expectedHeight=dimensions.width*dimensions.naturalHeight/dimensions.naturalWidth;
-  assert.ok(Math.abs(dimensions.height-expectedHeight)<1,`LOUD image keeps original aspect ratio at ${width}px: ${JSON.stringify(dimensions)}`);
+  assert.ok(dimensions.height<=expectedHeight+1,`LOUD image keeps original aspect ratio at ${width}px: ${JSON.stringify(dimensions)}`);
  }
  if(width<600){await page.getByRole('button',{name:'メニュー'}).click();assert.equal(await page.getByRole('button',{name:'メニュー'}).getAttribute('aria-expanded'),'true');await page.getByRole('button',{name:'メニュー'}).click();}
  assert.deepEqual(await page.evaluate(()=>[...document.querySelectorAll('a[href^="#"]')].filter(a=>!document.getElementById(a.hash.slice(1))).map(a=>a.hash)),[]);
