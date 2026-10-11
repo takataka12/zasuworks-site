@@ -12,3 +12,5 @@ input:not([type=checkbox]),select{font-size:16px;border-radius:8px;min-height:54
 .downloads a{border-radius:8px;font-size:13px}.signed-downloads a{border-radius:8px;min-height:44px}.verified{color:#38612a}.pill{background:#f0f2eb}#account-nav button[aria-current=page]{font-weight:750;background:#edf3e5;padding-inline:12px;border-radius:8px}
 footer{flex-wrap:wrap;font-size:12px;align-items:center}footer .common-support{flex-basis:100%;max-width:none;margin:0;padding-bottom:0;border-color:var(--line)}footer .common-support a{color:var(--muted)!important}
 @media(max-width:650px){header{padding-block:14px}.brand{font-size:16px;gap:9px}.mark{width:34px;height:34px}.back{font-size:12px}main{padding-top:28px}.optional{margin-top:16px;padding:13px;font-size:12px}.wordmark{font-size:30px;line-height:1.25}aside{margin-bottom:30px}.lead{font-size:14px}.auth-foot{font-size:12px}#account-nav button{font-size:13px}footer{font-size:11px}}
+.skip{background:var(--action);color:var(--ink)}
+body :is(a,button,input,select):focus-visible{outline:3px solid #38612a;outline-offset:4px}
