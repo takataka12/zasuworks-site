@@ -51,13 +51,13 @@ jobs:
       - name: Verify published studio homepage
         run: |
           python - <<'PYCODE'
-          import urllib.request, time
+          import urllib.request, time, os
           for attempt in range(18):
               try:
-                  req = urllib.request.Request('https://zasuworks.jp/?studio=20261011', headers={'Cache-Control':'no-cache'})
+                  req = urllib.request.Request('https://zasuworks.jp/?revision=' + os.environ['GITHUB_SHA'], headers={'Cache-Control':'no-cache'})
                   with urllib.request.urlopen(req, timeout=20) as response:
                       html = response.read().decode('utf-8')
-                  if 'studio-home' in html and 'studio.css?v=20261011' in html:
+                  if 'studio-home' in html and 'readability.css?v=20261011-r1' in html:
                       break
               except Exception as error:
                   print(type(error).__name__)

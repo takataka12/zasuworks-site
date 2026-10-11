@@ -14,15 +14,23 @@ before(async()=>{
 });
 after(async()=>{await browser?.close();await new Promise(r=>server?server.close(r):r());});
 
-for(const width of [320,360,390,430,768,1440])test(`creative studio and purchase routes fit ${width}px`,async()=>{
+for(const width of [320,360,375,390,414,430,768,820,1024,1440])test(`creative studio and purchase routes fit ${width}px`,async()=>{
  const page=await browser.newPage({viewport:{width,height:844},reducedMotion:'reduce'});page.setDefaultTimeout(5000);
- const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(origin+'/?studio=20261011');
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(origin+'/?studio=readability-20261011');
  assert.match(await page.title(),/個人とAIのクリエイティブスタジオ/);
  assert.match(await page.locator('h1').innerText(),/音楽から始まって、\s*あらゆる創作を簡単に。/);
  assert.equal(await page.locator('h1').count(),1);
  assert.deepEqual(await page.locator('[data-product]').evaluateAll(es=>es.map(e=>e.dataset.product)),['daw','audio','loud','vocal','apps']);
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'no horizontal overflow');
  for(const card of await page.locator('.create-card').all())assert.equal(await card.evaluate(e=>e.scrollWidth<=e.clientWidth),true,'activity card text fits');
+ assert.equal(await page.locator('.heading-jp').count(),6);
+ assert.equal(await page.locator('.product-shortcuts a').count(),6);
+ assert.equal(await page.locator('.studio-top').isVisible(),false,'top shortcut stays out of the initial view');
+ assert.equal(await page.locator('.studio-mark').count(),3);
+ if(width<=600){
+  assert.equal(await page.locator('.create-card').first().boundingBox().then(b=>b.width>width-60),true,'activity cards use the available reading width');
+  for(const card of await page.locator('.create-card').all())assert.ok((await card.boundingBox()).height<180,'activity cards are compact and readable');
+ }
  for(const id of ['products','about','projects','news','contact'])assert.equal(await page.locator('#'+id).count(),1);
  for(const [id,version,price] of [['daw','v1.4','¥1,980'],['vocal','v1.0.0','¥3,980'],['loud','v2.0.0','¥2,980']]){
   const card=page.locator('#'+id);const text=await card.innerText();
@@ -45,13 +53,22 @@ for(const width of [320,360,390,430,768,1440])test(`creative studio and purchase
   const button=page.getByRole('button',{name:'メニュー',exact:true});await button.click();
   assert.equal(await button.getAttribute('aria-expanded'),'true');assert.equal(await page.locator('#studio-nav').isVisible(),true);
   await page.keyboard.press('Escape');assert.equal(await button.getAttribute('aria-expanded'),'false');
-  await button.click();await page.locator('#studio-nav').getByRole('link',{name:'PROJECTS',exact:true}).click();
+  await button.click();await page.locator('#studio-nav').getByRole('link',{name:'プロジェクト',exact:true}).click();
   assert.equal(await button.getAttribute('aria-expanded'),'false');assert.equal(await page.locator('#studio-nav').isVisible(),false);
  }
+ await page.locator('.product-shortcuts a[href="#audio"]').click();
+ await page.waitForURL(u=>u.hash==='#audio');
+ await page.waitForFunction(()=>!document.querySelector('.studio-top').hidden);
+ const target=await page.locator('#audio').boundingBox();
+ assert.ok(target.y>=60,'product jump clears the sticky header');
+ await page.getByRole('link',{name:'ページの先頭へ戻る',exact:true}).click();
+ await page.waitForFunction(()=>scrollY<1);
  for(const img of await page.locator('img').all()){await img.scrollIntoViewIfNeeded();await img.evaluate(e=>e.decode());assert.ok(await img.evaluate(e=>e.complete&&e.naturalWidth>0));}
  if(process.env.CAPTURE_DIR){
-  await fs.mkdir(process.env.CAPTURE_DIR,{recursive:true});await page.evaluate(()=>{document.activeElement.blur();scrollTo(0,0)});
+  await fs.mkdir(process.env.CAPTURE_DIR,{recursive:true});await page.evaluate(()=>{document.activeElement.blur();scrollTo({top:0,behavior:'instant'})});
+  await page.waitForFunction(()=>scrollY<1);
   await page.screenshot({path:path.resolve(process.env.CAPTURE_DIR,`home-${width}.png`)});
+  if(width===390){await page.locator('.create-section').screenshot({path:path.resolve(process.env.CAPTURE_DIR,'home-mobile-fields.png')});await page.locator('.product-finder').screenshot({path:path.resolve(process.env.CAPTURE_DIR,'home-mobile-finder.png')});await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));}
   if(width===390||width===1440)await page.screenshot({path:path.resolve(process.env.CAPTURE_DIR,`home-${width}-full.png`),fullPage:true});
  }
  await page.getByRole('link',{name:'ZASU DAWを見る →',exact:true}).click();assert.equal(new URL(page.url()).pathname,'/zasu-daw/');assert.match(await page.locator('h1').innerText(),/v1\.4 正式版/);
@@ -63,6 +80,9 @@ for(const pathname of ['/products.html','/about.html'])test(`related studio page
  assert.equal(await page.locator('.studio-header').evaluate(e=>getComputedStyle(e).position),'sticky');
  await page.getByRole('button',{name:'メニュー',exact:true}).click();assert.equal(await page.locator('#studio-nav').isVisible(),true);
  await page.keyboard.press('Escape');assert.equal(await page.locator('#studio-nav').isVisible(),false);
+ assert.ok(await page.locator('.page-contents a').count());
+ assert.deepEqual(await page.locator('.page-contents a').evaluateAll(es=>es.filter(e=>!document.querySelector(e.hash)).map(e=>e.hash)),[]);
+ await page.evaluate(()=>{document.activeElement.blur();scrollTo({top:0,behavior:'instant'})});
  if(process.env.CAPTURE_DIR)await page.screenshot({path:path.resolve(process.env.CAPTURE_DIR,pathname.includes('products')?'products-mobile.png':'about-mobile.png'),fullPage:true});
  assert.deepEqual(errors,[]);await page.close();
 });
@@ -87,6 +107,7 @@ for(const pathname of ['/radio.html','/services.html','/crowdfunding.html','/pri
   assert.equal(await page.locator('iframe').getAttribute('src'),await page.locator('iframe').getAttribute('data-src'));
   await page.getByText('ページ内プレーヤーを開く',{exact:true}).click();
  }
+ await page.evaluate(()=>{document.activeElement.blur();scrollTo({top:0,behavior:'instant'})});
  if(process.env.CAPTURE_DIR&&(width===390||width===1440)){await fs.mkdir(process.env.CAPTURE_DIR,{recursive:true});await page.screenshot({path:path.resolve(process.env.CAPTURE_DIR,pathname.slice(1,-5)+'-'+width+'.png'),fullPage:true});}
  assert.deepEqual(errors,[]);await page.close();
 });

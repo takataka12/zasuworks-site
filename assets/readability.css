@@ -1,0 +1,76 @@
+/* Shared reading and navigation refinements. No product content is hidden. */
+body.studio-home,body.studio-page{line-height:1.85;text-size-adjust:100%;-webkit-text-size-adjust:100%}
+.studio-menu{appearance:none;-webkit-appearance:none;color:var(--ink)}
+.studio-page .studio-header nav a,.desktop-nav{letter-spacing:0;font-size:12px}
+.studio-page .studio-header .studio-mobile a,.studio-mobile a{font-size:15px;font-weight:650;letter-spacing:0}
+.studio-mobile a:last-child{border-bottom:0}
+.studio-skip{top:0;left:0;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.studio-skip:focus{top:12px;left:12px;width:auto;height:auto;padding:14px 18px;clip-path:none}
+.studio-mark{display:inline-block;vertical-align:middle;width:1em;height:1em;flex-shrink:0}
+.hero-signature .signature-star{font-size:44px}
+.hero-signature>span{font-size:11px;letter-spacing:.09em}
+.studio-hero h1{line-height:1.45;letter-spacing:-.055em}
+.hero-bottom p{font-size:16px;line-height:2;max-width:34em}
+.heading-jp{display:block;font-size:15px!important;font-weight:650;letter-spacing:0!important;line-height:1.8!important;margin-top:14px;color:var(--muted)}
+.about-section .heading-jp{color:#3d542b}
+.connect-grid h2>.heading-jp{font-size:15px;color:var(--muted);margin-left:0}
+.section-heading p{font-size:15px;line-height:1.9}
+.create-card h3 .area-en{display:block;line-height:1.35}
+.create-card h3 .area-jp{display:block;font-size:13px;font-weight:650;line-height:1.8;letter-spacing:0;margin-top:10px}
+.create-card p{font-size:14px;line-height:1.9}
+.product-finder{border:1px solid var(--line);border-radius:14px;padding:24px;margin-bottom:32px;background:#f0f2eb}
+.finder-label{font-size:15px;font-weight:750;margin:0 0 16px}.finder-label span{font-size:13px;font-weight:400;color:var(--muted);margin-left:14px}
+.product-shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:stretch}
+.product-shortcuts a{display:grid;grid-template-columns:minmax(0,1fr) 16px;gap:2px 8px;background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:14px 16px;min-height:72px;transition:border-color .2s,background .2s;letter-spacing:0;text-transform:none}
+.product-shortcuts a:hover{border-color:#648448;background:#eaf3d6;color:var(--ink)}
+.product-shortcuts span{font-size:12px;line-height:1.7;color:var(--muted);font-weight:450}.product-shortcuts strong{grid-column:1;font-size:16px;line-height:1.5;font-weight:750}.product-shortcuts b{grid-column:2;grid-row:1/3;align-self:center;font-weight:500;font-size:18px}
+[id]{scroll-margin-top:12px}
+.studio-product-copy>p,.project-card p{font-size:15px;line-height:1.9}
+.studio-product-copy>p.environment{font-size:12px;line-height:1.85}
+.studio-product h3{font-size:29px;line-height:1.45}
+.price-row span{font-size:12px;line-height:1.85}
+.download-link{font-size:12px;text-decoration:underline;text-underline-offset:4px}
+.about-copy p,.connect-grid p{font-size:15px;line-height:2}
+.news-list h3{font-size:15px;line-height:1.85}.news-list time,.news-date{font-size:12px}
+.studio-page .page-hero h1{line-height:1.12;font-size:clamp(44px,6vw,76px)}
+.page-title-jp{display:block;font-size:16px;font-weight:650;line-height:1.8;letter-spacing:0;margin:20px 0 4px;color:var(--muted)}
+.studio-page .page-hero p{font-size:16px;line-height:2;max-width:46em}
+.page-contents-wrap{padding:20px 0}
+.page-contents{display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-bottom:1px solid var(--line);padding-bottom:20px}
+.page-contents>span{font-size:12px;color:var(--muted);margin-right:8px}
+.page-contents a{display:inline-flex;align-items:center;min-height:44px;padding:8px 14px;border:1px solid var(--line);border-radius:100px;font-size:13px;color:var(--ink);letter-spacing:0;font-weight:600;text-transform:none}
+.page-contents a:hover{background:#eaf3d6;border-color:#648448}
+.studio-page .card p,.studio-page .card ul,.studio-page .studio-copy,.studio-page .time p{font-size:15px;line-height:1.95}
+.studio-page .card ul{padding-left:20px}.studio-page .card li+li{margin-top:8px}
+.studio-page .intro{font-size:16px;line-height:2;max-width:46em}
+.studio-page .section-head h2{font-size:clamp(30px,3.8vw,48px);line-height:1.45;letter-spacing:-.035em}
+.studio-page .card h3{font-size:26px;line-height:1.5;letter-spacing:-.025em}
+.studio-page .simple-list strong{font-size:16px;font-weight:650;line-height:1.8}
+.studio-page .app-item small{font-size:13px;line-height:1.8}
+.studio-top{position:fixed;right:22px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;align-items:center;justify-content:center;min-width:48px;min-height:48px;padding:10px;background:var(--paper);color:var(--ink);border:1px solid #b9c2b0;border-radius:50%;font-size:22px;box-shadow:0 3px 12px #17191612}
+.studio-top:hover{background:var(--green);color:var(--ink)}.studio-top[hidden]{display:none!important}
+@media(max-width:1100px){.desktop-nav{gap:18px}}
+@media(max-width:800px){.product-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){
+ html{scroll-padding-top:82px}[id]{scroll-margin-top:10px}
+ .header-inner{min-height:64px}.studio-brand img{width:34px;height:34px}.studio-brand{font-size:17px}.studio-menu{padding:10px 13px;gap:8px;font-size:12px}
+ .studio-hero{padding-top:25px}.studio-hero h1{font-size:clamp(25px,7vw,40px);line-height:1.55;margin:26px 0 20px}
+ .hero-bottom p{font-size:14px;line-height:1.95}.hero-bottom{gap:18px}.hero-actions{gap:6px 18px}.hero-actions .text-link{font-size:12px}
+ .hero-signature{padding:18px 0 23px;margin-top:22px}.hero-signature strong{display:none}.hero-signature>span{display:block;font-size:10px;letter-spacing:.13em}
+ .section-heading h2{font-size:29px;line-height:1.2}.heading-jp{margin-top:8px;font-size:14px!important}.section-heading p{font-size:14px;line-height:1.9}
+ .create-grid{grid-template-columns:1fr;gap:10px}.create-card{padding:17px 38px 17px 66px;min-height:112px;border-radius:10px}
+ .card-top{position:absolute;top:18px;left:18px;margin:0}.card-top>span:first-child{display:none}.area-symbol{width:32px;height:32px;font-size:23px}.area-symbol .studio-mark{width:20px;height:20px}
+ .create-card h3{display:flex;flex-direction:column-reverse;gap:3px;margin:0 0 8px;letter-spacing:0}.create-card h3 .area-jp{margin:0;font-size:16px;line-height:1.5;font-weight:750}.create-card h3 .area-en{font-size:11px;line-height:1.5;font-weight:650;letter-spacing:.025em;color:var(--muted)}
+ .create-card .area-type{display:none}.create-card p{margin:0;font-size:14px;line-height:1.85}.card-arrow{top:19px;bottom:auto;right:15px;font-size:21px}
+ .create-section{padding:32px 0}.product-section{padding-top:40px}.product-finder{padding:16px;margin-bottom:24px}.finder-label{font-size:14px;margin-bottom:12px}.finder-label span{display:block;font-size:12px;margin:3px 0 0}
+ .product-shortcuts{gap:8px}.product-shortcuts a{padding:11px;min-height:78px;gap:3px 5px}.product-shortcuts span{font-size:11px;line-height:1.7}.product-shortcuts strong{font-size:14px;line-height:1.5}.product-shortcuts b{font-size:16px}
+ .studio-product-copy{padding:21px}.studio-product h3{font-size:26px}.studio-product-copy>p{font-size:14px;line-height:1.95}.product-image{height:210px;padding:18px}.price-row{align-items:flex-start}.price-row span{font-size:12px;line-height:1.85}.studio-products{gap:20px}
+ .about-copy p,.project-card p,.connect-grid p{font-size:14px;line-height:2}.news-list h3{font-size:14px}.connect-grid h2{font-size:54px}.connect-grid h2>.heading-jp{font-size:14px;margin-top:14px}
+ .studio-page .page-hero{padding:30px 0}.studio-page .page-hero h1{font-size:48px;line-height:1.12}.page-title-jp{font-size:15px;margin-top:15px}.studio-page .page-hero p{font-size:14px;line-height:1.95}
+ .page-contents-wrap{padding:16px 0}.page-contents{gap:7px;padding-bottom:16px}.page-contents>span{flex-basis:100%;margin-bottom:2px}.page-contents a{font-size:12px;padding:8px 12px}
+ .studio-page .section-head{margin-bottom:28px}.studio-page .section-head h2{font-size:29px;line-height:1.5}.studio-page .intro{font-size:14px;line-height:2}
+ .studio-page .card{padding:24px}.studio-page .card h3{font-size:23px;line-height:1.55}.studio-page .card p,.studio-page .card ul,.studio-page .time p{font-size:14px;line-height:1.95}.studio-page .studio-copy{font-size:15px;line-height:2}
+ .studio-page .studio-legal{font-size:15px;line-height:2}.studio-page .studio-legal section{padding:0!important}.studio-top{right:14px;bottom:calc(16px + env(safe-area-inset-bottom,0px));min-width:44px;min-height:44px;font-size:20px}
+ .studio-footer{padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}.footer-bottom{padding-right:48px}
+}
+@media(prefers-reduced-motion:reduce){.product-shortcuts a{transition:none}}
