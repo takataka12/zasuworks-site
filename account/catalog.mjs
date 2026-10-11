@@ -10,8 +10,8 @@ export const CATALOG=Object.freeze({
  vocal:{name:'ZASU VOCAL',status:'available',offline:true,platforms:['macOS','Windows'],salesVersion:'1.0.0',page:'/zasu-vocal/',note:'配布版 1.0.0。既存のオフライン利用を継続できます。'},
  loud:{name:'ZASU LOUD',status:'available',offline:true,platforms:['macOS','Windows'],salesVersion:'2.0.0',page:'/zasu-loud/',note:'配布版 2.0.0。以前の購入も最新配布版を取得できます。'},
  daw:{name:'ZASU DAW',status:'available',offline:true,platforms:['macOS','Windows'],salesVersion:'1.4',page:'/zasu-daw/',note:'販売表記 1.4 / 配布ファイル 0.0.14。アカウントはオフライン利用に不要です。'},
- finish:{name:'ZASU FINISH',status:'scheduled',offline:true,platforms:['macOS','Windows'],salesVersion:'1.0.0',page:'/zasu-finish/',note:'2026年10月13日発売予定。購入者はMac / Windows両版を取得できます。'},
- vocal_editor:{name:'ZASU VOCAL EDITOR',status:'scheduled',offline:true,platforms:['macOS','Windows'],salesVersion:'0.3.0',page:'/zasu-vocal-editor/',note:'2026年10月13日発売予定。ZASU VOCALとは別製品です。'},
+ finish:{name:'ZASU FINISH',status:'available',offline:true,platforms:['macOS','Windows'],salesVersion:'1.0.0',page:'/zasu-finish/',note:'2026年10月13日発売予定。購入者はMac / Windows両版を取得できます。'},
+ vocal_editor:{name:'ZASU VOCAL EDITOR',status:'available',offline:true,platforms:['macOS','Windows'],salesVersion:'0.3.0',page:'/zasu-vocal-editor/',note:'2026年10月13日発売予定。ZASU VOCALとは別製品です。'},
 });
 export function ownedUpdates(purchases){const keys=new Set(purchases.filter(p=>p.status==='paid').flatMap(p=>p.products.map(x=>x.key)));return [...keys].filter(key=>RELEASES[key]&&CATALOG[key]).map(key=>({key,...CATALOG[key],version:RELEASES[key].version}));}
 
