@@ -65,7 +65,7 @@ jobs:
           else:
               raise SystemExit('Published studio homepage has not propagated yet')
           PYCODE
-          NODE_PATH=/tmp/zasu-home-check/node_modules SITE_URL=https://zasuworks.jp CAPTURE_DIR=/tmp/zasu-home-shots/production node --test tests/home.test.cjs
+          NODE_PATH=/tmp/zasu-home-check/node_modules SITE_URL=https://zasuworks.jp CAPTURE_DIR=/tmp/zasu-home-shots/production node --test tests/home.test.cjs tests/account-ui.test.cjs
 
       - name: Save homepage screenshots
         if: always()
