@@ -15,7 +15,7 @@ export function createSquare({token,fetchImpl=fetch}){
    const reader=response.body?.getReader();if(!reader)denied('receipt_lookup_incomplete');const chunks=[];let size=0;
    while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>200000){await reader.cancel();denied('receipt_lookup_incomplete')}chunks.push(value);}
    const bytes=new Uint8Array(size);let offset=0;for(const c of chunks){bytes.set(c,offset);offset+=c.length;}const html=new TextDecoder().decode(bytes);
-   if(!html.includes('ZASU WORKS')||!['ZASU VOCAL','ZASU LOUD','ZASU DAW','ZASU 歌ってみた制作セット'].some(t=>html.includes(t)))denied('receipt_lookup_incomplete');
+   if(!html.includes('ZASU WORKS')||!['ZASU FINISH','ZASU VOCAL EDITOR','ZASU VOCAL','ZASU LOUD','ZASU DAW','ZASU 歌ってみた制作セット'].some(t=>html.includes(t)))denied('receipt_lookup_incomplete');
    const ids=new Set([...html.matchAll(/href\s*=\s*["']https:\/\/squareup\.com\/receipts\/pt\/([A-Za-z0-9_-]{16,192})(?=[?\/"'])/gi)].map(m=>m[1]));if(ids.size!==1)denied('receipt_lookup_incomplete');paymentId=[...ids][0];
   }
   if(!validSquareId(paymentId))denied();const p=await getPayment(paymentId);if(p?.id!==paymentId||!validSquareId(p.order_id))denied();return p.order_id;

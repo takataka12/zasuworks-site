@@ -66,7 +66,7 @@ export function createHandler(deps){return async(req)=>{
     if(!UUID.test(b.challengeId||'')||!/^\d{8}$/.test(b.code||''))return reply(400,{error:'invalid_code'});
     return reply(200,await deps.commerce.claimVerify(user,b));
    }
-   if(!UUID.test(b.orderId||'')||!['vocal','loud','daw'].includes(b.product))return reply(400,{error:'invalid_request'});
+   if(!UUID.test(b.orderId||'')||!['vocal','loud','daw','finish','vocal_editor'].includes(b.product))return reply(400,{error:'invalid_request'});
    return reply(200,await deps.commerce.download(user,b));
   }
   if(b.action==='update'){

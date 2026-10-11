@@ -39,7 +39,7 @@ async function loadAccount(){show('loading');try{renderAccount(await api({action
 setInterval(updateResend,1000);
 if(session)loadAccount();else{authMode('login');show('auth');}
 
-const productNames={vocal:'VOCAL',loud:'LOUD',daw:'DAW'};
+const productNames={vocal:'VOCAL',loud:'LOUD',daw:'DAW',finish:'FINISH',vocal_editor:'VOCAL EDITOR'};
 const purchaseStates={paid:'利用可能',pending:'決済確認中',refund_pending:'返金処理中',refunded:'返金済み',review:'サポート確認が必要',void:'取り消し済み'};
 function element(tag,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;}
 async function loadPurchases(){
