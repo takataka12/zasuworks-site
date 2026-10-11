@@ -9,3 +9,11 @@ if(studioMenu&&studioMobile){
  document.addEventListener('click',event=>{if(!studioMobile.hidden&&!event.target.closest('.studio-header'))setOpen(false);});
  matchMedia('(min-width:801px)').addEventListener('change',event=>{if(event.matches)setOpen(false);});
 }
+
+// Load third-party audio only when the visitor opens the player.
+for(const player of document.querySelectorAll('.radio-embed')){
+ player.addEventListener('toggle',()=>{
+  const frame=player.querySelector('iframe[data-src]');
+  if(player.open&&frame&&!frame.hasAttribute('src'))frame.src=frame.dataset.src;
+ });
+}
