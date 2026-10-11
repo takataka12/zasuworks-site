@@ -30,33 +30,6 @@ jobs:
           sudo apt-get install -y librsvg2-bin
           rsvg-convert assets/ogp.svg -w 1200 -h 630 -o ogp.png
 
-      - name: Inject social card metadata
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          p = Path("index.html")
-          s = p.read_text(encoding="utf-8")
-          old = '<meta property="og:url" content="https://zasuworks.jp/">\n<meta name="twitter:card" content="summary">'
-          new = '''<meta property="og:url" content="https://zasuworks.jp/">
-          <meta property="og:image" content="https://zasuworks.jp/assets/ogp-brand.png">
-          <meta property="og:image:secure_url" content="https://zasuworks.jp/assets/ogp-brand.png">
-          <meta property="og:image:type" content="image/png">
-          <meta property="og:image:width" content="1200">
-          <meta property="og:image:height" content="630">
-          <meta property="og:image:alt" content="ZASU WORKS。音楽制作ツール ZASU DAW / ZASU AUDIO / ZASU LOUD。">
-          <meta name="twitter:card" content="summary_large_image">
-          <meta name="twitter:title" content="ZASU WORKS｜DAW・Audio Tools・Plugins">
-          <meta name="twitter:description" content="ZASU DAW、ZASU AUDIO、ZASU LOUD。音楽制作をもっとシンプルにするクリエイターツールを開発・提供しています。">
-          <meta name="twitter:image" content="https://zasuworks.jp/assets/ogp-brand.png">
-          <meta name="twitter:image:alt" content="ZASU WORKS。音楽制作ツール ZASU DAW / ZASU AUDIO / ZASU LOUD。">'''
-          if '<meta property="og:image" ' in s and '<meta name="twitter:image" ' in s:
-              print("Social card metadata already present in source; keeping it unchanged")
-              raise SystemExit(0)
-          if old not in s:
-              raise SystemExit("social metadata anchor not found")
-          p.write_text(s.replace(old, new), encoding="utf-8")
-          PY
-
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
@@ -66,14 +39,6 @@ jobs:
           /tmp/zasu-home-check/node_modules/.bin/playwright install --with-deps chromium
           NODE_PATH=/tmp/zasu-home-check/node_modules CAPTURE_DIR=/tmp/zasu-home-shots node --test tests/*.test.cjs supabase/tests/*.test.mjs
 
-      - name: Save homepage screenshots
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: homepage-screenshots
-          path: /tmp/zasu-home-shots
-          if-no-files-found: ignore
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
@@ -82,3 +47,30 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Verify published studio homepage
+        run: |
+          python - <<'PYCODE'
+          import urllib.request, time
+          for attempt in range(18):
+              try:
+                  req = urllib.request.Request('https://zasuworks.jp/?studio=20261011', headers={'Cache-Control':'no-cache'})
+                  with urllib.request.urlopen(req, timeout=20) as response:
+                      html = response.read().decode('utf-8')
+                  if 'studio-home' in html and 'studio.css?v=20261011' in html:
+                      break
+              except Exception as error:
+                  print(type(error).__name__)
+              time.sleep(10)
+          else:
+              raise SystemExit('Published studio homepage has not propagated yet')
+          PYCODE
+          NODE_PATH=/tmp/zasu-home-check/node_modules SITE_URL=https://zasuworks.jp CAPTURE_DIR=/tmp/zasu-home-shots/production node --test tests/home.test.cjs
+
+      - name: Save homepage screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: homepage-screenshots
+          path: /tmp/zasu-home-shots
+          if-no-files-found: ignore
