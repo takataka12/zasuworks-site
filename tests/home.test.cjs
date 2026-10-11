@@ -66,3 +66,19 @@ for(const pathname of ['/products.html','/about.html'])test(`related studio page
  if(process.env.CAPTURE_DIR)await page.screenshot({path:path.resolve(process.env.CAPTURE_DIR,pathname.includes('products')?'products-mobile.png':'about-mobile.png'),fullPage:true});
  assert.deepEqual(errors,[]);await page.close();
 });
+for(const pathname of ['/radio.html','/services.html','/crowdfunding.html','/privacy.html','/sales.html'])for(const width of [320,390,1440])test(`studio secondary page ${pathname} at ${width}px`,async()=>{
+ const page=await browser.newPage({viewport:{width,height:844},reducedMotion:'reduce'});page.setDefaultTimeout(5000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(origin+pathname+'?studio=pages-20261011');
+ assert.equal(await page.locator('h1').count(),1);
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'page has no horizontal overflow');
+ assert.equal(await page.locator('body').evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(250, 250, 247)');
+ assert.equal(await page.locator('.studio-header').count(),1);assert.equal(await page.locator('.studio-footer').count(),1);
+ if(width<800){const button=page.getByRole('button',{name:'メニュー',exact:true});await button.click();assert.equal(await page.locator('#studio-nav').isVisible(),true);await page.keyboard.press('Escape');assert.equal(await button.getAttribute('aria-expanded'),'false');}
+ if(pathname==='/radio.html'){
+  assert.equal(await page.locator('iframe').getAttribute('src'),'https://open.spotify.com/embed/episode/2CPAfyuf9b3tXpwfNr2uDw?utm_source=generator&theme=0');
+  assert.equal(await page.getByRole('link',{name:'Spotifyで直接聴く ↗',exact:true}).getAttribute('href'),'https://open.spotify.com/episode/2CPAfyuf9b3tXpwfNr2uDw');
+  assert.equal(await page.locator('.simple-list').first().getByRole('link').count(),2);
+ }
+ if(process.env.CAPTURE_DIR&&(width===390||width===1440)){await fs.mkdir(process.env.CAPTURE_DIR,{recursive:true});await page.screenshot({path:path.resolve(process.env.CAPTURE_DIR,pathname.slice(1,-5)+'-'+width+'.png'),fullPage:true});}
+ assert.deepEqual(errors,[]);await page.close();
+});
