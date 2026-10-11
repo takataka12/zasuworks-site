@@ -67,7 +67,7 @@ for(const pathname of ['/products.html','/about.html'])test(`related studio page
  assert.deepEqual(errors,[]);await page.close();
 });
 for(const pathname of ['/radio.html','/services.html','/crowdfunding.html','/privacy.html','/sales.html'])for(const width of [320,390,1440])test(`studio secondary page ${pathname} at ${width}px`,async()=>{
- const page=await browser.newPage({viewport:{width,height:844},reducedMotion:'reduce'});page.setDefaultTimeout(5000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const page=await browser.newPage({viewport:{width,height:844},reducedMotion:'reduce'});page.setDefaultTimeout(5000);const errors=[];page.on('pageerror',e=>errors.push({message:e.message,stack:e.stack}));
  await page.goto(origin+pathname+'?studio=pages-20261011');
  assert.equal(await page.locator('h1').count(),1);
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'page has no horizontal overflow');
@@ -78,7 +78,13 @@ for(const pathname of ['/radio.html','/services.html','/crowdfunding.html','/pri
   assert.equal(await page.locator('iframe').getAttribute('src'),'https://open.spotify.com/embed/episode/2CPAfyuf9b3tXpwfNr2uDw?utm_source=generator&theme=0');
   assert.equal(await page.getByRole('link',{name:'Spotifyで直接聴く ↗',exact:true}).getAttribute('href'),'https://open.spotify.com/episode/2CPAfyuf9b3tXpwfNr2uDw');
   assert.equal(await page.locator('.simple-list').first().getByRole('link').count(),2);
+  await page.locator('iframe').scrollIntoViewIfNeeded();
+  const player=await page.locator('iframe').elementHandle();const frame=await player.contentFrame();
+  await frame.waitForFunction(()=>document.body?.innerText.includes('ZASU'),null,{timeout:15000});
  }
  if(process.env.CAPTURE_DIR&&(width===390||width===1440)){await fs.mkdir(process.env.CAPTURE_DIR,{recursive:true});await page.screenshot({path:path.resolve(process.env.CAPTURE_DIR,pathname.slice(1,-5)+'-'+width+'.png'),fullPage:true});}
- assert.deepEqual(errors,[]);await page.close();
+ // Playwright forwards errors from cross-origin frames; keep our page errors fatal.
+ const thirdParty=errors.filter(e=>e.stack?.includes('https://open.spotify.com/embed/'));
+ if(thirdParty.length)console.log('Spotify embed diagnostic:',JSON.stringify(thirdParty));
+ assert.deepEqual(errors.filter(e=>!thirdParty.includes(e)),[]);await page.close();
 });
