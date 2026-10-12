@@ -1,5 +1,5 @@
-// Enable only after the shop and corresponding products are publicly purchasable.
+// BOOTH shop and these three products were verified public on 2026-10-12 JST.
 window.ZASU_BOOTH = {
-  shopOpen: false,
-  products: { vocal: false, loud: false, daw: false, finish: false, 'vocal-editor': false }
+  shopOpen: true,
+  products: { vocal: true, loud: true, daw: true, finish: false, 'vocal-editor': false }
 };
