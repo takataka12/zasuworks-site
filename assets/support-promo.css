@@ -1,0 +1,43 @@
+/* ZASU WORKS — buyer onboarding support / 2026-10-12 */
+.purchase-support-banner{box-sizing:border-box;max-width:1120px;margin:24px auto;padding:clamp(22px,3.5vw,38px);background:#eef2e5;color:#172017;border:1px solid #cbd5be;border-radius:18px;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Hiragino Kaku Gothic ProN",Meiryo,sans-serif}
+.purchase-support-banner *{box-sizing:border-box}
+.purchase-support-banner .psb-tag{display:inline-block;margin:0 0 12px;font-size:11px;font-weight:800;letter-spacing:.09em;color:#385e2c}
+.purchase-support-banner h2{margin:0 0 12px;color:#172017;font-size:clamp(21px,3vw,30px);line-height:1.4;letter-spacing:0}
+.purchase-support-banner p{margin:0 0 16px;font-size:14px;line-height:1.85;color:#304031}
+.purchase-support-banner .psb-actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
+.purchase-support-banner a.psb-link{display:inline-flex;justify-content:center;align-items:center;min-height:44px;padding:12px 20px;border:1px solid #172017;border-radius:7px;background:#172017;color:#fff!important;font-size:13px;font-weight:800;text-decoration:none}
+.purchase-support-banner a.psb-link:hover{background:#304334}
+.purchase-support-banner .psb-note{font-size:12px;color:#4a5548}
+.support-highlight-section{margin:24px 0 0;padding:clamp(48px,6vw,88px) 0;border-top:1px solid #d9ded4;background:#eef2e5;color:#172017}
+.support-highlight-inner{max-width:1160px;margin:auto;padding:0 22px;display:grid;grid-template-columns:minmax(200px,1fr) minmax(300px,1.25fr);gap:clamp(24px,5vw,70px);align-items:center}
+.support-highlight-section .support-mini{font-size:12px;font-weight:800;letter-spacing:.14em;color:#42623c}
+.support-highlight-section h2{margin:10px 0;font-size:clamp(32px,4.6vw,56px);line-height:1.35;letter-spacing:-.04em}
+.support-highlight-section p{font-size:15px;line-height:1.95;margin:0 0 19px;color:#344133}
+.support-highlight-section .support-tags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px;padding:0;list-style:none}
+.support-highlight-section .support-tags li{border:1px solid #b5c5aa;background:#fff;padding:8px 11px;border-radius:6px;font-size:12px;font-weight:700}
+.support-highlight-section .support-action{display:inline-flex;min-height:45px;padding:12px 22px;background:#172017;color:#fff!important;border-radius:5px;font-size:13px;font-weight:800;text-decoration:none;align-items:center}
+.support-highlight-section .support-action:hover{background:#344934}
+.support-page{background:#fafaf7;color:#171916}
+.support-page .sp-container{max-width:1050px;margin:auto;padding:0 24px}
+.support-page .sp-hero{padding:clamp(55px,8vw,110px) 0 50px;border-bottom:1px solid #d9ded4}
+.support-page .sp-kicker{font-size:12px;letter-spacing:.18em;font-weight:800;color:#50664b}
+.support-page h1{margin:18px 0 25px;font-size:clamp(36px,6vw,66px);line-height:1.25;letter-spacing:-.05em}
+.support-page .sp-lead{max-width:730px;font-size:clamp(16px,2vw,19px);line-height:1.9;color:#424d40}
+.support-page .sp-hero-note{display:inline-block;margin-top:16px;font-size:12px;font-weight:800;background:#d7f459;padding:9px 13px;border-radius:4px}
+.support-page .sp-block{padding:48px 0;border-bottom:1px solid #d9ded4}
+.support-page .sp-block h2{font-size:clamp(24px,3vw,34px);line-height:1.45;margin:0 0 22px}
+.support-page .sp-block p,.support-page .sp-block li{font-size:15px;line-height:2;color:#394637}
+.support-page .sp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.support-page .sp-card{padding:26px;border-radius:12px;background:#fff;border:1px solid #d9ded4}
+.support-page .sp-card strong{font-size:16px}
+.support-page .sp-card p{margin:8px 0 0}
+.support-page .sp-steps{padding-left:24px}
+.support-page .sp-steps li{padding:5px 0}
+.support-page .sp-actions{display:flex;flex-wrap:wrap;gap:12px;margin:20px 0}
+.support-page .sp-button{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:13px 22px;border-radius:6px;background:#171916;color:white!important;font-size:14px;font-weight:750;text-decoration:none}
+.support-page .sp-button.alt{background:transparent;border:1px solid #171916;color:#171916!important}
+.support-page .sp-disclaimer{font-size:13px!important;color:#677264!important}
+.support-page .sp-footer{padding:32px 0 45px;display:flex;gap:20px;justify-content:space-between;flex-wrap:wrap;font-size:13px}
+.support-page .sp-footer a{text-decoration:underline}
+@media(max-width:750px){.support-highlight-inner{grid-template-columns:1fr}.support-highlight-section h2{font-size:35px}.support-page .sp-grid{grid-template-columns:1fr}.purchase-support-banner{margin:20px 12px}}
+@media(prefers-reduced-motion:reduce){.purchase-support-banner a,.support-highlight-section a{transition:none}}
