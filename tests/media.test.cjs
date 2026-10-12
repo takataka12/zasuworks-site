@@ -18,6 +18,15 @@ for(const width of [320,390,768,1440]) test(`media application flow fits ${width
  const page=await browser.newPage({viewport:{width,height:900}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(origin+'/media/');
  assert.equal(await page.locator('h1').count(),1);
+ assert.equal(await page.locator('a[href="https://www.linkedin.com/in/takashi-nose-00aa16442"]').count(),2);
+ assert.equal(await page.locator('#about a[href="https://x.com/zasumaker"]').count(),1);
+ assert.equal(await page.locator('.launch-label').innerText(),'2026年11月始動予定｜事前相談受付中');
+ assert.equal(await page.locator('#journal .tag').innerText(),'2026年11月始動予定・事前相談受付中');
+ assert.ok((await page.locator('.consultation-timing').innerText()).includes('個別に相談'));
+ const links=await page.locator('.profile-links a').evaluateAll(as=>as.map(a=>{const r=a.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom};}));
+ assert.ok(links[0].right<=links[1].x||links[0].bottom<=links[1].y);
+ if(process.env.CAPTURE_DIR && width===390){await fs.mkdir(process.env.CAPTURE_DIR,{recursive:true});await page.locator('.hero').screenshot({path:path.join(process.env.CAPTURE_DIR,'media-hero-mobile.png')});await page.locator('#about').screenshot({path:path.join(process.env.CAPTURE_DIR,'media-about-mobile.png')});}
+
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
  await page.locator('#maker').fill('テスト利用者');await page.locator('#product').fill('音楽 & アプリ');
  await page.locator('#url').fill('https://example.com/?a=1&b=2');await page.locator('#message').fill('<script>文字として扱う</script>');
@@ -25,6 +34,11 @@ for(const width of [320,390,768,1440]) test(`media application flow fits ${width
  const href=await page.locator('#send-mail').getAttribute('href');assert.ok(href.startsWith('mailto:zasuworks@gmail.com?'));
  const query=new URLSearchParams(href.split('?')[1]);assert.ok(query.get('subject').includes('音楽 & アプリ'));
  assert.ok(query.get('body').includes('https://example.com/?a=1&b=2'));assert.ok(query.get('body').includes('<script>文字として扱う</script>'));
+ await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async text=>{window.copiedReview=text;}}}));
+ await page.locator('#copy').click();assert.equal(await page.evaluate(()=>window.copiedReview),await page.locator('#draft-text').inputValue());
+ const timing=page.locator('details').filter({has:page.getByText('レビューはいつ届きますか？',{exact:true})});
+ assert.ok((await timing.innerText()).includes('レビューはいつ届きますか？'));
+ assert.ok((await timing.locator('p').textContent()).includes('すべての応募作品を11月中にレビューするという意味ではありません'));
  await page.getByText('必ず動画になりますか？',{exact:true}).click();assert.equal(await page.locator('details[open]').count(),1);
  assert.deepEqual(await page.evaluate(()=>[...document.querySelectorAll('a[href^="#"]')].filter(a=>!document.getElementById(a.hash.slice(1))).map(a=>a.hash)),[]);
  assert.deepEqual(errors,[]);
