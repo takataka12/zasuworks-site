@@ -53,5 +53,7 @@
 .support-product-links a{display:inline-flex;align-items:center;min-height:44px;text-decoration:underline;font-size:14px}
 .product-mobile-support{display:none}
 @media(max-width:1100px){.support-highlight-inner{width:calc(100% - 64px)}}
-@media(max-width:800px){.support-highlight-inner{grid-template-columns:1fr}.site-header .product-mobile-support,.header .product-mobile-support,.nav .product-mobile-support{display:inline-flex;align-items:center;min-height:44px;font-size:13px;text-decoration:underline}.site-header,.header,.nav{flex-wrap:wrap}.product-mobile-support{flex-basis:100%}}
+@media(max-width:800px){.support-highlight-inner{grid-template-columns:1fr}}
+@media(max-width:760px){.site-header{flex-wrap:wrap}.site-header .product-mobile-support{display:inline-flex;align-items:center;min-height:44px;flex-basis:100%;font-size:13px;text-decoration:underline}}
+@media(max-width:600px){.nav{height:auto;min-height:60px;flex-wrap:wrap;padding-block:10px}.nav .product-mobile-support{display:inline-flex;align-items:center;min-height:44px;flex-basis:100%;font-size:13px;text-decoration:underline}}
 @media(max-width:600px){.support-highlight-inner{width:calc(100% - 40px)}.support-page .sp-footer{padding:28px 24px 40px}}

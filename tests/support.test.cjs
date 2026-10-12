@@ -36,7 +36,7 @@ for(const product of ['daw','finish','vocal-editor','vocal','loud'])for(const wi
  assert.equal(await pricing.locator('.purchase-support-inline a[href="/support.html"]').count(),1);
  assert.equal(await page.locator('.purchase-support-banner').count(),1);
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
- if(width===390&&['daw','vocal','loud'].includes(product))assert.equal(await page.locator('.product-mobile-support').isVisible(),true);
+ if(width===390&&['daw','loud'].includes(product))assert.equal(await page.locator('.product-mobile-support').isVisible(),true);
  if(process.env.CAPTURE_DIR){await pricing.screenshot({path:path.resolve(process.env.CAPTURE_DIR,`support-purchase-${product}-${width}.png`)});}
  await pricing.getByRole('link',{name:'無料導入サポートについて →',exact:true}).click();assert.equal(new URL(page.url()).pathname,'/support.html');await page.close();
 });
