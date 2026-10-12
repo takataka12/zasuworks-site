@@ -57,7 +57,7 @@ jobs:
                   req = urllib.request.Request('https://zasuworks.jp/?revision=' + os.environ['GITHUB_SHA'], headers={'Cache-Control':'no-cache'})
                   with urllib.request.urlopen(req, timeout=20) as response:
                       html = response.read().decode('utf-8')
-                  if 'studio-home' in html and 'readability.css?v=20261011-r1' in html:
+                  if 'studio-home' in html and 'readability.css?v=20261011-r1' in html and 'id="purchase-support"' in html and 'support-promo.css?v=20261012-r2' in html:
                       break
               except Exception as error:
                   print(type(error).__name__)
@@ -65,7 +65,7 @@ jobs:
           else:
               raise SystemExit('Published studio homepage has not propagated yet')
           PYCODE
-          NODE_PATH=/tmp/zasu-home-check/node_modules SITE_URL=https://zasuworks.jp CAPTURE_DIR=/tmp/zasu-home-shots/production node --test tests/home.test.cjs tests/account-ui.test.cjs
+          NODE_PATH=/tmp/zasu-home-check/node_modules SITE_URL=https://zasuworks.jp CAPTURE_DIR=/tmp/zasu-home-shots/production node --test tests/home.test.cjs tests/account-ui.test.cjs tests/support.test.cjs
 
       - name: Save homepage screenshots
         if: always()

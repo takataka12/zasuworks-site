@@ -41,3 +41,17 @@
 .support-page .sp-footer a{text-decoration:underline}
 @media(max-width:750px){.support-highlight-inner{grid-template-columns:1fr}.support-highlight-section h2{font-size:35px}.support-page .sp-grid{grid-template-columns:1fr}.purchase-support-banner{margin:20px 12px}}
 @media(prefers-reduced-motion:reduce){.purchase-support-banner a,.support-highlight-section a{transition:none}}
+
+/* Compact purchase notes inherit each product page's palette. */
+.purchase-support-inline{font:inherit;font-size:13px;line-height:1.85;margin:14px 0;overflow-wrap:anywhere}
+.purchase-support-inline a{color:inherit;text-decoration:underline;text-underline-offset:4px}
+.support-highlight-section .support-note{font-size:12px;margin:0}
+.support-highlight-inner{width:min(1240px,calc(100% - 96px));max-width:none;padding:0;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr)}
+.support-highlight-inner>div{min-width:0}
+.support-action:focus-visible,.purchase-support-banner a:focus-visible{outline:3px solid #42623c;outline-offset:4px}
+.support-product-links{display:flex;flex-wrap:wrap;gap:8px 24px;margin:20px 0}
+.support-product-links a{display:inline-flex;align-items:center;min-height:44px;text-decoration:underline;font-size:14px}
+.product-mobile-support{display:none}
+@media(max-width:1100px){.support-highlight-inner{width:calc(100% - 64px)}}
+@media(max-width:800px){.support-highlight-inner{grid-template-columns:1fr}.site-header .product-mobile-support,.header .product-mobile-support,.nav .product-mobile-support{display:inline-flex;align-items:center;min-height:44px;font-size:13px;text-decoration:underline}.site-header,.header,.nav{flex-wrap:wrap}.product-mobile-support{flex-basis:100%}}
+@media(max-width:600px){.support-highlight-inner{width:calc(100% - 40px)}.support-page .sp-footer{padding:28px 24px 40px}}
