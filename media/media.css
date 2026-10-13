@@ -5,3 +5,8 @@
 
 /* Launch timing and operator profiles */
 .launch-notice{margin:20px 0 24px;max-width:480px}.launch-label{display:inline-block;margin:0;padding:6px 10px;background:var(--olive);font-size:12px;font-weight:700;line-height:1.8}.launch-notice .micro{margin:10px 0 0}.profile-links{display:flex;flex-wrap:wrap;gap:0 20px}.section-head{flex-wrap:wrap}.tag{white-space:normal;max-width:100%}.consultation-timing{font-size:13px;line-height:1.9}.footer nav{flex-wrap:wrap}
+
+/* Reference video: scoped styles keep existing media pages unchanged. */
+.review-style{max-width:1040px}.review-style-lead{font-size:clamp(17px,2vw,22px);font-weight:700;margin:0 0 28px}.review-style-copy{max-width:780px;font-size:15px}.review-style-copy p{margin:0 0 18px}.review-style-video{margin:36px 0 0}.review-style-label{display:inline-block;background:var(--olive);padding:5px 10px;font-size:12px;font-weight:700}.review-style-video h3{font-size:18px;margin:12px 0 18px}.review-style-player{position:relative;aspect-ratio:16/9;width:100%;background:var(--ink);border:1px solid var(--line)}.review-style-player iframe{position:absolute;inset:0;display:block;width:100%;height:100%;border:0}.review-style-disclosure{font-size:13px;line-height:1.9;border-left:3px solid #747e50;padding:8px 0 8px 16px;margin:20px 0}.review-style-video .button{max-width:100%;gap:12px}
+
+.review-style-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px}.review-style-grid .review-style-video{min-width:0}.review-style-video figcaption{min-height:106px}@media(max-width:760px){.review-style-grid{grid-template-columns:1fr;gap:0}.review-style-video figcaption{min-height:0}}

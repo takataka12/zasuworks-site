@@ -50,3 +50,16 @@
 ## 確認環境
 
 Node 22、既存のPlaywright設定（CI: playwright 1.56.1）。テスト用環境がHTTP接続を許可しない場合は、HTML/CSSをメモリ内で描画する補助チェックと、GitHub Actionsの通常HTTPテストを区別する。オフライン描画だけで公開動作を確認済みにしない。
+
+## 紹介スタイルの参考動画を差し替える
+
+`media/index.html` の `REVIEW_STYLE_VIDEO_START`〜`REVIEW_STYLE_VIDEO_END` が動画セクションです。ビルダーの自動生成領域外なので再ビルドでも維持されます。
+
+- 動画ID：iframe の `youtube-nocookie.com/embed/` の末尾と、YouTubeボタンの `watch?v=` を同じIDに変更。
+- タイトル：`figcaption` 内の `h3` と iframe の `title` を更新。
+- 紹介文：`.review-style-copy` 内の段落を更新。
+- 位置づけ・注記：`.section-id`、`.review-style-label`、各動画の `.review-style-disclosure` を実際の掲載内容に合わせて一緒に更新。
+
+正式な第三者レビューに差し替える際は、実試用と公開合意を確認し、製品名・提供関係・対応するレビュー記事へのリンクを記載してください。現在の参考動画はレビュー実績やレビュー件数には含めません。自社実演を残す場合は、正式レビューと別の枠で参考映像の表示・注記を維持します。APIや追加のJavaScriptは不要です。
+
+現在はZASU MASTER（`8jn3pmVkuL4`）とZASU DAW（`yAD6oBCpNwU`）の2本を掲載。PCでは2列、760px以下では1列です。各 `figure` 単位でタイトル・URL・注記を差し替え、注記IDの重複を避けてください。
