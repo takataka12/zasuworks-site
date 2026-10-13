@@ -4,6 +4,8 @@ html{scroll-padding-top:90px}
 .zw-header *,.zw-context,.zw-context *{box-sizing:border-box}
 .zw-header .zw-bar{width:min(1440px,100%);height:71px;margin:auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between;gap:28px}
 .zw-header a{color:#141414;text-decoration:none;text-transform:none;letter-spacing:0;font-weight:600}
+/* Product pages redefine --ink to a light color. Keep the unified light navigation readable. */
+.studio-page .zw-header.zw-header a{color:#141414}
 .zw-header .zw-brand{display:flex;align-items:center;flex-shrink:0;gap:10px;font-size:19px;line-height:1;letter-spacing:-.5px;font-weight:850;white-space:nowrap}
 .zw-header .zw-brand img{display:block;width:40px;height:40px;max-width:none;border:0;border-radius:0;object-fit:contain}
 .zw-header .zw-brand span{color:inherit;font-weight:850;font-size:inherit}
