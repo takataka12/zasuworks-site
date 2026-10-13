@@ -25,3 +25,12 @@ for(const route of ['/', '/products.html','/zasu-daw/','/zasu-vocal/','/zasu-voc
  }
  assert.deepEqual(errors,[]);await page.close();
 });
+
+test('catalogue first paint does not wait for Apple icon lookup',async()=>{
+ const page=await browser.newPage(pageOptions(390));let lookups=0;
+ await page.route('https://itunes.apple.com/**',route=>{lookups++;const cb=new URL(route.request().url()).searchParams.get('callback');route.fulfill({contentType:'text/javascript',body:cb+'({results:[]});'});});
+ await page.goto(origin+'/products.html',{timeout:5000});
+ assert.equal(lookups,0,'Apple lookup must wait until the iOS section is visible');
+ const request=page.waitForResponse('https://itunes.apple.com/**');await page.locator('#mobile-apps').scrollIntoViewIfNeeded();await request;
+ assert.ok(lookups>0);await page.close();
+});

@@ -63,3 +63,5 @@ for(const key of ['finish','vocal-editor'])edit(`zasu-${key}/index.html`,html=>{
 for(const file of ['index.html','products.html'])edit(file,html=>html.replace(/<img\b[^>]*>/g,tag=>{
  const offer=Object.values(offers).find(o=>tag.includes('src="'+o.image+'"'));return offer?tag.replace(/width="\d+"/,`width="${offer.width}"`).replace(/height="\d+"/,`height="${offer.height}"`):tag;
 }));
+
+edit('products.html',html=>html.replace(/<script>\s*const menu=document\.querySelector\('.menu'\)[\s\S]*?<\/script>/,'<script src="/assets/app-icons.js?v=20261013-p1" defer></script>'));
