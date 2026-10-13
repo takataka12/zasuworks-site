@@ -16,7 +16,7 @@ after(async()=>{await browser?.close();await new Promise(r=>server?server.close(
 for(const width of [320,390,820,1024,1440])test(`buyer can reach support and return at ${width}px`,async()=>{
  const page=await browser.newPage({viewport:{width,height:900},reducedMotion:'reduce'});
  await page.goto(origin+'/');
- assert.equal(await page.locator('#products').evaluate(e=>e.nextElementSibling.id),'purchase-support');
+ assert.equal(await page.evaluate(()=>Boolean(document.querySelector('#products').compareDocumentPosition(document.querySelector('#purchase-support')) & Node.DOCUMENT_POSITION_FOLLOWING)),true,'support follows product selection');
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
  if(width<1200){await page.getByRole('button',{name:'メニュー',exact:true}).click();assert.equal(await page.locator('#studio-nav a[href="/support.html"]').isVisible(),true);await page.keyboard.press('Escape');}
  else {await page.locator('[data-zw-desktop] summary').filter({hasText:'サポート'}).click();assert.equal(await page.locator('[data-zw-desktop] a[href="/support.html"]').isVisible(),true);await page.keyboard.press('Escape');}

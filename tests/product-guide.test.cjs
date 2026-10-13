@@ -10,7 +10,7 @@ before(async()=>{
  browser=await (process.env.NAV_WEBKIT?webkit:chromium).launch({headless:true,args:process.env.NAV_WEBKIT?[]:['--no-sandbox']});
 });
 after(async()=>{await browser?.close();if(server)await new Promise(r=>server.close(r));});
-for(const route of ['/', '/products.html','/zasu-daw/','/zasu-vocal/','/zasu-vocal-editor/','/zasu-loud/','/zasu-finish/'])for(const width of [320,390,1440])test(`product selection is readable and routes resolve: ${route} ${width}`,async()=>{
+for(const route of ['/', '/products.html','/zasu-daw/','/zasu-vocal/','/zasu-vocal-editor/','/zasu-loud/','/zasu-finish/'])for(const width of [320,390,430,768,1440])test(`product selection is readable and routes resolve: ${route} ${width}`,async()=>{
  const page=await browser.newPage(pageOptions(width));const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(origin+route);
  const guide=page.locator('.zw-guide');assert.equal(await guide.count(),1);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
  if(route==='/'){assert.equal(await guide.locator('[data-guide-product]').count(),6);assert.equal(await page.locator('.hero-actions .studio-btn').first().getAttribute('href'),'https://percymusic.booth.pm/');assert.equal(await page.locator('.hero-actions a[href="#choose-product"]').count(),1);}
@@ -18,5 +18,10 @@ for(const route of ['/', '/products.html','/zasu-daw/','/zasu-vocal/','/zasu-voc
  else{assert.match(await guide.innerText(),/向いている使い方/);assert.match(await guide.innerText(),/ほかの製品との違い/);assert.equal(await guide.getByRole('link',{name:'価格・購入条件を見る',exact:true}).count(),1);}
  for(const href of await guide.locator('a').evaluateAll(es=>es.map(a=>a.getAttribute('href')))){if(href.startsWith('https:'))continue;if(href.startsWith('#')){assert.equal(await page.locator('[id]').evaluateAll((es,id)=>es.some(e=>e.id===id),href.slice(1)),true,href);continue;}const response=await page.request.get(origin+href.split('#')[0]);assert.equal(response.status(),200,href);}
  if(process.env.CAPTURE_DIR&&(width===390||width===1440)){await fs.mkdir(process.env.CAPTURE_DIR,{recursive:true});await guide.screenshot({path:path.resolve(process.env.CAPTURE_DIR,`guide-${route==='/'?'home':route.replaceAll('/','').replace('.html','')}-${width}.png`)});}
+ if(process.env.CAPTURE_DIR&&route==='/products.html'&&[390,1440].includes(width)){
+  for(const img of await page.locator('#tools img').all()){await img.scrollIntoViewIfNeeded();await img.evaluate(e=>e.decode());}
+  await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
+  await page.screenshot({path:path.resolve(process.env.CAPTURE_DIR,`catalog-${width}.png`),fullPage:true});
+ }
  assert.deepEqual(errors,[]);await page.close();
 });

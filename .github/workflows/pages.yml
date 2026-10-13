@@ -33,6 +33,9 @@ jobs:
       - name: Build product selection guides
         run: node tools/build-product-guide.cjs
 
+      - name: Build storefront and purchase channel guides
+        run: node tools/build-storefront.cjs
+
       - name: Build OGP image
         run: |
           sudo apt-get update

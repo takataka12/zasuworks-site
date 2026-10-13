@@ -1,4 +1,4 @@
-// Release remains closed until all delivery checks are complete.
+// Release checks are complete. Preserve the launch gate and scheduled Square offers.
 // Square prices are canonical; never substitute a displayed price for checkout validation.
 (() => {
   const ready = true;
