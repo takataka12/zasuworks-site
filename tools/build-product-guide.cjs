@@ -19,6 +19,8 @@ function build(){for(const [file,kind,p] of [['index.html','home'],['products.ht
  if(html.includes('<!-- PRODUCT_GUIDE_START -->'))html=html.replace(/<!-- PRODUCT_GUIDE_START -->[\s\S]*?<!-- PRODUCT_GUIDE_END -->/,block);
  else if(kind!=='fit'){const anchor=html.indexOf('<section class="duo-announcement');if(anchor<0)throw Error('Missing guide insertion point: '+file);html=html.slice(0,anchor)+block+html.slice(anchor);}
  else{const start=html.indexOf('<main');if(start<0)throw Error('Missing main: '+file);const content=html.slice(start);const tag=content.indexOf('<header class="hero"')>=0?'header':'section';const end=html.indexOf('</'+tag+'>',start)+tag.length+3;if(end<start)throw Error('Missing hero end: '+file);html=html.slice(0,end)+block+html.slice(end);}
+ if(kind==='home')html=html.replace('<a class="studio-btn dark" href="#products">製品を見る','<a class="studio-btn dark" href="#choose-product">製品を選ぶ');
+ if(kind==='compare'&&!html.includes('<a href="#compare-products">'))html=html.replace('<span>このページ</span>','<span>このページ</span><a href="#compare-products">製品を比較</a>');
  if(!html.includes('/assets/product-guide.css'))html=html.replace('</head>','<link rel="stylesheet" href="/assets/product-guide.css?v=20261013-guide1"></head>');fs.writeFileSync(dest,html);
  }console.log('Product selection guide built for 7 pages.');}
 module.exports={products,build};if(require.main===module)build();
