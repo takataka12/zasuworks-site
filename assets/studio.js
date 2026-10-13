@@ -1,15 +1,6 @@
 'use strict';
 const studioMenu=document.querySelector('.studio-menu');
 const studioMobile=document.getElementById('studio-nav');
-if(studioMenu&&studioMobile){
- const setOpen=open=>{studioMobile.hidden=!open;studioMenu.setAttribute('aria-expanded',String(open));studioMenu.querySelector('span').textContent=open?'−':'＋';};
- studioMenu.addEventListener('click',()=>setOpen(studioMobile.hidden));
- studioMobile.addEventListener('click',event=>{if(event.target.closest('a'))setOpen(false);});
- document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!studioMobile.hidden){setOpen(false);studioMenu.focus();}});
- document.addEventListener('click',event=>{if(!studioMobile.hidden&&!event.target.closest('.studio-header'))setOpen(false);});
- matchMedia('(min-width:801px)').addEventListener('change',event=>{if(event.matches)setOpen(false);});
-}
-
 // Load third-party audio only when the visitor opens the player.
 for(const player of document.querySelectorAll('.radio-embed')){
  player.addEventListener('toggle',()=>{
@@ -27,7 +18,7 @@ if(document.getElementById('main')){
  let studioScrollPending=false;
  const syncStudioTop=()=>{studioTop.hidden=scrollY<Math.max(600,innerHeight)||studioMenu?.getAttribute('aria-expanded')==='true';studioScrollPending=false;};
  addEventListener('scroll',()=>{if(!studioScrollPending){studioScrollPending=true;requestAnimationFrame(syncStudioTop);}},{passive:true});
- studioMenu?.addEventListener('click',syncStudioTop);
+ document.addEventListener('zw:navigation',syncStudioTop);
  document.addEventListener('keydown',event=>{if(event.key==='Escape')syncStudioTop();});
  studioMobile?.addEventListener('click',syncStudioTop);
  syncStudioTop();

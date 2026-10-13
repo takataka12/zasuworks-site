@@ -1,0 +1,186 @@
+{
+  "/media/": [
+    {
+      "href": "/media/reviews/",
+      "label": "作品を探す"
+    },
+    {
+      "href": "/media/sample/",
+      "label": "レビュー見本"
+    },
+    {
+      "href": "/media/#submit",
+      "label": "作品を紹介する ↗"
+    }
+  ],
+  "/avatarlive/": [
+    {
+      "href": "/avatarlive/#features",
+      "label": "機能"
+    },
+    {
+      "href": "/avatarlive/#specs",
+      "label": "仕様"
+    },
+    {
+      "href": "/avatarlive/support/",
+      "label": "Support"
+    }
+  ],
+  "/zasu-vocal/": [
+    {
+      "href": "/zasu-vocal/#steps",
+      "label": "3ステップ"
+    },
+    {
+      "href": "/zasu-vocal/#compatibility",
+      "label": "対応環境"
+    },
+    {
+      "href": "/zasu-vocal/#faq",
+      "label": "FAQ"
+    },
+    {
+      "href": "/zasu-vocal/#purchase",
+      "label": "価格・購入"
+    }
+  ],
+  "/zasu-daw/tokushoho.html": [
+    {
+      "href": "/zasu-daw/",
+      "label": "ZASU DAW"
+    },
+    {
+      "href": "/zasu-daw/download/",
+      "label": "再ダウンロード"
+    },
+    {
+      "href": "/zasu-daw/#pricing",
+      "label": "価格・購入 ↗"
+    }
+  ],
+  "/zasu-daw/": [
+    {
+      "href": "/zasu-daw/#pitch-editor",
+      "label": "Pitch Editor"
+    },
+    {
+      "href": "/zasu-daw/#benefits",
+      "label": "特典"
+    },
+    {
+      "href": "/zasu-daw/#features",
+      "label": "機能"
+    },
+    {
+      "href": "/zasu-daw/download/",
+      "label": "再ダウンロード"
+    },
+    {
+      "href": "/zasu-daw/#pricing",
+      "label": "価格・購入 ↗"
+    }
+  ],
+  "/zasu-daw/terms.html": [
+    {
+      "href": "/zasu-daw/",
+      "label": "ZASU DAW"
+    },
+    {
+      "href": "/zasu-daw/download/",
+      "label": "再ダウンロード"
+    },
+    {
+      "href": "/zasu-daw/#pricing",
+      "label": "価格・購入 ↗"
+    }
+  ],
+  "/zasu-loud/download/": [
+    {
+      "href": "/zasu-loud/",
+      "label": "ZASU LOUD"
+    }
+  ],
+  "/zasu-loud/thanks/": [
+    {
+      "href": "/zasu-loud/",
+      "label": "ZASU LOUD"
+    }
+  ],
+  "/avatarlive/support/": [
+    {
+      "href": "/avatarlive/",
+      "label": "← AvatarLive"
+    }
+  ],
+  "/avatarlive/terms/": [
+    {
+      "href": "/avatarlive/",
+      "label": "← AvatarLive"
+    }
+  ],
+  "/avatarlive/privacy/": [
+    {
+      "href": "/avatarlive/",
+      "label": "← AvatarLive"
+    }
+  ],
+  "/zasu-vocal/download/": [
+    {
+      "href": "/zasu-vocal/",
+      "label": "ZASU VOCAL"
+    }
+  ],
+  "/zasu-daw/download/": [
+    {
+      "href": "/zasu-daw/",
+      "label": "ZASU DAW"
+    }
+  ],
+  "/zasu-loud/": [
+    {
+      "href": "/zasu-loud/#features",
+      "label": "機能"
+    },
+    {
+      "href": "/zasu-loud/#buy",
+      "label": "価格・購入 ↗"
+    },
+    {
+      "href": "/zasu-loud/download/",
+      "label": "再ダウンロード"
+    }
+  ],
+  "/zasu-finish/": [
+    {
+      "href": "/zasu-finish/#pricing",
+      "label": "価格・購入 ↗"
+    },
+    {
+      "href": "/zasu-finish/download/",
+      "label": "再ダウンロード"
+    }
+  ],
+  "/zasu-finish/download/": [
+    {
+      "href": "/zasu-finish/",
+      "label": "ZASU FINISH"
+    }
+  ],
+  "/zasu-vocal-editor/": [
+    {
+      "href": "/zasu-vocal-editor/#pricing",
+      "label": "価格・購入 ↗"
+    },
+    {
+      "href": "/zasu-vocal-editor/download/",
+      "label": "再ダウンロード"
+    }
+  ],
+  "/zasu-vocal-editor/download/": [
+    {
+      "href": "/zasu-vocal-editor/",
+      "label": "ZASU VOCAL EDITOR"
+    }
+  ]
+}

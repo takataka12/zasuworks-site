@@ -27,6 +27,9 @@ jobs:
       - name: Build ZASU MEDIA editorial pages
         run: node tools/build-media.cjs
 
+      - name: Build shared site navigation
+        run: node tools/build-navigation.cjs
+
       - name: Build OGP image
         run: |
           sudo apt-get update
@@ -64,7 +67,7 @@ jobs:
                   html = read_page('/')
                   media = read_page('/media/')
                   reviews = read_page('/media/reviews/')
-                  if 'studio-home' in html and 'readability.css?v=20261011-r1' in html and 'id="purchase-support"' in html and 'support-promo.css?v=20261012-r2' in html and 'editorial.css?v=20261013-r1' in media and 'id="review-list"' in reviews:
+                  if 'navigation.css?v=20261013-nav1' in html and 'data-zw-header' in media and 'studio-home' in html and 'readability.css?v=20261011-r1' in html and 'id="purchase-support"' in html and 'support-promo.css?v=20261012-r2' in html and 'editorial.css?v=20261013-r1' in media and 'id="review-list"' in reviews:
                       break
               except Exception as error:
                   print(type(error).__name__)
@@ -72,7 +75,7 @@ jobs:
           else:
               raise SystemExit('Published studio homepage or ZASU MEDIA has not propagated yet')
           PYCODE
-          NODE_PATH=/tmp/zasu-home-check/node_modules SITE_URL=https://zasuworks.jp CAPTURE_DIR=/tmp/zasu-home-shots/production node --test tests/home.test.cjs tests/account-ui.test.cjs tests/support.test.cjs tests/media.test.cjs tests/media-editorial.test.cjs
+          NODE_PATH=/tmp/zasu-home-check/node_modules SITE_URL=https://zasuworks.jp CAPTURE_DIR=/tmp/zasu-home-shots/production node --test tests/home.test.cjs tests/account-ui.test.cjs tests/support.test.cjs tests/media.test.cjs tests/media-editorial.test.cjs tests/navigation.test.cjs
 
       - name: Save homepage screenshots
         if: always()

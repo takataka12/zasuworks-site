@@ -18,8 +18,8 @@ for(const width of [320,390,820,1024,1440])test(`buyer can reach support and ret
  await page.goto(origin+'/');
  assert.equal(await page.locator('#products').evaluate(e=>e.nextElementSibling.id),'purchase-support');
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
- if(width<=800){await page.getByRole('button',{name:'メニュー',exact:true}).click();assert.equal(await page.locator('#studio-nav a[href="/support.html"]').isVisible(),true);await page.keyboard.press('Escape');}
- else assert.equal(await page.locator('.desktop-nav a[href="/support.html"]').isVisible(),true);
+ if(width<1200){await page.getByRole('button',{name:'メニュー',exact:true}).click();assert.equal(await page.locator('#studio-nav a[href="/support.html"]').isVisible(),true);await page.keyboard.press('Escape');}
+ else {await page.locator('[data-zw-desktop] summary').filter({hasText:'サポート'}).click();assert.equal(await page.locator('[data-zw-desktop] a[href="/support.html"]').isVisible(),true);await page.keyboard.press('Escape');}
  await page.getByRole('link',{name:'無料導入サポートについて →',exact:true}).click();
  assert.equal(new URL(page.url()).pathname,'/support.html');
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
@@ -36,7 +36,7 @@ for(const product of ['daw','finish','vocal-editor','vocal','loud'])for(const wi
  assert.equal(await pricing.locator('.purchase-support-inline a[href="/support.html"]').count(),1);
  assert.equal(await page.locator('.purchase-support-banner').count(),1);
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
- if(width===390&&['daw','loud'].includes(product))assert.equal(await page.locator('.product-mobile-support').isVisible(),true);
+ if(width===390){await page.locator('[data-zw-toggle]').click();assert.equal(await page.locator('#studio-nav a[href="/support.html"]').isVisible(),true);await page.keyboard.press('Escape');}
  if(process.env.CAPTURE_DIR){await pricing.screenshot({path:path.resolve(process.env.CAPTURE_DIR,`support-purchase-${product}-${width}.png`)});}
  await pricing.getByRole('link',{name:'無料導入サポートについて →',exact:true}).click();assert.equal(new URL(page.url()).pathname,'/support.html');await page.close();
 });
