@@ -65,3 +65,32 @@ for(const file of ['index.html','products.html'])edit(file,html=>html.replace(/<
 }));
 
 edit('products.html',html=>html.replace(/<script>\s*const menu=document\.querySelector\('.menu'\)[\s\S]*?<\/script>/,'<script src="/assets/app-icons.js?v=20261013-p1" defer></script>'));
+
+const experiences={
+ daw:{label:'実演を見る ↗',href:'https://youtu.be/yAD6oBCpNwU',note:'収録時と現行版では、画面・機能が異なる場合があります。'},
+ loud:{label:'音の違いを試聴する →',href:'/zasu-loud/#demo',note:'旧版の参考音源。RAW比較・音量を揃えた比較の条件を試聴欄に掲載。'},
+ vocal:{label:'画面・操作を見る →',href:'/zasu-vocal/#product-screen'},
+ 'vocal-editor':{label:'画面・操作を見る →',href:'/zasu-vocal-editor/#interface'},
+ finish:{label:'画面・操作を見る →',href:'/zasu-finish/#interface'}
+};
+function experience(key){const e=experiences[key];return e?`<div class="zw-experience"><a href="${e.href}"${key==='daw'?' target="_blank" rel="noopener noreferrer"':''}>${e.label}</a>${e.note?`<p>${e.note}</p>`:''}</div>`:'';}
+edit('index.html',html=>{
+ if(!html.includes('class="zw-hero-layout"')){
+  html=html.replace('<h1 id="hero-title">','<div class="zw-hero-layout"><div class="zw-hero-copy"><h1 id="hero-title">');
+  html=html.replace('ZASU WORKSは、個人とAIがアイデアを実際の製品に変えていくインディペンデント・クリエイティブスタジオです。','個人とAIで、音楽制作ソフト・iOSアプリ・Webサービスを作っています。');
+  html=html.replace('<div class="hero-signature"',`</div><figure class="zw-hero-screen"><p class="zw-screen-label">ZASU DAW / REAL SOFTWARE</p><a href="/zasu-daw/#screens" aria-label="ZASU DAWの実画面と操作を詳しく見る"><img src="/assets/studio-daw.webp" width="1100" height="715" loading="eager" fetchpriority="high" decoding="async" alt="ZASU DAWの実画面。複数トラックの波形、録音、自動MIX、WAV書き出しの操作"></a><figcaption><div><strong>ZASU DAW</strong><span>録音から、一曲を完成。</span></div><a href="https://youtu.be/yAD6oBCpNwU" target="_blank" rel="noopener noreferrer">実演を見る ↗</a></figcaption><p class="zw-screen-note">実画面の撮影資料。実演動画は収録時と現行版で画面・機能が異なる場合があります。</p></figure></div><div class="hero-signature"`);
+ }
+ return html;
+});
+for(const file of ['index.html','products.html'])edit(file,html=>{
+ for(const key of Object.keys(experiences)){
+  const id=file==='index.html'?key:'zasu-'+key;
+  const pattern=new RegExp(`(<article\\b[^>]*\\bid="${id}"[^>]*>)([\\s\\S]*?)(</article>)`);
+  html=html.replace(pattern,(_,open,body,close)=>{
+   body=body.replace(/<div class="zw-experience">[\s\S]*?<\/div>/,'');
+   // Keep the viewing link subordinate to purchase, directly after the existing actions.
+   return open+body+experience(key)+close;
+  });
+ }
+ return html.replace('storefront-polish.css?v=20261013-p1','storefront-polish.css?v=20261013-p2');
+});

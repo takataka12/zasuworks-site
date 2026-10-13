@@ -34,3 +34,21 @@ test('catalogue first paint does not wait for Apple icon lookup',async()=>{
  const request=page.waitForResponse('https://itunes.apple.com/**');await page.locator('#mobile-apps').scrollIntoViewIfNeeded();await request;
  assert.ok(lookups>0);await page.close();
 });
+
+for(const width of [320,390,430,768,1440])test(`first-view product screen and direct demonstrations at ${width}px`,async()=>{
+ const page=await browser.newPage(pageOptions(width));await page.goto(origin+'/');
+ assert.equal(await page.locator('.zw-hero-screen img').count(),1);
+ assert.equal(await page.locator('.zw-hero-screen img').getAttribute('loading'),'eager');
+ assert.ok(await page.locator('.zw-hero-screen').evaluate(e=>e.getBoundingClientRect().top<innerHeight));
+ assert.equal(await page.locator('#daw .zw-experience a').getAttribute('href'),'https://youtu.be/yAD6oBCpNwU');
+ assert.equal(await page.locator('#loud .zw-experience a').getAttribute('href'),'/zasu-loud/#demo');
+ await page.goto(origin+'/products.html');
+ assert.equal(await page.locator('#zasu-daw .zw-experience a').getAttribute('href'),'https://youtu.be/yAD6oBCpNwU');
+ assert.equal(await page.locator('#zasu-loud .zw-experience a').getAttribute('href'),'/zasu-loud/#demo');
+ for(const key of ['vocal','vocal-editor','finish']){
+  const href=await page.locator('#zasu-'+key+' .zw-experience a').getAttribute('href');
+  const target=await browser.newPage();await target.goto(origin+href);
+  assert.equal(await target.locator(new URL(origin+href).hash).count(),1);await target.close();
+ }
+ await page.close();
+});
