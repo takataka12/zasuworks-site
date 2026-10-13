@@ -63,3 +63,7 @@ Node 22、既存のPlaywright設定（CI: playwright 1.56.1）。テスト用環
 正式な第三者レビューに差し替える際は、実試用と公開合意を確認し、製品名・提供関係・対応するレビュー記事へのリンクを記載してください。現在の参考動画はレビュー実績やレビュー件数には含めません。自社実演を残す場合は、正式レビューと別の枠で参考映像の表示・注記を維持します。APIや追加のJavaScriptは不要です。
 
 現在はZASU MASTER（`8jn3pmVkuL4`）とZASU DAW（`yAD6oBCpNwU`）の2本を掲載。PCでは2列、760px以下では1列です。各 `figure` 単位でタイトル・URL・注記を差し替え、注記IDの重複を避けてください。
+
+### 返却物の見本ページへの反映
+
+`/media/sample/` にも同じ2本を掲載しています。生成元 `tools/build-media.cjs` がトップの `REVIEW_STYLE_VIDEO_START`〜`REVIEW_STYLE_VIDEO_END` を読み込み、書式見本の案内の後に挿入します。動画変更はトップの該当ブロックを編集し、`node tools/build-media.cjs` で見本ページへ反映してください。見本ページの生成HTMLだけを編集しないでください。
