@@ -18,6 +18,15 @@
       return 'https://zasuworks.jp'+canonical(u.pathname)+(params.size?'?'+params.toString():'');
     }catch{return null;}
   }
+  function recordingEligible(href,ref,c){
+    try{
+      const u=new URL(href),safe=new URL(pageLocation(href,c));
+      if(!eligible(u.pathname,c)||u.search!==safe.search)return false;
+      if(u.hash&&!['#purchase','#pricing','#demo','#demos','#steps','#faq','#compatibility','#product-screen','#listen','#video','#features','#compare-products'].includes(u.hash))return false;
+      if(ref){const r=new URL(ref);if(r.search||r.hash||r.username||r.password)return false;if(r.hostname!=='zasuworks.jp'&&(r.pathname!=='/'||referrer(ref)==='https://other-referral.invalid/'))return false;if(r.hostname==='zasuworks.jp'&&!eligible(r.pathname,c))return false;}
+      return true;
+    }catch{return false;}
+  }
   function referrer(href){
     if(!href)return '';
     try{const u=new URL(href);if(!['http:','https:'].includes(u.protocol))return '';
@@ -58,5 +67,5 @@
     if(u.hostname==='zasumaster.com'){p={id:'audio',name:names.audio};events=['click_service'];destination='zasu_audio';return result();}
     return null;
   }
-  return {eligible,pageLocation,referrer,product,classify};
+  return {eligible,pageLocation,recordingEligible,referrer,product,classify};
 });

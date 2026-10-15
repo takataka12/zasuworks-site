@@ -45,3 +45,10 @@ test('mail drafts, demo and download are intent; never purchase success or conta
  assert.equal(core().classify({href:'#submit',page:'/media/'},cfg).events[0],'click_apply');
  assert.equal(core().classify({href:'/zasu-vocal/',page:'/'},cfg),null);
 });
+
+test('recording rejects secrets in URLs and referrers while accepting approved campaign metadata',()=>{
+ assert.equal(core().recordingEligible('https://zasuworks.jp/zasu-vocal/?email=a@example.com','',cfg),false);
+ assert.equal(core().recordingEligible('https://zasuworks.jp/zasu-vocal/#access_token=secret','',cfg),false);
+ assert.equal(core().recordingEligible('https://zasuworks.jp/zasu-vocal/','https://zasuworks.jp/account/?token=secret',cfg),false);
+ assert.equal(core().recordingEligible('https://zasuworks.jp/zasu-vocal/?utm_source=x&utm_campaign=zasu_vocal_20261015','https://t.co/',cfg),true);
+});
