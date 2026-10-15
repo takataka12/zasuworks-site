@@ -57,3 +57,16 @@ UTM例：https://zasuworks.jp/zasu-vocal/?utm_source=x&utm_medium=paid_social&ut
 
 ## 有効化確認
 Clarity有効化設定後の解析回帰テスト24件成功。GA4管理画面は前段の実受信記録がある一方、この作業セッションでは権限エラーを表示し、追加イベントの実受信は未確認。本番タグはG-JPG8NNYWWTが1つのみで、同意前の未読み込み・同意後の表示・価格導線を確認した。広告設定は未変更。
+
+## Clarity本番受信の実測（2026-10-15 15:46 JST以降）
+
+- 公開コミット：`69765d819ffb9bebe314fc2a267a707f8bf9c136`。Actions `38694154652` は成功。
+- 正式プロジェクトID `yxzaksze7v` のタグと、実SDK `https://scripts.clarity.ms/0.8.75-beta/clarity.js` の読み込みを本番DOMで確認。
+- bodyの `data-clarity-mask=true` を確認。Clarity側でも検証用UTM付きVOCAL訪問がライブ録画に出現し、再生画面の文字がマスクされていることを目視確認。これは実装検証の訪問であり、顧客獲得数には数えない。
+- `/account/` のClarity script数は0。購入・認証・返金の処理に変更なし。
+- プロジェクト設定のマスクモードは「厳密」。GA4連携は未接続。統計ダッシュボード・ヒートマップは処理待ちで、まだ利用可能になったことを確認していない。
+- 計測ID変更に追随して設定JSのURLも変わる仕組みを追加。旧設定がキャッシュに残る問題の回帰テストを先に失敗させてから修正。最終全体テストは491 passed / 0 failed / 0 skipped。
+- PageSpeedのブラウザー測定も試行。実ユーザー欄は「データがありません」、ラボ測定は読み込み中のままで数値未取得。改善効果を捏造しない。
+- X広告管理のリンクはXログイン画面に到達。安全な入力機能が画面の対象を検証できなかったため、ログインのみ所有者へ引き継ぐ。Pixel IDの発行はこの後。予算・ターゲット・入札は未変更。
+
+管理画面： https://clarity.microsoft.com/projects/view/yxzaksze7v/impressions?date=Last%203%20days
