@@ -4,9 +4,9 @@
 
 既存GA4 G-JPG8NNYWWTを維持。共通所有者を拡張し、Clarityの同意後読み込み、v2同意、全体テキストマスキング、公開URL許可リスト、未知クエリ・非公開流入元・未知フラグメントの拒否を追加。入力フォームのあるページは録画しない。GA4の既存同意はClarityの同意に流用しない。同意保存不能時は計測しない。撤回時はCookie削除後に再読み込みしてSDKを終了する。
 
-Clarity project IDは空欄であり、**まだ録画・ヒートマップは有効になっていない**。初回登録の利用規約同意が必要。Googleログインはtaka.ns00@gmail.comを選択済み。所有者が規約を確認した後にプロジェクト作成・ID設定・実SDKの録画確認を行う。
+Clarity project ID **yxzaksze7v** を発行し設定。所有者が初回利用規約への同意を完了後、ZASU WORKS / https://zasuworks.jp/ のプロジェクトを作成。サイト側の同意・全体マスキングに加え、プロジェクトの厳密マスキングを設定。実サービスでの受信・録画表示は別途確認し、表示待ちと未設定を区別する。
 
-Search Console URLプレフィックス https://zasuworks.jp/ のHTML確認タグを取得しホームへ追加。公開後に所有権確認・サイトマップ送信を行う。DNS操作は不要な方式。
+Search Console URLプレフィックス https://zasuworks.jp/ のHTML確認タグを取得しホームへ追加。本番公開後、所有権確認とサイトマップ送信に成功（当初17 URLを検出）。不足していたFINISH・VOCAL EDITOR・Supportを追加し20 URLへ拡張。DNS操作は不要。VOCALは検出済み・インデックス未登録。登録リクエストの最終受理は未確認。
 
 ## イベント
 
@@ -42,7 +42,7 @@ UTM例：https://zasuworks.jp/zasu-vocal/?utm_source=x&utm_medium=paid_social&ut
 ## 管理画面
 
 - GA4：https://analytics.google.com/ （ZASU WORKS、測定ID G-JPG8NNYWWT）
-- Clarity：https://clarity.microsoft.com/ （初回規約同意待ち）
+- Clarity：https://clarity.microsoft.com/ （プロジェクト yxzaksze7v 作成済み）
 - Search Console：https://search.google.com/search-console （URLプレフィックス所有権確認）
 - X広告：https://ads.x.com/ （本ブラウザでは管理画面に未到達）
 
@@ -54,3 +54,6 @@ UTM例：https://zasuworks.jp/zasu-vocal/?utm_source=x&utm_medium=paid_social&ut
 全体テスト結果と本番デプロイは最新コミット/Actionsを参照。今回のソース変更には追加費用なし。有料契約なし。
 
 最終ローカル検証：`NODE_PATH=/tmp/zasu-home-check/node_modules node --test tests/*.test.cjs supabase/tests/*.test.mjs` → **490 passed / 0 failed / 0 skipped**。`git diff --check`成功。独立レビューの重要指摘2点（メール作成リンクへの入力流出、同意保存失敗後の古い許可の再利用）は対象ページの除外と保存不能時の計測禁止、回帰テストで対処。実Clarity SDKによる個人情報保護確認はプロジェクト作成後に残る。
+
+## 有効化確認
+Clarity有効化設定後の解析回帰テスト24件成功。GA4管理画面は前段の実受信記録がある一方、この作業セッションでは権限エラーを表示し、追加イベントの実受信は未確認。本番タグはG-JPG8NNYWWTが1つのみで、同意前の未読み込み・同意後の表示・価格導線を確認した。広告設定は未変更。
