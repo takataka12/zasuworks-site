@@ -1,5 +1,7 @@
 # Mac実機検証記録 — 2026-10-15
 
+> このページは10月15日時点の記録。認証・オフライン・Logic実音声・有料版互換性の確認結果は[10月16日の最新記録](zasu-trial-mac-validation-2026-10-16.md)を優先する。
+
 ユーザー実機での報告に基づく。macOS 26.7 / Apple Silicon、Xcode、JUCE 8.0.15、Debug Universal。
 
 確認済み:
