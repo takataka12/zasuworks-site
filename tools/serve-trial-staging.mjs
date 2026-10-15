@@ -7,7 +7,7 @@ import path from 'node:path';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const url='https://giljyqaohutxoxlpkfjf.supabase.co';
 const config=`export const SUPABASE_URL=${JSON.stringify(url)};\nexport const PUBLISHABLE_KEY="sb_publishable_znE-zypk331F36X945paoQ_h18eZNc8";\nexport const ACCOUNT_ENDPOINT=SUPABASE_URL+'/functions/v1/zasu-trial-account-validation';\n`;
-const files=new Set(['account/index.html','account/account.mjs','account/account.css','account/catalog.mjs','account/trials.mjs','trial/model.mjs','assets/site-improvements.css','assets/navigation.css','assets/navigation.js','assets/favicon.svg','favicon.ico','apple-touch-icon.png']);
+const files=new Set(['account/index.html','account/account.mjs','account/account.css','account/catalog.mjs','account/trials.mjs','account/trial-auth-state.mjs','trial/model.mjs','assets/site-improvements.css','assets/navigation.css','assets/navigation.js','assets/favicon.svg','favicon.ico','apple-touch-icon.png']);
 const types={'.mjs':'text/javascript','.js':'text/javascript','.css':'text/css','.html':'text/html','.svg':'image/svg+xml','.ico':'image/x-icon','.png':'image/png'};
 const server=http.createServer(async(req,res)=>{
  res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');

@@ -33,6 +33,7 @@
 <div class="content">
 <p id="notice" role="status" aria-live="polite" hidden></p>
 <section id="loading" hidden><p class="eyebrow">PLEASE WAIT</p><h1>アカウントを確認しています。</h1></section>
+<div id="trial-auth-context" class="empty" hidden><p class="eyebrow">ZASU TRIAL SYSTEM</p><p id="trial-auth-note"></p><button id="trial-use-tab" class="secondary" type="button" hidden>ログイン済みのタブで承認する</button></div>
 <section id="auth">
 <p class="eyebrow">WELCOME TO ZASU ACCOUNT</p><h1 id="auth-title">おかえりなさい。</h1><p class="lead">メールに届く確認コードでログイン。<br>パスワードは必要ありません。</p>
 <div class="tabs" aria-label="ログイン・新規登録"><button type="button" id="login-tab" aria-pressed="true">ログイン</button><button type="button" id="signup-tab" aria-pressed="false">アカウントを作成</button></div>
@@ -41,6 +42,7 @@
 <div class="auth-foot"><p>購入済み製品をまとめたい方は、ログイン後の「購入管理」で領収書・取引IDを追加できます。購入時のメールで確認します。</p><p>登録しない方は<a href="/vocal-loud-set/download/">制作セット</a>・<a href="/zasu-vocal/download/">VOCAL</a>・<a href="/zasu-loud/download/">LOUD</a>・<a href="/zasu-daw/download/">DAW</a>のページで再ダウンロードできます。</p><p>初めての方は「アカウントを作成」を選んでください。</p><p>認証メールは ZASU WORKS から送信します。<br><span class="sender">accounts@alerts.zasumaster.com</span></p><a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a></div>
 </section>
 <section id="dashboard" hidden>
+<section id="trial-approval" hidden aria-labelledby="trial-product-name"><p class="eyebrow">ZASU TRIAL SYSTEM</p><h2 id="trial-product-name" tabindex="-1">無料体験の認証</h2><p id="trial-approval-note"></p><button id="trial-inspect-retry" type="button" class="secondary" hidden>承認画面を再取得</button><p>ご自身が製品から開いた画面の場合のみ承認してください。</p><button id="trial-approve" type="button">7日間無料体験を承認</button></section>
 <p class="eyebrow">MY PRODUCTS · MY AUDIO · MY ACCOUNT</p><h1>マイページ</h1><p class="lead"><span id="user-name"></span><span id="greeting">、こんにちは。</span></p>
 <div class="identity"><span class="avatar" aria-hidden="true">ZW</span><div><p id="user-email"></p><p class="fine">メール認証済み <span class="verified">✓</span></p></div></div>
 <div class="section-title"><h2>購入した製品</h2><span id="purchase-pill" class="pill">準備中</span></div>
@@ -48,7 +50,7 @@
 <div id="purchase-summary" class="empty" hidden><h3>購入した製品を、ここに。</h3><p>領収書・取引IDから購入を追加できます。購入時のメールへの確認が必要です。</p><button class="primary" type="button" data-view="purchases">購入を管理する →</button></div>
 <h2 class="download-title">購入済みの方・再ダウンロード</h2><div class="downloads"><a href="/zasu-vocal/download/">VOCALを再ダウンロード <span>↗</span></a><a href="/zasu-loud/download/">LOUDを再ダウンロード <span>↗</span></a><a href="/zasu-daw/download/">DAWを再ダウンロード <span>↗</span></a><a href="/vocal-loud-set/download/">制作セットを再ダウンロード <span>↗</span></a></div>
 <div id="audio-connect-panel" class="empty" hidden><p class="eyebrow">CONNECT ZASU AUDIO</p><h2>AUDIOをこのアカウントに接続</h2><p>これから作るジョブを共通アカウントで管理します。匿名利用も引き続き利用できます。</p><button id="audio-connect-confirm" class="primary" type="button">このアカウントで接続する</button></div>
-<section id="trial-approval" hidden aria-labelledby="trial-product-name"><p class="eyebrow">ZASU TRIAL SYSTEM</p><h2 id="trial-product-name">無料体験の認証</h2><p id="trial-approval-note"></p><p>ご自身が製品から開いた画面の場合のみ承認してください。</p><button id="trial-approve" type="button">7日間無料体験を承認</button></section><div id="phase3-dashboard" hidden><div class="section-title"><h2>MY PRODUCTS</h2></div><div id="owned-summary"></div><div class="section-title"><h2>UPDATES</h2></div><div id="updates-list"></div><div class="coming"><p class="eyebrow">MY AUDIO</p><p>処理履歴と、保存期限内の完成ファイル。</p><button type="button" data-view="audio" class="secondary">AUDIO履歴を見る</button><a href="https://zasumaster.com/" target="_blank" rel="noopener">ZASU AUDIOを使う ↗</a></div></div>
+<div id="phase3-dashboard" hidden><div class="section-title"><h2>MY PRODUCTS</h2></div><div id="owned-summary"></div><div class="section-title"><h2>UPDATES</h2></div><div id="updates-list"></div><div class="coming"><p class="eyebrow">MY AUDIO</p><p>処理履歴と、保存期限内の完成ファイル。</p><button type="button" data-view="audio" class="secondary">AUDIO履歴を見る</button><a href="https://zasumaster.com/" target="_blank" rel="noopener">ZASU AUDIOを使う ↗</a></div></div>
 </section>
 <section id="purchases" hidden>
 <p class="eyebrow">YOUR PRODUCTS</p><h1>購入管理</h1><p class="lead">購入済み製品と、いつでも再ダウンロード。</p>
