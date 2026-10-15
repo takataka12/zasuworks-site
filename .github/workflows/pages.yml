@@ -36,6 +36,9 @@ jobs:
       - name: Build storefront and purchase channel guides
         run: node tools/build-storefront.cjs
 
+      - name: Build consent-gated analytics and public route inventory
+        run: node tools/build-analytics.cjs
+
       - name: Build OGP image
         run: |
           sudo apt-get update

@@ -96,7 +96,9 @@ function build(root=path.resolve(__dirname,'..'),check=false){
  if(!marker.test(home)) throw new Error('Homepage review insertion markers missing');
  const latest=reviews.length?`<div class="review-grid">${reviews.slice(0,3).map(card).join('')}</div><a class="text-link" href="/media/reviews/">すべての体験レビューを見る →</a>`:'<div class="journal-intro"><div class="journal-number" aria-hidden="true">00<span>FIRST CONTACT</span></div><div><h3>最初の一作品を、待っています。</h3><p>公開済みの体験レビューは、まだありません。2026年11月から、実際に使ってわかったことを一つずつ残していきます。</p><a class="text-link" href="/media/reviews/">作品を探すページへ →</a></div></div>';
  home=home.replace(marker,()=>`<!-- MEDIA_LATEST_START -->${latest}<!-- MEDIA_LATEST_END -->`);outputs.set('media/index.html',home);
- for(const [name,html] of outputs){const file=path.join(root,name);if(check){if(!fs.existsSync(file)||fs.readFileSync(file,'utf8')!==html)throw new Error(`Generated file out of date: ${name}`);}else{fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,html);}}
+ // Analytics is owned by the final common-page build, not the editorial renderer.
+ const editorialHTML=html=>html.replace(/<!-- ZW_ANALYTICS_START -->[\s\S]*?<!-- ZW_ANALYTICS_END -->/g,'');
+ for(const [name,html] of outputs){const file=path.join(root,name);if(check){if(!fs.existsSync(file)||editorialHTML(fs.readFileSync(file,'utf8'))!==editorialHTML(html))throw new Error(`Generated file out of date: ${name}`);}else{fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,html);}}
  return {reviews:reviews.length,pages:outputs.size};
 }
 module.exports={validateReviews,renderArchive,renderArticle,build,safeURL,esc};
