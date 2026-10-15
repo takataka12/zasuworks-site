@@ -1,6 +1,6 @@
 # ZASU WORKS — analytics operations
 
-Status (2026-10-15): implementation prepared, real GA4 measurement ID and account setup pending. No live collection or Google Realtime/DebugView receipt has been verified. Do not present this document as a completed GA4 deployment.
+Status (2026-10-15): GA4 `G-JPG8NNYWWT` is deployed and receiving production events. Account `412134904`, property `559113085`, Web stream `16132618253`. The owner completed Google terms and approved the currently signed-in personal Google account. Enhanced measurement, Signals and user-provided data collection are off. Realtime confirmed one verification visitor, page_view, view_item, click_purchase, click_square and the exact approved UTM URL. DebugView and the mobile app have not been independently verified. The active X ad URL has not been changed; untagged visits cannot yet be reliably classified as paid campaign traffic. See analytics-delivery.md for the final coverage and links.
 
 ## Activate the actual stream
 
@@ -41,7 +41,16 @@ GA4 Reports → Acquisition → Traffic acquisition: use **Session source / medi
 
 X clicks and GA4 sessions differ: repeat clicks can share one session; a click may never finish loading; refusal, script blocking and browser restrictions prevent GA collection; automated or accidental clicks are filtered differently; reporting timezone, date range, latency and attribution definitions differ. This implementation's explicit consent creates a known collection gap. Do not compute reliable cost per purchase without verified ad cost and attributed completed sales.
 
-## Free Google report collection to configure after activation
+## Free Google report collection — configured
+
+Published collection: `ZASU WORKS｜集客・製品・購入意向`, collection ID `16132652584`. It includes the standard traffic overview, Pages and screens, Traffic acquisition and Events, plus two saved custom reports:
+
+- `製品別購入クリック｜売上ではありません` (`16132657345`): filter eventName regex `^click_purchase$`; default dimension 製品名; alternative dimensions 購入先, セッションの参照元 / メディア and イベント名; metrics Event count, Total users, Events per active user. Revenue removed.
+- `X広告｜VOCAL 20261015` (`16132658471`): sessionSourceMedium regex `^x / paid_social$` AND sessionCampaignName regex `^zasu_vocal_20261015$`; Sessions, engaged-session/engagement metrics, Event count, Key events, session key-event rate and Total users. Revenue removed.
+
+Four custom definitions (product_id, product_name, sales_channel, destination) were saved. click_purchase is a key event counted once per session, with **no default monetary value**. Default purchase appears in GA4's own key-event list, but this site does not emit purchase.
+
+The table below remains a reference for reading/expanding the collection:
 
 Use GA4 Library → create a `ZASU WORKS` collection, publish it, and add:
 
@@ -56,7 +65,7 @@ Use GA4 Library → create a `ZASU WORKS` collection, publish it, and add:
 
 For an optional GA4 Exploration funnel use session X campaign → VOCAL `page_view` → `view_item` → `click_purchase`. Configure consistent session scope, sequential steps and the appropriate open/closed funnel setting. Label its final step as purchase intent. A simple event-count ratio is not a purchase conversion rate and can exceed 100% with repeat clicks. Use user/session funnel completion rates with matching denominators.
 
-Check collection availability in the official Google Analytics mobile app and mobile web after the reports exist. The report collection, custom definitions, mobile access and GA receipt are not yet configured/verified.
+Use the same owning Google account in mobile web or the official Google Analytics app. Desktop collection navigation, saved report filters and live receipt were verified; actual iPhone app/mobile report rendering remains unverified. Standard reports initially default to the previous 28 days and exclude today: use the date selector for Today or a 7/30-day period that includes today. Fresh standard reports can remain blank while Realtime already receives data; do not read that as zero total traffic.
 
 ## Sales coverage
 
