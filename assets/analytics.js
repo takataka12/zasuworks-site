@@ -44,7 +44,7 @@
     gtag('js',new Date());
     gtag('config',c.measurementId,{...params(),send_page_view:false,allow_google_signals:false,allow_ad_personalization_signals:false,cookie_expires:ttl/1000,cookie_update:false});
     const script=document.createElement('script');script.async=true;script.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(c.measurementId);script.referrerPolicy='strict-origin';document.head.append(script);
-    if(!viewSent){viewSent=true;emit('page_view');const p=core.product(location.pathname,c);if(p.id!=='site')emit('view_item',{items:[{item_id:p.id,item_name:p.name}]});}
+    if(!viewSent){viewSent=true;emit('page_view');if(location.pathname.replace(/index\.html$/,'')==='/trial/')emit('trial_page_view');const p=core.product(location.pathname,c);if(p.id!=='site')emit('view_item',{items:[{item_id:p.id,item_name:p.name}]});}
     observePrice();
   }
   function observePrice(){
@@ -89,7 +89,7 @@
   function trackClick(e){
     if(e.type==='auxclick'&&e.button!==1)return;
     const el=e.target.closest?.('a[href],button[data-duo-product]');if(!el||el.disabled||el.getAttribute('aria-disabled')==='true')return;
-    const result=core.classify({href:el.getAttribute('href'),duoProduct:el.dataset.duoProduct,page:location.pathname,existingBuyer:!!el.closest('#purchase-channels,.zw-receipt-guide')},c);if(!result)return;
+    const result=core.classify({href:el.getAttribute('href'),trialProduct:el.dataset.trialProduct,trialAction:el.dataset.trialAction,duoProduct:el.dataset.duoProduct,page:location.pathname,existingBuyer:!!el.closest('#purchase-channels,.zw-receipt-guide')},c);if(!result)return;
     const {events,...safe}=result;for(const name of events)emit(name,safe);
   }
   document.addEventListener('click',trackClick,true);document.addEventListener('auxclick',trackClick,true);
