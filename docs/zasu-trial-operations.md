@@ -80,3 +80,35 @@ GA4で同意がある場合のみ `trial_page_view`、`trial_download`（ダウ�
 ## 新製品
 
 DBカタログ登録に加え、API製品IDの許可、Webモデルの製品ページ対応、ネイティブビルドでproduct IDを設定します。現在の実装は設定追加だけであらゆる製品へ自動統合されるものではありません。新規DSP・DAW制限・パッケージ検証は必要です。期間はDBのduration_seconds（新規grantのみ）で変更できます。既存grantの日時を通常運用で書き換えないでください。
+
+## 公開フラグを変えないMac実機の非公開認証試験
+
+`supabase/staging/` は既存の giljyqaohutxoxlpkfjf 専用です。本番へ適用しないでください。通常の migrations に入れていません。
+
+- `trial-validation.sql`: RLSで閉じたメールallowlist（VOCALのみ・有効期限必須）と、既存trial RPCのステージング用制御。allowlistは空で作成され、許可済み本人だけが承認・権限取得できます。pendingリクエストだけで権限は発行しません。
+- `account-validation.ts`: `zasu-trial-account-validation` としてデプロイ。既存account adapterのOTP・プロフィール・session proofを再利用し、メール送信はallowlist内だけ。送信ドメインは確認済みの alerts.zasumaster.com。Vaultのzasu_resend_api_keyをサーバー内部だけで参照。共通health通知のtransport設定・通常account関数・本番Authは変更しません。
+- `trial-validation.ts`: ステージングのzasu-trialのみにデプロイ。通常と同じ署名・期限・PKCE・レート制限を使用。検証者メールを再確認し、Originは http://127.0.0.1:8765 のみ。
+- `tools/serve-trial-staging.mjs`: 上記の固定Originにのみlisten。許可した静的ファイルだけを配信し、リポジトリ・秘密鍵フォルダは公開しません。configとCSPを応答時だけステージングに置換。本番configは保持します。
+
+まずSQL/サービスの検証とデプロイを完了し、管理者が対象メールに一時的な検証許可を登録します。メール・有効期限はGitに保存しません。テーブルへの登録・削除はサービス権限の管理操作だけで行います。
+
+```sh
+node tools/serve-trial-staging.mjs
+```
+
+このターミナルを起動したまま、Macの別ターミナルでVOCALを再ビルドします。
+
+```sh
+ZASU_TRIAL_RSA_MODULUS_FILE="$HOME/ZASU-TRIAL-STAGING-PRIVATE/public-modulus.txt" \
+ZASU_TRIAL_API="https://giljyqaohutxoxlpkfjf.supabase.co/functions/v1/zasu-trial" \
+ZASU_TRIAL_ACCOUNT_URL="http://127.0.0.1:8765/account/" \
+bash "$HOME/zasu-trial-vocal/Build-TRIAL-Mac.command"
+```
+
+通常のブラウザURLは https://zasuworks.jp/account/ のまま。上記のloopbackは固定ステージングAPIとの組合せだけCMakeが許可します。再ビルド後はコード署名を再実施します。検証はまずStandaloneで進め、有料版AUの復帰状態を保ちます。
+
+このステージングには本番の会員データをコピーしません。初回は検証ページの説明・規約を確認して新規登録し、本人の既存ZASU ACCOUNTと同じメールアドレスを使えます。本番で重複登録されることはありません。OTP・トークン・秘密鍵はチャットに送らず本人の画面で入力します。
+
+試験終了後はallowlistを削除し、検証account関数を停止・削除、trial関数/RPCを通常版へ復帰します。既発行の署名ライセンスは元の168時間の期限を維持し、期限を再発行しません。公開フラグは全製品falseのままです。
+
+2026-10-15の追加準備: JSの認証/試用/プレビュー150件、ブラウザ8件、変更後VOCAL試用プロセッサ1件とnative clock/deadline 2件をLinuxで確認。検証account関数v1とステージングtrial関数v5をデプロイ済みで、固定loopbackのCORS 204、外部Originの403を実APIで確認。通常account関数・本番は変更していません。DB変更用APIの接続エラーによりステージングSQL適用と実DBテストは未完了。手元のMacからSQLを適用し、実DB検証後にのみ認証へ進みます。

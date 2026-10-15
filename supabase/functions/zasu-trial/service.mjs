@@ -1,8 +1,8 @@
 import {sha256} from './crypto.mjs';
 const fail=code=>{throw Object.assign(Error(code),{code});};
-export function createTrialService({rpc,sign,catalog,admins=[]}){return {
+export function createTrialService({rpc,sign,catalog,admins=[],accountUrl='https://zasuworks.jp/account/'}){return {
  async catalog(){return {products:await catalog()};},
- async begin({product,platform,challenge}){const requestId=await rpc('trial_begin',{p_product:product,p_platform:platform,p_challenge:challenge});return {requestId,expiresIn:600,interval:5,authorizeUrl:'https://zasuworks.jp/account/#trial_request='+encodeURIComponent(requestId)};},
+ async begin({product,platform,challenge}){const requestId=await rpc('trial_begin',{p_product:product,p_platform:platform,p_challenge:challenge});return {requestId,expiresIn:600,interval:5,authorizeUrl:accountUrl+'#trial_request='+encodeURIComponent(requestId)};},
  async inspect({requestId},user){return rpc('trial_request_info',{p_request:requestId,p_user:user.id,p_session:user.sessionId});},
  async approve({requestId},user){if(!await rpc('trial_approve',{p_request:requestId,p_user:user.id,p_session:user.sessionId}))fail('expired_request');return {ok:true};},
  async exchange({requestId,verifier}){

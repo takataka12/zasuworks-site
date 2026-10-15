@@ -1,4 +1,4 @@
-export function createAdapter({db,key,createAuthClient,fetchMail=fetch}){
+export function createAdapter({db,key,createAuthClient,fetchMail=fetch,getMailConfig=null}){
 const PRIVACY_VERSION='2026-10-09';
 async function rpc(name,args={}){const {data,error}=await db.rpc(name,args);if(error)throw new Error('database_unavailable');return data;}
 async function digest(value){const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(key),{name:'HMAC',hash:'SHA-256'},false,['sign']);const bytes=new Uint8Array(await crypto.subtle.sign('HMAC',k,new TextEncoder().encode(value)));return [...bytes].map(b=>b.toString(16).padStart(2,'0')).join('');}
@@ -19,7 +19,7 @@ return {
   const identity=await rpc('account_find_identity',{p_email:email});
   if(identity?.status==='closed'||(purpose!=='signup'&&(!identity||identity.status!=='active')))return null;
   if(purpose==='close'&&identity.id!==user?.id)return null;
-  const cfg=await rpc('zasu_alert_delivery_config');
+  const cfg=getMailConfig?await getMailConfig():await rpc('zasu_alert_delivery_config');
   if(!cfg?.resend_api_key||!cfg.delivery?.domain_verified||!cfg.delivery?.transport_enabled)throw new Error('mail_unavailable');
   for(const [k,l,w] of [['mail-hour',30,3600],['mail-day',50,86400]]){
    if(!await rpc('account_rate_check',{p_key:k,p_limit:l,p_window:w}))throw new Error('rate_limited');

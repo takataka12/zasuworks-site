@@ -2,8 +2,8 @@ const origins=new Set(['https://zasuworks.jp','https://www.zasuworks.jp']);
 const products=new Set(['vocal','loud','finish','vocal_editor','daw']);
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const fields={catalog:['action'],begin:['action','product','platform','challenge'],exchange:['action','requestId','verifier'],inspect:['action','requestId'],approve:['action','requestId'],list:['action'],stats:['action']};
-export function createTrialHandler({authenticate,limit,service}){return async req=>{
- const origin=req.headers.get('origin'),trusted=origins.has(origin);
+export function createTrialHandler({authenticate,limit,service,origins:configuredOrigins}){const allowedOrigins=new Set(configuredOrigins??origins);return async req=>{
+ const origin=req.headers.get('origin'),trusted=allowedOrigins.has(origin);
  const headers={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','Vary':'Origin','X-Content-Type-Options':'nosniff'};
  if(trusted)Object.assign(headers,{'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Headers':'authorization, content-type','Access-Control-Allow-Methods':'POST, OPTIONS'});
  const reply=(status,body)=>new Response(JSON.stringify(body),{status,headers});

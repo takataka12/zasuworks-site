@@ -1,7 +1,7 @@
 import {installTrials} from './trials.mjs';
 import {CATALOG,ownedUpdates} from './catalog.mjs';
-import {SUPABASE_URL,PUBLISHABLE_KEY} from './config.mjs';
-const ENDPOINT=SUPABASE_URL+'/functions/v1/zasu-account',STORE='zasu.account.session.v1';
+import {SUPABASE_URL,PUBLISHABLE_KEY,ACCOUNT_ENDPOINT} from './config.mjs';
+const ENDPOINT=ACCOUNT_ENDPOINT,STORE='zasu.account.session.v1';
 const $=id=>document.getElementById(id);
 let sessionEpoch=0;
 let session=null,account=null,purpose='login',challenge=null,email='',closeChallenge=null,resendAt=0,refreshing=null,purchaseChallenge=null,purchaseResendAt=0;

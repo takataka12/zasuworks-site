@@ -60,7 +60,7 @@ void Controller::run(){restore();while(!threadShouldExit()){
  const auto response=post(body({{"action","begin"},{"product",product},{"platform",platform},{"challenge",challenge}}));
  const auto request=response["requestId"].toString();
  if(request.length()!=36){status(juce::String::fromUTF8("体験版の認証を開始できません。後で再試行してください。"),"Cannot start activation. Try again later.");continue;}
- {std::lock_guard<std::mutex> lock(mutex);browserUrl="https://zasuworks.jp/account/#trial_request="+request;}
+ {std::lock_guard<std::mutex> lock(mutex);browserUrl=juce::String(ZASU_TRIAL_ACCOUNT_URL)+"#trial_request="+request;}
  status(juce::String::fromUTF8("ブラウザでログインして開始を確認してください。"),"Sign in and confirm in your browser.");
  const auto deadline=monotonic()+600;while(!threadShouldExit()&&monotonic()<deadline){
   // Five-second polling with interruptible short waits and clock updates.

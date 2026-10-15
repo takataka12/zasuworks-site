@@ -1,11 +1,11 @@
 const ORIGINS=new Set(['https://zasuworks.jp','https://www.zasuworks.jp','https://zasumaster.com']);
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-export function createHandler(deps){return async(req)=>{
+export function createHandler(deps){const allowedOrigins=new Set(deps.origins??ORIGINS);return async(req)=>{
  const origin=req.headers.get('origin');
  const headers={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','Vary':'Origin','X-Content-Type-Options':'nosniff'};
- if(ORIGINS.has(origin)){headers['Access-Control-Allow-Origin']=origin;headers['Access-Control-Allow-Headers']='authorization, content-type';headers['Access-Control-Allow-Methods']='POST, OPTIONS';}
+ if(allowedOrigins.has(origin)){headers['Access-Control-Allow-Origin']=origin;headers['Access-Control-Allow-Headers']='authorization, content-type';headers['Access-Control-Allow-Methods']='POST, OPTIONS';}
  const reply=(status,data)=>new Response(JSON.stringify(data),{status,headers});
- if(!ORIGINS.has(origin))return reply(403,{error:'origin_denied'});
+ if(!allowedOrigins.has(origin))return reply(403,{error:'origin_denied'});
  if(req.method==='OPTIONS')return new Response(null,{status:204,headers});
  if(req.method!=='POST')return reply(405,{error:'method_not_allowed'});
  if(!/^application\/json(?:;|$)/i.test(req.headers.get('content-type')||''))return reply(415,{error:'json_required'});
