@@ -13,3 +13,13 @@ test('public pages receive exactly one loader; protected pages are excluded; bui
  const first=fs.readFileSync(path.join(fixture,'zasu-vocal/index.html'),'utf8');build(fixture);assert.equal(fs.readFileSync(path.join(fixture,'zasu-vocal/index.html'),'utf8'),first);assert.equal(fs.readFileSync(path.join(fixture,'assets/analytics-config.js'),'utf8'),config);
  }finally{fs.rmSync(temp,{recursive:true,force:true});}
 });
+test('changing provider IDs changes loader URLs so cached inactive config cannot survive activation',()=>{
+ const {build}=require('../tools/build-analytics.cjs');const temp=fs.mkdtempSync(path.join(require('node:os').tmpdir(),'zw-activation-cache-'));
+ try{
+ fs.mkdirSync(path.join(temp,'assets'));fs.writeFileSync(path.join(temp,'index.html'),'<html><head></head><body></body></html>');
+ const file=path.join(temp,'assets/analytics-config.js');fs.writeFileSync(file,"window.ZASU_ANALYTICS_CONFIG={measurementId:'G-TEST123456',clarityProjectId:'',campaigns:[]};");
+ build(temp);const first=fs.readFileSync(path.join(temp,'index.html'),'utf8').match(/analytics-config.js\?v=([^"]+)/)[1];
+ fs.writeFileSync(file,fs.readFileSync(file,'utf8').replace("clarityProjectId: ''","clarityProjectId: 'testproject'"));build(temp);
+ const second=fs.readFileSync(path.join(temp,'index.html'),'utf8').match(/analytics-config.js\?v=([^"]+)/)[1];assert.notEqual(first,second);
+ }finally{fs.rmSync(temp,{recursive:true,force:true});}
+});
