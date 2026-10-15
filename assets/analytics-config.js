@@ -1,6 +1,7 @@
 // Public configuration. Never put GA API secrets or account credentials here.
 window.ZASU_ANALYTICS_CONFIG = {
   measurementId: 'G-JPG8NNYWWT',
+  clarityProjectId: '',
   "campaigns": [
     "zasu_vocal_20261015"
   ],

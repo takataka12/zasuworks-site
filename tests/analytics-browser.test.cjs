@@ -13,10 +13,11 @@ after(async()=>{await browser?.close();if(server)await new Promise(r=>server.clo
 async function pageWithMeasurement(options={}){
  const context=await browser.newContext({viewport:{width:390,height:844}});
  const page=await context.newPage(),requests=[];
- await page.route('**/assets/analytics-config.js*',async route=>{const body=await fs.readFile(path.join(root,'assets/analytics-config.js'),'utf8');await route.fulfill({contentType:'text/javascript',body:body.replace(/measurementId: '[^']*'/,"measurementId: 'G-TEST123456'")});});
+ await page.route('**/assets/analytics-config.js*',async route=>{const body=await fs.readFile(path.join(root,'assets/analytics-config.js'),'utf8');await route.fulfill({contentType:'text/javascript',body:body.replace(/measurementId: '[^']*'/,"measurementId: 'G-TEST123456'").replace(/clarityProjectId: '[^']*'/,"clarityProjectId: '"+(options.clarity?'testproject':'')+"'")});});
  await page.route('https://www.googletagmanager.com/**',route=>{requests.push(route.request().url());return route.fulfill({contentType:'text/javascript',body:'/* no real analytics from automated tests */'});});
+ await page.route('https://www.clarity.ms/**',route=>{requests.push(route.request().url());return route.fulfill({contentType:'text/javascript',body:'/* stub */'});});
  if(options.storageFailure)await page.addInitScript(()=>{Storage.prototype.getItem=()=>{throw Error('blocked')};Storage.prototype.setItem=()=>{throw Error('blocked')};});
- if(options.consent)await page.addInitScript(()=>localStorage.setItem('zw-analytics-consent-v1',JSON.stringify({choice:'granted',at:Date.now()})));
+ if(options.consent)await page.addInitScript(()=>localStorage.setItem('zw-analytics-consent-v2',JSON.stringify({choice:'granted',at:Date.now()})));
  return {page,context,requests};
 }
 const events=page=>page.evaluate(()=>Array.from(window.dataLayer||[]).filter(a=>a[0]==='event').map(a=>({name:a[1],params:a[2]})));
@@ -67,6 +68,52 @@ test('audio playback records demo intent without source URL; consent changes pro
  const {page,context}=await pageWithMeasurement({consent:true});await page.goto(origin+'/zasu-loud/');
  await page.locator('#demoRaw').evaluate(el=>el.dispatchEvent(new Event('play')));
  assert.equal((await events(page)).find(e=>e.name==='click_demo')?.params.destination,'onsite_audio');
- await page.evaluate(()=>{document.addEventListener('click',e=>e.preventDefault());window.dispatchEvent(new StorageEvent('storage',{key:'zw-analytics-consent-v1',newValue:JSON.stringify({choice:'denied',at:Date.now()})}));});
+ await page.evaluate(()=>{document.addEventListener('click',e=>e.preventDefault());window.dispatchEvent(new StorageEvent('storage',{key:'zw-analytics-consent-v2',newValue:JSON.stringify({choice:'denied',at:Date.now()})}));});
  const count=(await events(page)).length;await page.locator('a[href="https://square.link/u/pJNTXnu7"]').first().click();assert.equal((await events(page)).length,count);await context.close();
+});
+
+test('Clarity requires fresh consent, masks body and loads once; unsafe URLs never load recording',async()=>{
+ const {page,context,requests}=await pageWithMeasurement({clarity:true});
+ await page.goto(origin+'/zasu-vocal/?utm_source=x&utm_campaign=zasu_vocal_20261015');
+ assert.equal(requests.length,0);
+ await page.getByRole('button',{name:'解析を許可する',exact:true}).click();
+ await page.waitForFunction(()=>document.querySelector('script[src*="clarity.ms/tag/"]'));
+ assert.equal(await page.locator('body').getAttribute('data-clarity-mask'),'true');
+ assert.equal(requests.filter(u=>u.includes('clarity.ms')).length,1);
+ await page.addScriptTag({url:origin+'/assets/analytics.js'});
+ assert.equal(requests.filter(u=>u.includes('clarity.ms')).length,1);
+ await page.getByRole('button',{name:'アクセス解析の設定',exact:true}).click();
+ await page.getByRole('button',{name:'許可しない',exact:true}).click();
+ await page.waitForLoadState();
+ assert.equal(await page.locator('script[src*="clarity.ms/tag/"]').count(),0);
+ await context.close();
+ const unsafe=await pageWithMeasurement({clarity:true,consent:true});
+ await unsafe.page.goto(origin+'/zasu-vocal/?email=alice@example.com');
+ assert.equal(unsafe.requests.filter(u=>u.includes('clarity.ms')).length,0);
+ await unsafe.context.close();
+});
+test('old GA4 consent does not authorize new recording disclosures',async()=>{
+ const {page,context,requests}=await pageWithMeasurement({clarity:true});
+ await page.addInitScript(()=>localStorage.setItem('zw-analytics-consent-v1',JSON.stringify({choice:'granted',at:Date.now()})));
+ await page.goto(origin+'/zasu-vocal/');assert.equal(requests.length,0);
+ assert.equal(await page.locator('.zw-analytics-panel').isVisible(),true);await context.close();
+});
+test('price exposure is observed once and does not imply purchase',async()=>{
+ const {page,context}=await pageWithMeasurement({consent:true});await page.goto(origin+'/zasu-vocal/');
+ await page.locator('#purchase').scrollIntoViewIfNeeded();
+ await page.waitForFunction(()=>window.dataLayer?.some(a=>a[1]==='view_price'));
+ await page.locator('#purchase').scrollIntoViewIfNeeded();
+ const es=await events(page);assert.equal(es.filter(e=>e.name==='view_price').length,1);assert.equal(es.filter(e=>e.name==='purchase').length,0);
+ assert.ok(es.filter(e=>e.name==='scroll_depth').length>0);await context.close();
+});
+test('a stale stored grant with unwritable consent storage never starts SDKs',async()=>{
+ const {page,context,requests}=await pageWithMeasurement({consent:true,clarity:true});
+ await page.addInitScript(()=>{Storage.prototype.setItem=()=>{throw Error('quota')};});
+ await page.goto(origin+'/zasu-vocal/');assert.equal(requests.length,0);await context.close();
+});
+
+test('pages with user input never load Clarity even when consented',async()=>{
+ const {page,context,requests}=await pageWithMeasurement({clarity:true,consent:true});
+ await page.goto(origin+'/media/');assert.equal(requests.filter(u=>u.includes('clarity.ms')).length,0);
+ await context.close();
 });
