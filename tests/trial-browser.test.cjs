@@ -23,3 +23,21 @@ for(const kind of ['refresh','stale401'])test('old '+kind+' response cannot repl
 });
 
 test('unpublished private validation requires explicit approval and never sends an exchange from browser',async()=>{const {page,actions,errors}=await setup(390,true);await page.addInitScript(()=>sessionStorage.setItem('zasu.account.session.v1',JSON.stringify({access_token:'test',refresh_token:'test',expires_at:Date.now()/1000+3600})));await page.goto(origin+'/account/#trial_request='+rid);await page.locator('#trial-approve').waitFor({state:'visible'});assert.ok(!actions.some(x=>x.action==='approve'));await page.locator('#trial-approve').click();await page.locator('#trial-approve').waitFor({state:'hidden'});assert.ok(actions.some(x=>x.action==='approve'));assert.ok(!actions.some(x=>x.action==='exchange'));assert.deepEqual(errors,[]);await page.close();});
+
+test('JUCE escaped fragment survives email login and shows private trial approval',async()=>{
+ const {page,actions,errors}=await setup(390,true);
+ await page.route('https://siwmzradvrtetotakkbi.supabase.co/**',async route=>{
+  if(route.request().method()==='OPTIONS')return route.fallback();
+  const b=route.request().postDataJSON();let result;
+  if(b.action==='request')result={challengeId:rid};
+  else if(b.action==='verify')result={session:{access_token:'test',refresh_token:'test',expires_at:Date.now()/1000+3600}};
+  else return route.fallback();
+  await route.fulfill({status:200,headers:{'access-control-allow-origin':origin,'content-type':'application/json'},body:JSON.stringify(result)});
+ });
+ await page.goto(origin+'/account/#trial_request%3D'+rid);
+ await loginB(page);
+ await page.locator('#trial-approve').waitFor({state:'visible',timeout:3000});
+ assert.ok(actions.some(x=>x.action==='inspect'&&x.requestId===rid));
+ assert.ok(!actions.some(x=>x.action==='approve'||x.action==='exchange'));
+ assert.deepEqual(errors,[]);await page.close();
+});

@@ -6,7 +6,9 @@ const $=id=>document.getElementById(id);
 let sessionEpoch=0;
 let session=null,account=null,purpose='login',challenge=null,email='',closeChallenge=null,resendAt=0,refreshing=null,purchaseChallenge=null,purchaseResendAt=0;
 try{session=JSON.parse(sessionStorage.getItem(STORE)||'null')}catch{sessionStorage.removeItem(STORE)}
-const audioParams=new URLSearchParams(location.hash.slice(1));
+// JUCE URL::getAnchorString escapes the fragment separator '=' as %3D.
+// Normalize only this exact trial key; request IDs still require UUID validation.
+const audioParams=new URLSearchParams(location.hash.slice(1).replace(/^trial_request%3d/i,'trial_request='));
 const audioConnectRequest=audioParams.get('audio_connect')==='1'&&/^[A-Za-z0-9_-]{43}$/.test(audioParams.get('challenge')||'')&&/^[a-f0-9]{64}$/.test(audioParams.get('state')||'')?{challenge:audioParams.get('challenge'),state:audioParams.get('state')}:null;
 if(location.hash)history.replaceState(null,'',location.pathname+location.search);
 const channel=typeof BroadcastChannel==='function'?new BroadcastChannel('zasu-account'):null;
