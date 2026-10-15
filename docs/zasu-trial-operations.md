@@ -112,3 +112,13 @@ bash "$HOME/zasu-trial-vocal/Build-TRIAL-Mac.command"
 試験終了後はallowlistを削除し、検証account関数を停止・削除、trial関数/RPCを通常版へ復帰します。既発行の署名ライセンスは元の168時間の期限を維持し、期限を再発行しません。公開フラグは全製品falseのままです。
 
 2026-10-15の追加準備: JSの認証/試用/プレビュー150件、ブラウザ8件、変更後VOCAL試用プロセッサ1件とnative clock/deadline 2件をLinuxで確認。検証account関数v1とステージングtrial関数v5をデプロイ済みで、固定loopbackのCORS 204、外部Originの403を実APIで確認。通常account関数・本番は変更していません。DB変更用APIの接続エラーによりステージングSQL適用と実DBテストは未完了。手元のMacからSQLを適用し、実DB検証後にのみ認証へ進みます。
+
+
+### 2026-10-15 認証障害の調査中
+
+実機認証が完了しない場合は、再送・再ログイン・キャッシュ削除・鍵再生成を繰り返さない。
+[認証障害の調査記録](zasu-trial-auth-incident-2026-10-15.md)を先に確認する。
+ステージングの公開鍵対応は `node tools/check-trial-staging-key.mjs` で読み取り確認できる。
+このスクリプトは既定のMac配置だけを対象とし、秘密鍵ファイルを読まず、catalog以外のAPIを呼ばない。
+出力のpublicKeySha256は公開modulusの小文字hex表現のSHA-256。秘密鍵全体のハッシュではない。
+一致しても、実通信での署名検証・ローカル保存・Logic動作の合格とはしない。

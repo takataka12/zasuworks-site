@@ -9,3 +9,15 @@ test('approve derives identity from account and handles expired requests',async(
 test('authorization preview never starts trial and uses authenticated identity',async()=>{let n,args;const s=createTrialService({rpc:async(name,a)=>{n=name;args=a;return {name:'ZASU VOCAL'};}});assert.equal((await s.inspect({requestId:'r'},user)).name,'ZASU VOCAL');assert.equal(n,'trial_request_info');assert.equal(args.p_user,user.id);});
 test('polling budget supports full ten-minute five-second polling independently per request',async()=>{const {limits}=await import('../functions/zasu-trial/limits.mjs');const a=limits('exchange','11111111-aaaa-4111-8111-111111111111'),b=limits('exchange','22222222-aaaa-4222-8222-222222222222');assert.ok(a.limit>=a.window/5+1);assert.notEqual(a.bucket,b.bucket);});
 test('authorization URL is configured by server, never browser input',async()=>{const s=createTrialService({rpc:async()=> 'request',accountUrl:'http://127.0.0.1:8765/account/'});assert.equal((await s.begin({product:'vocal',platform:'mac',challenge:'x'})).authorizeUrl,'http://127.0.0.1:8765/account/#trial_request=request');});
+test('catalog exposes only a digest of the actual signing public modulus for read-only diagnostics',async()=>{
+ const {createSigner}=await import('../functions/zasu-trial/crypto.mjs');
+ const keys=await crypto.subtle.generateKey({name:'RSASSA-PKCS1-v1_5',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['sign','verify']);
+ const privateJwk=await crypto.subtle.exportKey('jwk',keys.privateKey),publicJwk=await crypto.subtle.exportKey('jwk',keys.publicKey);
+ const sign=await createSigner(privateJwk);let writes=0;
+ const service=createTrialService({rpc:async()=>{writes++;throw Error('catalog must not change trial rights');},sign,catalog:async()=>[]});
+ const result=await service.catalog();
+ const {createHash}=await import('node:crypto');const expected=createHash('sha256').update(Buffer.from(publicJwk.n,'base64url').toString('hex')).digest('hex');
+ assert.equal(result.verificationKeySha256,expected);assert.equal(writes,0);
+ assert.deepEqual(Object.keys(result).sort(),['products','verificationKeySha256']);
+ assert.ok(!JSON.stringify(result).includes(privateJwk.d));assert.ok(!JSON.stringify(result).includes(privateJwk.n));
+});

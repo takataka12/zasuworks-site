@@ -6,7 +6,10 @@ export async function createSigner(jwk){
  if(!jwk||jwk.kty!=='RSA'||!jwk.d||unbase64url(jwk.n).length!==256||jwk.e!=='AQAB')throw Error('signer_not_configured');
  const key=await crypto.subtle.importKey('jwk',jwk,{name:'RSASSA-PKCS1-v1_5',hash:'SHA-256'},false,['sign']);
  const header=base64url(encoder.encode(JSON.stringify({alg:'RS256',typ:'ZASU-TRIAL',kid:'zasu-trial-1'})));
- return async claims=>{const message=header+'.'+base64url(encoder.encode(JSON.stringify(claims)));return message+'.'+base64url(new Uint8Array(await crypto.subtle.sign('RSASSA-PKCS1-v1_5',key,encoder.encode(message))));};
+ const sign=async claims=>{const message=header+'.'+base64url(encoder.encode(JSON.stringify(claims)));return message+'.'+base64url(new Uint8Array(await crypto.subtle.sign('RSASSA-PKCS1-v1_5',key,encoder.encode(message))));};
+ const modulusHex=[...unbase64url(jwk.n)].map(x=>x.toString(16).padStart(2,'0')).join('');
+ sign.verificationKeySha256=[...new Uint8Array(await crypto.subtle.digest('SHA-256',encoder.encode(modulusHex)))].map(x=>x.toString(16).padStart(2,'0')).join('');
+ return sign;
 }
 export async function verifyLicense(value,jwk,product,now){try{
  if(typeof value!=='string'||value.length>4096)return null;
