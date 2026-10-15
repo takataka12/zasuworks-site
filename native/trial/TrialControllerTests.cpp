@@ -12,6 +12,9 @@ template<class Predicate> static bool until(Predicate predicate,int ms=7500){con
 struct Temp {juce::File dir=juce::File::getSpecialLocation(juce::File::tempDirectory).getChildFile("zasu-controller-"+juce::Uuid().toString());~Temp(){dir.deleteRecursively();}};
 int main(int argc,char** argv){try{
  require(argc==2,"fixture required");auto fixture=juce::JSON::parse(juce::File(argv[1]));const auto token=fixture["license"].toString(),modulus=fixture["modulus"].toString();
+ const auto started=std::chrono::steady_clock::now();
+ auto trace=[&](const char* phase){std::cout<<"TRACE "<<std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-started).count()<<"ms "<<phase<<std::endl;};
+ trace("controller suite started");
  Temp temp;std::atomic<int> begins{0};std::mutex mutex;std::condition_variable cv;bool released=false;
  {
  Controller c("vocal",modulus,"https://example.invalid/functions/v1/zasu-trial",[&](const juce::var& request){
@@ -28,13 +31,22 @@ int main(int argc,char** argv){try{
  std::cout<<"PASS duplicate clicks preserve signature failure and send one activation request\n";
  // Exercise the real controller, signature verifier and atomic cache, with only HTTP replaced.
  std::atomic<int> calls{0};const auto validCache=temp.dir.getChildFile("valid.json");
- auto validTransport=[&](const juce::var& request){++calls;auto* response=new juce::DynamicObject;if(request["action"].toString()=="begin")response->setProperty("requestId","22222222-aaaa-4222-8222-222222222222");else{response->setProperty("state","active");response->setProperty("license",token);}return juce::var(response);};
+ auto validTransport=[&](const juce::var& request){++calls;trace(request["action"].toString()=="begin"?"transport begin":"transport signed exchange");auto* response=new juce::DynamicObject;if(request["action"].toString()=="begin")response->setProperty("requestId","22222222-aaaa-4222-8222-222222222222");else{response->setProperty("state","active");response->setProperty("license",token);}return juce::var(response);};
  {Controller c("vocal",modulus,"https://example.invalid/functions/v1/zasu-trial",validTransport,validCache);c.begin();require(until([&]{return c.active();}),"valid signed license did not activate");require(validCache.existsAsFile(),"successful activation not persisted");require(c.diagnosticReport().contains("signature_verified"),"missing signature success stage");const auto before=calls.load();c.begin();std::this_thread::sleep_for(std::chrono::milliseconds(350));require(calls.load()==before,"active trial initiated another login");}
  {Controller c("vocal",modulus,"https://example.invalid/functions/v1/zasu-trial",[&](const juce::var&){throw std::runtime_error("offline restore contacted network");return juce::var();},validCache);require(until([&]{return c.active();},1000),"offline cache restore failed");require(c.diagnosticReport().contains("cache_restored"),"cache restore not diagnosed");}
  std::cout<<"PASS signed license receipt, activation, atomic save, offline restart, active-click guard\n";
  // A transient outage must recover without requesting a second browser authorization.
- int polls=0;const auto recoveredCache=temp.dir.getChildFile("recovered.json");
- {Controller c("vocal",modulus,"https://example.invalid/functions/v1/zasu-trial",[&](const juce::var& request){if(request["action"].toString()=="exchange"&&++polls==1)return object(R"({"error":"transport_error"})");return validTransport(request);},recoveredCache);c.begin();require(until([&]{return c.active();},12500),"transient network failure did not recover");require(polls==2,"unexpected exchange retries");}
+ std::atomic<int> polls{0},recoveryBegins{0};std::atomic<bool> sameRequest{true};juce::String firstVerifier;const auto recoveredCache=temp.dir.getChildFile("recovered.json");
+ {Controller c("vocal",modulus,"https://example.invalid/functions/v1/zasu-trial",[&](const juce::var& request){
+  if(request["action"].toString()=="begin")++recoveryBegins;
+  else{
+   const auto poll=++polls;
+   if(request["requestId"].toString()!="22222222-aaaa-4222-8222-222222222222")sameRequest=false;
+   if(poll==1){firstVerifier=request["verifier"].toString();trace("transport transient failure");return object(R"({"error":"transport_error"})");}
+   if(request["verifier"].toString()!=firstVerifier)sameRequest=false;
+  }
+  return validTransport(request);
+ },recoveredCache);c.begin();const bool recovered=until([&]{return c.active();},12500);trace(recovered?"transient recovered":"transient recovery deadline reached");if(!recovered)std::cerr<<"exchange_count="<<polls.load()<<" diagnostics="<<c.diagnosticReport()<<std::endl;require(recovered,"transient network failure did not recover");require(polls.load()==2,"unexpected exchange retries");require(recoveryBegins.load()==1&&sameRequest.load(),"outage replaced the original authorization request");require(recoveredCache.existsAsFile(),"recovered license not saved");require(c.diagnosticReport().contains("signature_verified"),"recovery bypassed signature verification");}
  std::cout<<"PASS transient exchange failure recovers with original request\n";
  // Cache failure must stay visible rather than silently promising offline access.
  const auto blocker=temp.dir.getChildFile("not-a-directory");require(blocker.replaceWithText("file"),"test fixture write failed");

@@ -188,3 +188,19 @@ ASanの修正前失敗→修正後成功は確認済み。修正後Mac/Windows C
 プローブは利用権限RPCを呼ばず、実利用権限・開始終了日時を変更していない。公開鍵指紋の既存診断は維持。
 
 次のMac操作は、CI結果を確認した修正版ソースの取得とビルド。新しい診断コマンド・再ログインを先に依頼しない。
+
+## 2026-10-16 — polling recovery regression
+
+The previous Mac candidate run 38752850373 on daa6eaf failed only `ZasuTrialControllerTests: transient network failure did not recover`. The independent native Mac run 38752850031 passed. Both used macos-15, AppleClang 17.0.0.17000013, JUCE 8.0.15 at 91ad83ae34a81e0833b1a2b0866f54846370ae53, Debug universal binaries, AddressSanitizer with detect_leaks=0, and serial CTest. The candidate generated its signed fixture before the paid/trial builds; the isolated workflow generated its fixture before the common build. Fixtures remain valid for seven days; neither test uses the staging account, server grant, or real network. Each controller test has its own UUID temporary directory and joins workers before cleanup. There is no common cache between workflow jobs.
+
+### Reproduction and bounded fix
+
+The controller previously approximated five seconds by twenty relative 250ms waits. OS scheduling delay accumulates in every wait. A notification also consumes one counted wait without spending its intended time. The transient test needs two polling intervals inside its unchanged 12,500ms bound. A local-only pthread wait interposer that delays each controller resume by 100ms reproduces the exact failed assertion: only one exchange completed; the controller remained busy with transport_failed and no second authorization. This experiment is evidence for the scheduling mechanism, not a measurement of the original Mac runner's scheduler.
+
+The production polling wait is now extracted into waitForTrialPoll in TrialRequestDeadline.h and waits against a steady-clock deadline. It still ticks the license clock and remains cancellable in at-most-250ms wait slices. No HTTP timeout, activation timeout, signature rule or trial period is changed. No test timeout is increased and no test is removed/skipped. Deterministic fake-time tests call that same production wait: the old counted implementation took 7000ms and failed `poll interval accumulated scheduler delay`; the corrected implementation takes 5100ms including the final delayed resume. Early notification and cancellation are also checked. The full real-controller test with the same 100ms resume delay passes after the fix (exchange recovery about 10.2s).
+
+The existing transient controller regression additionally asserts one begin request, two exchange attempts, unchanged request/verifier, a real verified signature, and a saved license. The exchange counter is atomic. Test-only traces contain stage labels and elapsed milliseconds, never credentials. Candidate/native CI now expose these traces and retain test logs on failure without publishing failed binaries. No server state was changed.
+
+The original Mac failure's precise scheduler timing is not available in its old log. A diagnostic-only commit 710c8b6 records phase times before this fix; its CI result must be distinguished from the controlled reproduction. Do not infer that all possible network faults or real Mac activation are verified by this injected-transport test.
+
+Local verification: common CTest 4/4 and delayed-resume controller success. Mac/Windows fixed-head CI results must be recorded after completion. Real Mac activation, offline restart, Logic activated DSP/project compatibility and signed/notarized distribution remain pending. PRs remain draft/unmerged and all release flags remain disabled. Existing grant 2026-10-15 22:27:31 to 2026-10-22 22:27:31 JST is untouched; relief requires separate user approval.

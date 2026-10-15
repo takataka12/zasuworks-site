@@ -89,7 +89,7 @@ void Controller::run(){restore();while(!threadShouldExit()){
  status(juce::String::fromUTF8("ブラウザでログインして開始を確認してください。"),"Sign in and confirm in your browser.");
  const auto deadline=monotonic()+600;while(!threadShouldExit()&&monotonic()<deadline){
   // Five-second polling with interruptible short waits and clock updates.
-  for(int i=0;i<20&&!threadShouldExit();++i){tick();wait(250);}
+  waitForTrialPoll([this]{return threadShouldExit();},[this]{tick();},[this](double ms){wait(ms);},[]{return std::chrono::steady_clock::now();});
   if(threadShouldExit())break;
   const auto requestStart=monotonic();const auto result=post(body({{"action","exchange"},{"requestId",request},{"verifier",secret}}));const auto state=result["state"].toString();
   if(state=="active"){
