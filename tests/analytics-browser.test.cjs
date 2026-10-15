@@ -13,7 +13,7 @@ after(async()=>{await browser?.close();if(server)await new Promise(r=>server.clo
 async function pageWithMeasurement(options={}){
  const context=await browser.newContext({viewport:{width:390,height:844}});
  const page=await context.newPage(),requests=[];
- await page.route('**/assets/analytics-config.js*',async route=>{const body=await fs.readFile(path.join(root,'assets/analytics-config.js'),'utf8');await route.fulfill({contentType:'text/javascript',body:body.replace("measurementId: ''","measurementId: 'G-TEST123456'")});});
+ await page.route('**/assets/analytics-config.js*',async route=>{const body=await fs.readFile(path.join(root,'assets/analytics-config.js'),'utf8');await route.fulfill({contentType:'text/javascript',body:body.replace(/measurementId: '[^']*'/,"measurementId: 'G-TEST123456'")});});
  await page.route('https://www.googletagmanager.com/**',route=>{requests.push(route.request().url());return route.fulfill({contentType:'text/javascript',body:'/* no real analytics from automated tests */'});});
  if(options.storageFailure)await page.addInitScript(()=>{Storage.prototype.getItem=()=>{throw Error('blocked')};Storage.prototype.setItem=()=>{throw Error('blocked')};});
  if(options.consent)await page.addInitScript(()=>localStorage.setItem('zw-analytics-consent-v1',JSON.stringify({choice:'granted',at:Date.now()})));
@@ -58,9 +58,10 @@ test('account/download routes do not load Google even after consent; storage fai
  await context.close();const blocked=await pageWithMeasurement({storageFailure:true});await blocked.page.goto(origin+'/zasu-vocal/');assert.equal(blocked.requests.length,0);assert.equal(await blocked.page.locator('a.checkout').count(),2);await blocked.context.close();
 });
 test('empty production ID is inert, no misleading consent prompt',async()=>{
- const context=await browser.newContext();const page=await context.newPage();await page.goto(origin+'/zasu-vocal/');
- const hasId=await page.evaluate(()=>!!window.ZASU_ANALYTICS_CONFIG.measurementId);
- if(!hasId){assert.equal(await page.locator('[data-zw-analytics-choice]').count(),0);assert.equal(await page.locator('script[src*="googletagmanager"]').count(),0);}await context.close();
+ const context=await browser.newContext();const page=await context.newPage();
+ await page.route('**/assets/analytics-config.js*',async route=>{const body=await fs.readFile(path.join(root,'assets/analytics-config.js'),'utf8');await route.fulfill({contentType:'text/javascript',body:body.replace(/measurementId: '[^']*'/,"measurementId: ''")});});
+ await page.goto(origin+'/zasu-vocal/');
+ assert.equal(await page.locator('[data-zw-analytics-choice]').count(),0);assert.equal(await page.locator('script[src*="googletagmanager"]').count(),0);await context.close();
 });
 test('audio playback records demo intent without source URL; consent changes propagate across tabs',async()=>{
  const {page,context}=await pageWithMeasurement({consent:true});await page.goto(origin+'/zasu-loud/');
