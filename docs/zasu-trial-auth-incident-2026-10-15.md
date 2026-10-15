@@ -2,7 +2,7 @@
 
 ## 結論と変更禁止事項
 
-Macの実認証は未解決。ライセンスを実際に検証・保存できない最初の原因はまだ確定していない。
+Macの実認証の再確認は未完了。後段の追加調査で署名検証中の解放後メモリー参照を再現・修正した（末尾の更新を優先）。
 既存記録から推測できるのは、サーバーでの権限発行以降、クライアントが有効化される以前の区間で失敗したこと。
 「鍵が違う」「署名検証が失敗した」を実機の確定原因として扱わない。
 
@@ -140,3 +140,51 @@ node tools/build-storefront.cjs
 node tools/build-analytics.cjs
 NODE_PATH=/tmp/zasu-home-check/node_modules node --test tests/*.test.cjs tests/*.test.mjs supabase/tests/*.test.mjs
 ```
+
+
+## 追加調査：署名検証のメモリー寿命不具合を再現・修正
+
+ユーザー実行の読み取り検査は全6項目true。公開ファイル・ビルド設定・実バイナリの鍵と実サーバーの公開鍵指紋が一致した。
+指紋は27fec33eb59362eaa51bcb7c0d178a1264d60a4a35e90f151f1a9a178c124b8d。
+鍵の再設定・再生成は不要。
+
+GitHub Actions実行38749656712のMac runnerで、通信もログインも使わないWebCrypto署名fixtureがJUCEで拒否された。
+Mac trial processorとpaid processorは成功していたが、追加したLicenseTestsとControllerTestsが失敗。
+したがって、APIやブラウザに依存しない検証経路で不具合を再現できた。
+
+原因コード:
+
+```cpp
+auto message=(parts[0]+"."+parts[1]).toUTF8();
+auto digest=juce::SHA256(message.getAddress(),message.sizeInBytes()-1).getRawData();
+```
+
+JUCE String::toUTF8()は所有権を持つコピーではなく、Stringの内部データを指す。
+一時Stringは最初の文の終わりで破棄され、次の文のmessageは解放済み領域を参照する。
+Linuxの通常実行で通ったことは安全性の証拠ではなかった。
+
+同じ検証コードとWebCrypto fixtureをAddressSanitizerで実行した結果:
+
+```text
+ERROR: AddressSanitizer: heap-use-after-free
+zasu::trial::verify ... TrialLicense.cpp:27
+freed by ... zasu::trial::verify ... TrialLicense.cpp:27
+SUMMARY: AddressSanitizer ... in strlen
+```
+
+修正: `const auto signedText=parts[0]+"."+parts[1];` を保持し、その所有者が生存する間にtoUTF8とSHA-256を実行。
+公開鍵指紋のtoLowerCase().toUTF8()にも同じ寿命パターンがあったため所有Stringを保持。
+修正後の同じASan実行はexit 0で、WebCrypto RS256検証・改ざん拒否・別製品拒否・誤鍵拒否が成功。
+受入条件、秘密鍵、DSP、保存形式は変更しない。
+
+Windows runnerは別にTrialController.cpp:45のstd::maxでC2059を報告。
+Windowsヘッダーのmaxマクロとの衝突を避けるため `(std::max)(...)` に修正。Windows再ビルドが必要。
+
+再発防止: 共通CMakeに開発用AddressSanitizerオプション、Mac CIで有効化、共通モジュールだけを早く検証するMac/Windows workflowを追加。
+ASanの修正前失敗→修正後成功は確認済み。修正後Mac/Windows CIとユーザー実機の認証完了は別途結果を確認する。
+
+一時的に準備した「認証を行わない署名プローブ」は、CIとASanで再現できたためMacへの操作案内を省略した。
+ステージングcatalogに一時追加したdiagnosticProofも除去し、v8でv6と同じbundleへ復帰（SHA256 02b51805784a4e282317e4f34e6a3f560c1f4948127c91d0416f30c123ce91b0）。
+プローブは利用権限RPCを呼ばず、実利用権限・開始終了日時を変更していない。公開鍵指紋の既存診断は維持。
+
+次のMac操作は、CI結果を確認した修正版ソースの取得とビルド。新しい診断コマンド・再ログインを先に依頼しない。

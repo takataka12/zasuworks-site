@@ -34,7 +34,7 @@ juce::String Controller::diagnosticReport()const{
  // An allowlist of fixed labels, public-key digest and HTTP numbers. Never serialize server bodies or exceptions.
  static const char* names[]={"cache_missing","cache_restored","cache_rejected","activation_started","browser_ready","browser_opened","browser_open_failed","http_ok","http_failed","transport_failed","response_invalid","license_received","signature_rejected","signature_verified","cache_saved","cache_write_failed","activated","pending","server_rejected","activation_timed_out","license_format_rejected","license_header_rejected","public_key_rejected","license_claims_rejected","server_authentication_required","server_request_expired","server_unavailable","server_rate_limited","server_not_available"};
  juce::Array<juce::var> events;{std::lock_guard<std::mutex> lock(mutex);for(const auto& d:diagnostics)events.add(body({{"stage",names[static_cast<int>(d.event)]},{"http",d.status}}));}
- const auto publicBytes=modulus.toLowerCase().toUTF8();const auto fingerprint=juce::SHA256(publicBytes.getAddress(),publicBytes.sizeInBytes()-1).toHexString();
+ const auto normalizedModulus=modulus.toLowerCase();const auto publicBytes=normalizedModulus.toUTF8();const auto fingerprint=juce::SHA256(publicBytes.getAddress(),publicBytes.sizeInBytes()-1).toHexString();
  return juce::JSON::toString(body({{"schema",1},{"build","trial-diagnostic-1"},{"publicKeySha256",fingerprint},{"active",active()},{"busy",busy()},{"events",events}}),true);
 }
 void Controller::browserLaunchResult(bool opened){record(opened?Event::browserOpened:Event::browserFailed);if(!opened)status(juce::String::fromUTF8("ブラウザを開けません。診断情報を確認してください。"),"Browser launch failed. Copy diagnostics.");}
@@ -42,7 +42,7 @@ void Controller::restore(){
  if(!cache.existsAsFile()){record(Event::cacheMissing);return;}
  if(cache.getSize()>8192){record(Event::cacheRejected);return;}
  auto c=juce::JSON::parse(cache);license=c["license"].toString();claims=verify(license,product,modulus);
- if(claims){record(Event::cacheRestored);clock.restore(claims->start,claims->expiry,std::max(claims->issued,juce::int64(c["observed"])),wall(),monotonic());tick();}else{license.clear();record(Event::cacheRejected);}
+ if(claims){record(Event::cacheRestored);clock.restore(claims->start,claims->expiry,(std::max)(claims->issued,juce::int64(c["observed"])),wall(),monotonic());tick();}else{license.clear();record(Event::cacheRejected);}
 }
 bool Controller::save(){
  if(!claims)return false;lastSave=wall();
