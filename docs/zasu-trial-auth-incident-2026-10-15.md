@@ -2,6 +2,10 @@
 
 ## 結論と変更禁止事項
 
+**2026-10-16 更新:** 署名検証の解放後参照に続き、Mac統合CIの待機遅延蓄積を実測で特定・修正。
+コミット `29253a4a04d19a08c807aa0377a86ba472b2d80c` のMac/Windows統合CIと独立共通CIはすべてsuccess。
+実機での認証完了・Logicの認証後DSP・配布検証は未完了。以下の当初調査記録と末尾の確定結果を区別する。
+
 Macの実認証の再確認は未完了。後段の追加調査で署名検証中の解放後メモリー参照を再現・修正した（末尾の更新を優先）。
 既存記録から推測できるのは、サーバーでの権限発行以降、クライアントが有効化される以前の区間で失敗したこと。
 「鍵が違う」「署名検証が失敗した」を実機の確定原因として扱わない。
@@ -204,3 +208,103 @@ The existing transient controller regression additionally asserts one begin requ
 The original Mac failure's precise scheduler timing is not available in its old log. A diagnostic-only commit 710c8b6 records phase times before this fix; its CI result must be distinguished from the controlled reproduction. Do not infer that all possible network faults or real Mac activation are verified by this injected-transport test.
 
 Local verification: common CTest 4/4 and delayed-resume controller success. Mac/Windows fixed-head CI results must be recorded after completion. Real Mac activation, offline restart, Logic activated DSP/project compatibility and signed/notarized distribution remain pending. PRs remain draft/unmerged and all release flags remain disabled. Existing grant 2026-10-15 22:27:31 to 2026-10-22 22:27:31 JST is untouched; relief requires separate user approval.
+
+
+### Mac統合CIの実測で原因を確定（2026-10-16）
+
+診断だけを加えた `710c8b64776ecdae07ef1ca7c9e04a47b3c84971` の統合実行
+[38814641542 / Mac job 116696122578](https://github.com/takataka12/zasu-daw/actions/runs/38814641542/job/116696122578)
+でも同じアサーション失敗を再現した。
+
+```text
+TRACE 13492ms transport begin
+TRACE 19730ms transport transient failure
+TRACE 26028ms transient recovery deadline reached
+exchange_count=1 active=false busy=true
+stages: cache_missing, activation_started, browser_ready, transport_failed
+FAIL: transient network failure did not recover
+```
+
+要求開始から最初のexchangeまで6238ms。公称5秒の相対待機が約1.24秒延びていた。
+次の待機も積み上がり、12500msのテスト上限までに2回目のexchangeに到達していない。
+これはローカルで各待機の再開を100ms遅らせた再現と一致する。
+この実測により、当初の「ランナーのタイミング差かもしれない」という仮説から、
+**待機回数による時間管理がスケジューリング遅延を蓄積する実装上の欠陥**として特定できた。
+OS内部で再開が遅れた個別要因（タイマー合流・CPU割り当て等）までは計測していない。
+アプリ側でそれらの個別要因に依存しない期限方式へ修正した。
+
+同じ診断コミットのWindows job 116696122689は、認証より前の既存有料版UI性能テストで失敗した。
+`Long Pitch display ... 6466.44 ms` が既存の2000ms上限を超過。
+このWindows失敗も記録し、しきい値変更・スキップ・無条件の再実行は行わない。
+修正版headのWindows統合結果を別途記録する。
+
+### 修正版のMac統合成功
+
+対象コミット: `29253a4a04d19a08c807aa0377a86ba472b2d80c`。
+[統合CI run 38815217566 / Mac job 116698064390](https://github.com/takataka12/zasu-daw/actions/runs/38815217566/job/116698064390) はsuccess。
+有料版Processor 1/1（18.42s）、体験版Processor 1/1（0.53s）、AU/VST3/Standaloneビルド、共通4/4（Controller 26.33s）を確認。
+Mac共通テストにはAddressSanitizerを有効化し、検出エラーなし。
+
+```text
+scheduler_delay_poll_ms=5100
+PASS polling deadline, delayed scheduling, early notification and cancellation
+TRACE 10872ms transport begin
+TRACE 15906ms transport transient failure
+TRACE 21050ms transport signed exchange
+TRACE 21095ms transient recovered
+PASS transient exchange failure recovers with original request
+100% tests passed out of 4
+```
+
+復旧は要求開始から10223ms、元の12500ms上限を維持して成功。
+一つのbegin、二つのexchange、同じ要求ID・verifier、実署名検証、保存をアサートしている。
+このテストで置き換えているのはHTTP境界だけであり、実SupabaseとのHTTP通信やユーザー実機認証を成功したとは扱わない。
+
+[独立共通CI run 38815217615](https://github.com/takataka12/zasu-daw/actions/runs/38815217615) も両OS success。
+Mac job 116698064840、Windows job 116698065171。各4/4。
+Linux側は共通4/4、有料版Processor 1/1、体験版Processor 1/1、Standalone/VST3ビルド、準備済みサイト全530/530（失敗・skipなし）成功。
+
+ステージングDBは読み取りのみ。5製品のreleased=false、既存VOCAL grantの開始・終了・last_authenticated_atに変更がないことを再確認。
+体験期間は2026-10-15 22:27:31〜2026-10-22 22:27:31 JST。
+障害期間の救済案は、実機認証完了までの利用不能期間を集計し、承認後に当該grantの期限だけを監査付きで延長すること。
+現時点で承認・延長・再発行は行っていない。
+
+
+### 最終Windows統合結果・検証ゲート
+
+同じ `29253a4a04d19a08c807aa0377a86ba472b2d80c` の
+[Windows job 116698064048](https://github.com/takataka12/zasu-daw/actions/runs/38815217566/job/116698064048) はsuccess。
+統合run 38815217566全体もcompleted/success。
+有料版Processor 1/1（18.98s）、体験版Processor 1/1（0.09s）、VST3/Standaloneビルド、共通4/4（Controller 25.51s）成功。
+復旧は10025ms。同じ要求の維持、署名、保存、オフライン復元、既存期限・時計判定も実行。
+
+| 検証 | Mac | Windows |
+|---|---|---|
+| 独立共通4件・run 38815217615 | success / job 116698064840 | success / job 116698065171 |
+| 製品統合・run 38815217566 | success / job 116698064390 | success / job 116698064048 |
+| 有料版処理 | 1/1 | 1/1 |
+| 体験版処理 | 1/1 | 1/1 |
+| 統合内の共通認証 | 4/4・ASan有効 | 4/4 |
+| 製品形式 | AU・VST3・Standalone | VST3・Standalone |
+| ユーザー実機認証・ホスト | 未完了 | 未完了 |
+
+別コミットのWindows描画性能6466.44msは未解明の測定変動として保留する。
+今回の最終統合では同じ2000ms基準を変更せず通過したが、認証修正で描画問題も修正したとは主張しない。
+DSP/音質/Processor/プラグインID/保存形式には今回の差分なし。有料版のDRMなし・認証不要の分離も維持。
+
+再現テストはTrialRequestTests.cppのpollingScheduleとTrialControllerTests.cppに保存。
+共通テストの再実行方法は .github/workflows/zasu-trial-module-tests.yml、製品統合はzasu-trial-candidate.ymlに固定。
+検証用鍵はscripts/trial-test-key.mjsでメモリー内生成し、秘密鍵を保存・表示しない。
+修正前の「20回×250ms」実装へ戻すと、同じ決定的テストは7000msで失敗する。
+12500msの待機上限、署名受理条件、試用期間を変更したり失敗を無効化したりしていない。
+
+実機検証の完了条件（CIとは別）:
+1. ソースhead確認 → 固定ステージング・既存公開鍵でビルド → 署名検証。一般の有料AUは置換しない。
+2. 既存の公開鍵照合結果と新バイナリーの一致、診断コピー機能を確認してから、必要な認証検証を一度だけ実施。
+3. 診断でlicense_received/signature_verified/cache_saved/activated、再起動・オフライン復元を確認。
+4. AUを一時配置する場合は有料版退避・復元を維持し、Logicで解析/AUTO FIX/実音声/プロジェクト保存復元を確認。
+5. 期限切れと有料版互換性、Windows実環境、署名/公証/Staple/インストーラー/配布導線を別ゲートで確認。
+
+この報告時点でMac利用者に依頼するのはVOCAL検証ブランチのff-only取得とhead確認のみ。
+期待head先頭は29253a4a04d1。本人の完了応答を待ってから次のビルド操作へ進む。
+認証再送・鍵再生成・キャッシュ削除・ライセンス再発行・期限変更・PRマージ・一般公開は行わない。
