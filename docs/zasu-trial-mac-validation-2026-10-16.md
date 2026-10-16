@@ -161,3 +161,23 @@ BUILD_TESTING=OFF。既存の有料版インストール先には配置してい
 本候補のRelease AUのLogic音声・保存復元、VST3ホスト、隔離したダウンロード/隔離属性経由の初回起動、インストール/アンインストール、Intel実機、Windows実環境とインストーラーは未検証。
 以前のDebug AUの実機結果を、このRelease候補のホスト検証成功には代用しない。
 元の体験期限・署名鍵・認証キャッシュ・有料版配置を変更せず、公開フラグや本番設定にも変更なし。
+
+## 10:05–10:15 JST：Release AUのLogic検証と有料版復帰
+
+上記Release候補のAUを使用。Logic終了後、有料版AUを新規バックアップへコピーしてdiff一致を確認し、原本を退避した。Release AUをユーザーComponentsへ一時配置してstrict署名検証成功。auval -v aufx ZV01 ZasuはAU VALIDATION SUCCEEDED。
+
+ユーザー報告による実機結果：
+
+- Logic Proで既存検証プロジェクトをロード。体験残り時間・補正65%・解析結果が復元。
+- 再生正常、ノイズ・途切れ・フリーズなし。補正ON/OFFによる音の変化を確認。
+- 補正ON・65%で検証プロジェクトを保存して閉じ、開き直した後も65%・解析結果が復元され、再生正常。
+- Logic終了後、Release AUをバックアップ先へ保管し有料版原本を元のシステムComponentsへ復元。復元前後とも原本とバックアップのdiff一致。
+- 有料版で同じ検証プロジェクトを再ロード。無料体験/ログインボタンなし、65%・解析結果復元、再生正常・ノイズ/途切れなし。
+
+バックアップ：`$HOME/ZASU-VOCAL-RELEASE-AU-BACKUP.Cna1H8/ZASU VOCAL.component`。
+検証済みRelease AU保管：同ディレクトリーの `Logic-Test-Release-Trial.component`。
+最終配置は有料版原本が `/Library/Audio/Plug-Ins/Components/ZASU VOCAL.component`、ユーザーComponentsの体験AUは撤去済み。
+
+本節は共有されたコマンド出力・ユーザーの画面内容/聴取報告に基づく。添付画像のローカル読み取りには失敗しており、画像を直接確認した証拠として扱わない。音声を当方で測定・収録したものではない。
+今回のRelease AUの読み込み・音声処理・保存復元・有料版移行互換性は確認できたが、全プリセット/オートメーション/複数レートや期限到達中のLogic聴取は未検証。VST3/Intel/Windows実機およびインストーラー検証も未完了。
+実アカウントの体験期限変更、再認証、ライセンス再発行、公開/マージは行っていない。
