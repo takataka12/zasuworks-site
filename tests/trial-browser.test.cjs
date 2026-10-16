@@ -3,6 +3,31 @@ let browser,server,origin;
 before(async()=>{server=http.createServer(async(req,res)=>{const p=path.resolve(__dirname,'..','.'+req.url.split('?')[0]+(req.url.split('?')[0].endsWith('/')?'index.html':''));try{const b=await fs.readFile(p);res.setHeader('content-type',p.endsWith('.mjs')?'text/javascript':p.endsWith('.css')?'text/css':'text/html');res.end(b);}catch{res.writeHead(404).end();}});await new Promise(r=>server.listen(0,'127.0.0.1',r));origin='http://127.0.0.1:'+server.address().port;browser=await chromium.launch({headless:true,args:['--no-sandbox'],executablePath:process.env.CHROME_PATH});});
 after(async()=>{await browser?.close();await new Promise(r=>server.close(r));});
 const rid='11111111-aaaa-4111-8111-111111111111';
+test('cancel before login clears trial continuation without sending or approving anything',async()=>{
+ const {page,actions,errors}=await setup(390,true);page.setDefaultTimeout(2000);
+ await page.goto(origin+'/account/#trial_request='+rid);
+ await page.locator('#trial-cancel').click();
+ await page.locator('#notice').getByText(/承認を中止/).waitFor();
+ assert.equal(await page.evaluate(()=>sessionStorage.getItem('zasu.trial.request.v1')),null);
+ await page.reload();await page.locator('#auth').waitFor({state:'visible'});
+ assert.ok(!actions.some(x=>['request','inspect','approve','exchange'].includes(x.action)));
+ assert.deepEqual(errors,[]);await page.close();
+});
+test('cancel while inspect is pending prevents a late approval panel and survives reload',async()=>{
+ const {page,actions,errors}=await setup(390,true);page.setDefaultTimeout(2000);let held;
+ const waiting=new Promise(resolve=>held=resolve);let response;
+ await page.route('https://siwmzradvrtetotakkbi.supabase.co/**',async route=>{
+  if(route.request().method()==='OPTIONS')return route.fallback();const b=route.request().postDataJSON();
+  if(b.action!=='inspect')return route.fallback();response=route;held();
+ });
+ await page.addInitScript(()=>sessionStorage.setItem('zasu.account.session.v1',JSON.stringify({access_token:'test',refresh_token:'test',expires_at:Date.now()/1000+3600})));
+ await page.goto(origin+'/account/#trial_request='+rid);await waiting;
+ await page.locator('#trial-cancel').click();
+ await response.fulfill({status:200,headers:{'access-control-allow-origin':origin,'content-type':'application/json'},body:JSON.stringify({name:'ZASU VOCAL',released:true,purchased:false})});
+ assert.equal(await page.locator('#trial-approve').isVisible(),false);
+ assert.equal(await page.evaluate(()=>sessionStorage.getItem('zasu.trial.request.v1')),null);
+ assert.ok(!actions.some(x=>x.action==='approve'));assert.deepEqual(errors,[]);await page.close();
+});
 async function setup(width=390,privatePreview=false,context=null){const page=context?await context.newPage():await browser.newPage({viewport:{width,height:844}});const actions=[],errors=[];page.on('pageerror',e=>errors.push(e.message));await page.route('https://siwmzradvrtetotakkbi.supabase.co/**',async route=>{if(route.request().method()==='OPTIONS')return route.fulfill({status:204,headers:{'access-control-allow-origin':origin,'access-control-allow-headers':'authorization, content-type','access-control-allow-methods':'POST, OPTIONS'}});const b=route.request().postDataJSON();actions.push(b);const trial=route.request().url().endsWith('zasu-trial');let result={ok:true};if(b.action==='me')result={user:{id:rid,email:'test@example.invalid'},profile:{display_name:'Trial user',locale:'ja',created_at:'2026-10-15T00:00:00Z'},purchasesIntegrated:false};if(trial&&b.action==='inspect')result={name:'ZASU VOCAL',product:'vocal',released:!privatePreview,validationAllowed:privatePreview,purchased:false};if(trial&&b.action==='catalog')result={products:[{product_key:'vocal',name:'ZASU VOCAL',released:false}]};if(trial&&b.action==='list')result={serverTime:'2026-10-15T00:00:00Z',trials:[{name:'ZASU VOCAL',product:'vocal',state:'active',startedAt:'2026-10-15T00:00:00Z',expiresAt:'2026-10-22T00:00:00Z',released:false}]};await route.fulfill({status:200,headers:{'access-control-allow-origin':origin,'content-type':'application/json'},body:JSON.stringify(result)});});return {page,actions,errors};}
 test('account approval is explicit and trial management uses server time',async()=>{const {page,actions,errors}=await setup(320);await page.addInitScript(()=>sessionStorage.setItem('zasu.account.session.v1',JSON.stringify({access_token:'test',refresh_token:'test',expires_at:Date.now()/1000+3600})));await page.goto(origin+'/account/#trial_request='+rid);await page.locator('#trial-approval').waitFor({state:'visible'});assert.ok(!actions.some(x=>x.action==='approve'||x.action==='exchange'));assert.ok(!page.url().includes(rid));await page.locator('#trial-approve').click();await page.locator('#trial-approve').waitFor({state:'hidden'});assert.equal(actions.filter(x=>x.action==='approve').length,1);await page.locator('[data-view=trials]').click();await page.getByText('残り 168 時間（取得時点）').waitFor();assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.deepEqual(errors,[]);await page.close();});
 for(const width of [320,390,1440])test('trial overview hides unverified downloads at '+width,async()=>{const {page,actions,errors}=await setup(width);await page.goto(origin+'/trial/');await page.getByText('体験版は準備中です。公開後、ここから取得できます。').waitFor();assert.equal(await page.getByRole('link',{name:'Mac版ダウンロード'}).count(),0);assert.ok(!actions.some(x=>x.action==='begin'||x.action==='approve'));assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.deepEqual(errors,[]);await page.close();});

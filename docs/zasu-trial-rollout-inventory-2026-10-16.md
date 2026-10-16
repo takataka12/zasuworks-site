@@ -1,0 +1,16 @@
+# 4製品への展開準備 — 2026-10-16
+
+本格統合は未実施。VOCALのWindows保護/実機と残るMac品質ゲートが先。既存有料製品・販売用ブランチを変更していない。
+
+| 製品 | 読み取り対象 | ID・保存形式の確認範囲 | 共通化と固有対応 |
+|---|---|---|---|
+| LOUD | takataka12/zasu-loud main a14e45b483c298b48b311d457871320539c9d954、CMakeLists.txt/Source/PluginProcessor.cpp | bundle jp.zasuworks.ZASULOUD、Zasu/ZL01。APVTS copyState→XML binary、復元時PARAM移行あり | Controller/署名/期限/フェードと専用パッケージを再利用可能。既存の状態移行とラウドネスDSPは変更せず専用期限試験が必要 |
+| FINISH | zasu-daw feature/zasu-finish-rc5-native 03782611fa49f0079ffcba3cb9870c1cff8a94cc、finish-import/manifest.json/RELEASE-READY.md/rc5_compat_fix.py | アーカイブSHA-256 0c381a9395582d299da6ca294f0bee3081608acd0c689d97006de41dceb8a76e、pluginCode ZFn1、stateVersion 4、19パラメーター、R5 DSP locked | ソースはfinish_source_r4.tar.gzに格納されパッチ適用型。今回の監査はmanifest/パッチ/既存検証記録まで。アーカイブ内部のビルド・最終VST3 class ID・全保存処理は未監査。JUCE向けControllerをそのままリンク可能と断定しない |
+| VOCAL EDITOR | zasu-daw feature/zasu-vocal-editor-release-prep 9b10dea59342a861f0c2c881cda09bc39260f154、plugins/vocal_editor/CMakeLists.txt/Source/EditorProcessor.cpp/StateCodec.h | bundle jp.zasuworks.ZASUVOCALEDITOR、Zasu/ZVE1、0.3.0。音声cacheはch/sample/start/rate/float32、最大6,000,000sample、8–192kHz。APVTS/編集文書を含む復元処理 | 共通認証は別Trialビルドへ。期限時にcapture/render新規処理を止め、保存済み編集/音声/曲線を失わない専用検証が必須 |
+| DAW | zasu-daw main 46446e42f36aed58d2877f3306943893d60848c4、およびv2.1開発ブランチの存在を確認 | app bundle jp.zasu.audio.daw。既存Windows Inno/版番号/既存更新処理あり。GUIアプリでプラグインID適用外。プロジェクト全スキーマ/最新v2.1保存互換性は未監査 | Trial専用AppId/配置は共通化可能。録音停止・既存素材の再生/保存・export制限・プロジェクト救済をDAW固有仕様として決める。v2.1性能改善との並行変更を混ぜない |
+
+共通化候補：168時間サーバー時刻、RS256検証、秘密を含まない診断、要求/セッション継続、オフラインキャッシュ、公開ゲート、SHA-256台帳、既存有料版拒否と所有ファイル単位の削除。
+
+製品固有：AU/VST3 class IDs、パラメーターID/状態バージョン、音声/編集キャッシュ、キャプチャと非同期render、期限切れ時の音声経路、Standalone設定、既存インストーラーの所有範囲。VOCALのZV01を他製品へ流用しない。インストーラーAppIdとVST3 IDを混同しない。
+
+残る調査は、各製品の販売中バイナリーに対応する正本コミット確定、FINISHアーカイブ内部、最新DAW v2.1保存形式、各Windowsインストーラーの実際のreceipt/配置、既存購入者経路と全プラットフォーム実機。表は販売中製品の全監査完了を意味しない。

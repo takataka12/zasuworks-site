@@ -2,13 +2,16 @@ import {requestIdValid} from './trial-auth-state.mjs';
 import {SUPABASE_URL} from './config.mjs';import {productPages,remaining,statusLabel} from '../trial/model.mjs';
 const endpoint=SUPABASE_URL+'/functions/v1/zasu-trial';
 const el=(tag,text)=>{const e=document.createElement(tag);e.textContent=text;return e;};
-export function installTrials({api,busy,notify,request,channel,isAuthenticated,onHandoff}){
+export function installTrials({api,busy,notify,request,channel,isAuthenticated,onHandoff,onCancel}){
  const panel=document.getElementById('trial-approval'),list=document.getElementById('trial-list'),approve=document.getElementById('trial-approve'),retry=document.getElementById('trial-inspect-retry');
  let generation=0,current=null,handoffSource=null,sentRequest=null;
  const tabId=globalThis.crypto?.randomUUID?.(),useTab=document.getElementById('trial-use-tab');
  const context=document.getElementById('trial-auth-context'),note=document.getElementById('trial-auth-note');
  function contextView(){const pending=request.get();useTab.hidden=!pending||isAuthenticated()||!channel||!tabId;context.hidden=!pending&&!request.reason();note.textContent=pending?'製品の無料体験を認証します。ログイン、またはアカウント作成後に承認画面へ進みます。':request.reason()==='expired'?'無料体験の認証要求の有効期限が切れました。製品の表示をご確認ください。':'無料体験の認証要求を確認できません。製品の表示をご確認ください。';}
  contextView();
+ function cancelLocal(){clear(true);onCancel?.();notify('このタブでの承認を中止しました。承認済みの体験期間や他のタブの操作は変更しません。製品側の待機は最大10分で終了します。');}
+ document.getElementById('trial-cancel').addEventListener('click',cancelLocal);
+ document.getElementById('trial-cancel-approval').addEventListener('click',cancelLocal);
  useTab.addEventListener('click',()=>{
   const pending=request.get();if(!pending||!channel||!tabId){contextView();return;}
   sentRequest=pending.requestId;

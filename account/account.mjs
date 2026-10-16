@@ -60,7 +60,7 @@ $('close-form').addEventListener('submit',e=>{e.preventDefault();busy($('close-f
 window.addEventListener('pageshow',e=>{if(e.persisted&&session)loadAccount()});
 async function loadAccount(){show('loading');try{const ready=renderAccount(await api({action:'me'},true));show('dashboard');await ready}catch(e){if(e.message==='session_changed')return;if(!session)show('auth');else show('loading');notify(messages[e.message]||messages.temporarily_unavailable,true)}}
 setInterval(updateResend,1000);
-const trialUI=installTrials({api,busy,notify,request:trialRequest,channel,isAuthenticated:()=>!!session,onHandoff:loadAccount});
+const trialUI=installTrials({api,busy,notify,request:trialRequest,channel,isAuthenticated:()=>!!session,onHandoff:loadAccount,onCancel:()=>authAttempt.clear()});
 window.addEventListener('hashchange',()=>{
  const incoming=new URLSearchParams(location.hash.slice(1).replace(/^trial_request%3d/i,'trial_request='));
  if(!trialRequest.capture(incoming))return;
