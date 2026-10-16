@@ -56,7 +56,7 @@ test('reject and withdraw prevent later events and clear analytics cookies',asyn
 test('account/download routes do not load Google even after consent; storage failures leave shopping functional',async()=>{
  const {page,context,requests}=await pageWithMeasurement({consent:true});
  for(const route of ['/account/','/zasu-vocal/download/']){await page.goto(origin+route);assert.equal(await page.locator('[data-zw-analytics-choice]').count(),0);assert.equal(requests.length,0);}
- await context.close();const blocked=await pageWithMeasurement({storageFailure:true});await blocked.page.goto(origin+'/zasu-vocal/');assert.equal(blocked.requests.length,0);assert.equal(await blocked.page.locator('a.checkout').count(),2);await blocked.context.close();
+ await context.close();const blocked=await pageWithMeasurement({storageFailure:true});await blocked.page.goto(origin+'/zasu-vocal/');assert.equal(blocked.requests.length,0);assert.equal(await blocked.page.locator('a.checkout').count(),1);await blocked.context.close();
 });
 test('empty production ID is inert, no misleading consent prompt',async()=>{
  const context=await browser.newContext();const page=await context.newPage();
@@ -100,6 +100,7 @@ test('old GA4 consent does not authorize new recording disclosures',async()=>{
 });
 test('price exposure is observed once and does not imply purchase',async()=>{
  const {page,context}=await pageWithMeasurement({consent:true});await page.goto(origin+'/zasu-vocal/');
+ await page.evaluate(()=>scrollTo(0,document.body.scrollHeight));await page.waitForTimeout(300);
  await page.locator('#purchase').scrollIntoViewIfNeeded();
  await page.waitForFunction(()=>window.dataLayer?.some(a=>a[1]==='view_price'));
  await page.locator('#purchase').scrollIntoViewIfNeeded();

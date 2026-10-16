@@ -12,12 +12,12 @@ before(async()=>{
 after(async()=>{await browser?.close();if(server)await new Promise(r=>server.close(r));});
 for(const route of ['/', '/products.html','/zasu-daw/','/zasu-vocal/','/zasu-vocal-editor/','/zasu-loud/','/zasu-finish/'])for(const width of [320,390,430,768,1440])test(`product selection is readable and routes resolve: ${route} ${width}`,async()=>{
  const page=await browser.newPage(pageOptions(width));const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(origin+route);
- const guide=page.locator('.zw-guide');assert.equal(await guide.count(),1);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
- if(route==='/'){assert.equal(await guide.locator('[data-guide-product]').count(),6);assert.equal(await page.locator('.hero-actions .studio-btn').first().getAttribute('href'),'https://percymusic.booth.pm/');assert.equal(await page.locator('.hero-actions a[href="#choose-product"]').count(),1);}
- else if(route==='/products.html'){assert.equal(await guide.locator('tbody tr').count(),6);assert.match(await guide.innerText(),/最大120秒/);assert.match(await guide.innerText(),/EQ・コンプ・空間系/);assert.equal(await guide.locator('caption').count(),0,'comparison avoids collapsed mobile caption');assert.equal(await guide.locator('.zw-compare-intro').count(),1);assert.equal(await page.locator('#zasu-vocal-editor').count(),1);assert.equal(await page.locator('#zasu-finish').count(),1);}
+ const guide=page.locator('.zw-guide');if(route!=='/')assert.equal(await guide.count(),1);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+ if(route==='/'){assert.equal(await page.locator('[data-product]').count(),4);assert.equal(await page.locator('.shop-hero img').getAttribute('src'),'/zasu-vocal/assets/logic-pro-v1.0.0.jpg');}
+ else if(route==='/products.html'){assert.equal(await guide.locator('tbody tr').count(),5);assert.match(await guide.innerText(),/最大120秒/);assert.match(await guide.innerText(),/EQ・コンプ・空間系/);assert.equal(await guide.locator('caption').count(),0,'comparison avoids collapsed mobile caption');assert.equal(await guide.locator('.zw-compare-intro').count(),1);assert.equal(await page.locator('#zasu-vocal-editor').count(),1);assert.equal(await page.locator('#zasu-finish').count(),1);}
  else{assert.match(await guide.innerText(),/向いている使い方/);assert.match(await guide.innerText(),/ほかの製品との違い/);assert.equal(await guide.getByRole('link',{name:'価格・購入条件を見る',exact:true}).count(),1);}
  for(const href of await guide.locator('a').evaluateAll(es=>es.map(a=>a.getAttribute('href')))){if(href.startsWith('https:'))continue;if(href.startsWith('#')){assert.equal(await page.locator('[id]').evaluateAll((es,id)=>es.some(e=>e.id===id),href.slice(1)),true,href);continue;}const response=await page.request.get(origin+href.split('#')[0]);assert.equal(response.status(),200,href);}
- if(process.env.CAPTURE_DIR&&(width===390||width===1440)){await fs.mkdir(process.env.CAPTURE_DIR,{recursive:true});await guide.screenshot({path:path.resolve(process.env.CAPTURE_DIR,`guide-${route==='/'?'home':route.replaceAll('/','').replace('.html','')}-${width}.png`)});}
+ if(route!=='/'&&process.env.CAPTURE_DIR&&(width===390||width===1440)){await fs.mkdir(process.env.CAPTURE_DIR,{recursive:true});await guide.screenshot({path:path.resolve(process.env.CAPTURE_DIR,`guide-${route==='/'?'home':route.replaceAll('/','').replace('.html','')}-${width}.png`)});}
  if(process.env.CAPTURE_DIR&&route==='/products.html'&&[390,1440].includes(width)){
   for(const img of await page.locator('#tools img').all()){await img.scrollIntoViewIfNeeded();await img.evaluate(e=>e.decode());}
   await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
@@ -26,29 +26,7 @@ for(const route of ['/', '/products.html','/zasu-daw/','/zasu-vocal/','/zasu-voc
  assert.deepEqual(errors,[]);await page.close();
 });
 
-test('catalogue first paint does not wait for Apple icon lookup',async()=>{
- const page=await browser.newPage(pageOptions(390));let lookups=0;
- await page.route('https://itunes.apple.com/**',route=>{lookups++;const cb=new URL(route.request().url()).searchParams.get('callback');route.fulfill({contentType:'text/javascript',body:cb+'({results:[]});'});});
- await page.goto(origin+'/products.html',{timeout:5000});
- assert.equal(lookups,0,'Apple lookup must wait until the iOS section is visible');
- const request=page.waitForResponse('https://itunes.apple.com/**');await page.locator('#mobile-apps').scrollIntoViewIfNeeded();await request;
- assert.ok(lookups>0);await page.close();
-});
-
-for(const width of [320,390,430,768,1440])test(`first-view product screen and direct demonstrations at ${width}px`,async()=>{
- const page=await browser.newPage(pageOptions(width));await page.goto(origin+'/');
- assert.equal(await page.locator('.zw-hero-screen img').count(),1);
- assert.equal(await page.locator('.zw-hero-screen img').getAttribute('loading'),'eager');
- assert.ok(await page.locator('.zw-hero-screen').evaluate(e=>e.getBoundingClientRect().top<innerHeight));
- assert.equal(await page.locator('#daw .zw-experience a').getAttribute('href'),'https://youtu.be/yAD6oBCpNwU');
- assert.equal(await page.locator('#loud .zw-experience a').getAttribute('href'),'/zasu-loud/#demo');
- await page.goto(origin+'/products.html');
- assert.equal(await page.locator('#zasu-daw .zw-experience a').getAttribute('href'),'https://youtu.be/yAD6oBCpNwU');
- assert.equal(await page.locator('#zasu-loud .zw-experience a').getAttribute('href'),'/zasu-loud/#demo');
- for(const key of ['vocal','vocal-editor','finish']){
-  const href=await page.locator('#zasu-'+key+' .zw-experience a').getAttribute('href');
-  const target=await browser.newPage();await target.goto(origin+href);
-  assert.equal(await target.locator(new URL(origin+href).hash).count(),1);await target.close();
- }
- await page.close();
+test('catalogue and home use real screens without external icon lookups',async()=>{
+ const page=await browser.newPage(pageOptions(390));const lookups=[];page.on('request',r=>{if(r.url().includes('itunes.apple'))lookups.push(r.url());});await page.goto(origin+'/products.html');
+ assert.equal(await page.locator('[data-catalog-product]').count(),5);assert.deepEqual(lookups,[]);await page.close();
 });

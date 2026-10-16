@@ -58,5 +58,5 @@
   group.addEventListener('click',event=>{if(event.target.closest('a'))closeGroups();});
  });
  document.addEventListener('click',event=>{if(!header.contains(event.target))closeGroups();});
- matchMedia('(min-width:1200px)').addEventListener('change',()=>{setOpen(false);closeGroups();});
+ matchMedia('(min-width:800px)').addEventListener('change',()=>{setOpen(false);closeGroups();});
 })();

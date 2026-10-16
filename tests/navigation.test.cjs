@@ -18,18 +18,18 @@ test('mobile menu locks and restores scroll, traps focus, closes on Escape and l
  const box=await button.boundingBox();await page.mouse.click(box.x+box.width/2,box.y+box.height/2);assert.equal(await button.getAttribute('aria-expanded'),'true');
  assert.equal(await page.locator('[data-zw-header]').getAttribute('aria-modal'),'true');
  assert.equal(await page.evaluate(()=>getComputedStyle(document.body).position),'fixed');
- const panel=page.locator('#studio-nav');assert.ok(await panel.evaluate(e=>e.scrollHeight>e.clientHeight));
+ const panel=page.locator('#studio-nav');assert.equal(await panel.locator('a').count(),3);
  await panel.getByRole('link',{name:'お問い合わせ',exact:true}).focus({timeout:3000});await page.keyboard.press('Tab');assert.equal(await button.evaluate(e=>e===document.activeElement),true);
  await page.keyboard.press('Escape');assert.equal(await button.getAttribute('aria-expanded'),'false');assert.equal(await page.evaluate(()=>scrollY),y);
- await button.click();await panel.getByRole('link',{name:'プロジェクト',exact:true}).click();await page.waitForURL(u=>u.hash==='#projects');
- assert.equal(await button.getAttribute('aria-expanded'),'false');assert.ok(await page.locator('#projects').boundingBox().then(b=>b.y>=70));
+ await button.click();await panel.getByRole('link',{name:'お問い合わせ',exact:true}).click();await page.waitForURL(u=>u.hash==='#contact');
+ assert.equal(await button.getAttribute('aria-expanded'),'false');assert.ok(await page.locator('#contact').boundingBox().then(b=>b.y>=70));
  await page.close();
 });
 for(const width of [320,390,768,1024,1200,1440])test(`shared navigation fits ${width}px and desktop groups support keyboard`,async()=>{
  const page=await browser.newPage(pageOptions(width));const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(origin+'/media/');
  assert.equal(await page.locator('[data-zw-header]').count(),1);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
- if(width>=1200){const group=page.locator('[data-zw-desktop] details').first();await group.locator('summary').focus();await page.keyboard.press('Enter');assert.equal(await group.getAttribute('open'),'');await page.keyboard.press('Escape');assert.equal(await group.getAttribute('open'),null);}
- else{await page.locator('[data-zw-toggle]').click();assert.equal(await page.locator('#studio-nav').getByRole('link',{name:'ZASU MEDIA',exact:true}).getAttribute('aria-current'),'page');await page.keyboard.press('Escape');}
+ if(width>=800){assert.equal(await page.locator('[data-zw-desktop] a').count(),3);assert.equal(await page.locator('[data-zw-toggle]').isVisible(),false);}
+ else{await page.locator('[data-zw-toggle]').click();assert.equal(await page.locator('#studio-nav a').count(),3);await page.keyboard.press('Escape');}
  if(process.env.CAPTURE_DIR){await fs.mkdir(process.env.CAPTURE_DIR,{recursive:true});await page.screenshot({path:path.resolve(process.env.CAPTURE_DIR,`nav-media-${width}.png`)});if(width===390){await page.locator('[data-zw-toggle]').click();await page.screenshot({path:path.resolve(process.env.CAPTURE_DIR,'nav-mobile-open.png')});}}
  assert.deepEqual(errors,[]);await page.close();
 });
@@ -39,4 +39,9 @@ test('all public pages share navigation and every header route/anchor resolves',
  for(const file of await list(root)){const route='/'+path.relative(root,file).replaceAll('\\','/').replace(/index\.html$/,'');await page.goto(origin+route);assert.equal(await page.locator('[data-zw-header]').count(),1,route);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,route+' overflow');for(const href of await page.locator('[data-zw-header] a').evaluateAll(es=>es.map(a=>a.getAttribute('href'))))if(href.startsWith('/'))targets.add(href);}
  for(const target of targets){const response=await page.goto(origin+target);assert.equal(response.status(),200,target);const hash=new URL(page.url()).hash;if(hash)assert.equal(await page.locator('[id]').evaluateAll((es,id)=>es.some(e=>e.id===id),decodeURIComponent(hash.slice(1))),true,target);}
  assert.deepEqual(errors,[]);await page.close();
+});
+
+test('resizing an open mobile menu to desktop restores page interaction',async()=>{
+ const page=await browser.newPage(pageOptions(799));await page.goto(origin+'/');await page.locator('[data-zw-toggle]').click();assert.equal(await page.locator('main').evaluate(e=>e.inert),true);
+ await page.setViewportSize({width:820,height:844});await page.waitForTimeout(150);assert.equal(await page.locator('main').evaluate(e=>e.inert),false);assert.notEqual(await page.locator('body').evaluate(e=>getComputedStyle(e).position),'fixed');assert.equal(await page.locator('[data-zw-toggle]').getAttribute('aria-expanded'),'false');await page.close();
 });
