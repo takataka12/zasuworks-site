@@ -42,10 +42,10 @@ test('JUCE escaped fragment survives email login and shows private trial approva
  assert.deepEqual(errors,[]);await page.close();
 });
 
-async function loginRoutes(page,actions){
+async function loginRoutes(page,actions,delayResend=false){
  await page.route('https://siwmzradvrtetotakkbi.supabase.co/**',async route=>{
   if(route.request().method()==='OPTIONS')return route.fallback();const b=route.request().postDataJSON();let result;
-  if(b.action==='request'){actions.push(b);if(b.purpose==='signup'&&b.consent!==true)return route.fulfill({status:400,headers:{'access-control-allow-origin':origin,'content-type':'application/json'},body:JSON.stringify({error:'consent_required'})});result={challengeId:rid,expiresIn:600,resendAfter:60};}
+  if(b.action==='request'){actions.push(b);if(delayResend&&actions.filter(x=>x.action==='request').length>1)await new Promise(resolve=>setTimeout(resolve,150));if(b.purpose==='signup'&&b.consent!==true)return route.fulfill({status:400,headers:{'access-control-allow-origin':origin,'content-type':'application/json'},body:JSON.stringify({error:'consent_required'})});result={challengeId:rid,expiresIn:600,resendAfter:60};}
   else if(b.action==='verify'){actions.push(b);result={session:{access_token:'ONLY_THIS_TAB_ACCESS',refresh_token:'ONLY_THIS_TAB_REFRESH',expires_at:Date.now()/1000+3600}};}
   else return route.fallback();
   await route.fulfill({status:200,headers:{'access-control-allow-origin':origin,'content-type':'application/json'},body:JSON.stringify(result)});
@@ -135,9 +135,11 @@ test('no BroadcastChannel falls back to login in the originating tab',async()=>{
 });
 
 test('signup OTP reload preserves explicit consent for resend after cooldown',async()=>{
- const {page,actions,errors}=await setup(390,true);page.setDefaultTimeout(2500);await page.clock.install();await loginRoutes(page,actions);
+ const {page,actions,errors}=await setup(390,true);page.setDefaultTimeout(2500);await loginRoutes(page,actions,true);
  await page.goto(origin+'/account/#trial_request='+rid);await page.locator('#signup-tab').click();await page.locator('#consent').check();await page.locator('#email').fill('new@example.invalid');await page.locator('#email-form button[type=submit]').click();await page.locator('#code-form').waitFor({state:'visible'});
- await page.reload();await page.locator('#code-form').waitFor({state:'visible'});await page.clock.fastForward(61000);await page.locator('#resend').click();
- await page.waitForFunction(()=>document.querySelector('#resend').disabled);assert.equal(actions.filter(x=>x.action==='request').length,2);assert.equal(actions.filter(x=>x.action==='request')[1].consent,true);
+ // Isolated fixture: only the dummy OTP cooldown has elapsed; real wall clock and trial expiry stay unchanged.
+ await page.evaluate(()=>{const key='zasu.account.auth-attempt.v1',saved=JSON.parse(sessionStorage.getItem(key));saved.resendAt=Date.now()-1;sessionStorage.setItem(key,JSON.stringify(saved));});
+ await page.reload();await page.locator('#code-form').waitFor({state:'visible'});const priorResend=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('zasu.account.auth-attempt.v1')).resendAt);await page.locator('#resend').click();
+ await page.waitForFunction(prior=>JSON.parse(sessionStorage.getItem('zasu.account.auth-attempt.v1')).resendAt>prior&&!document.querySelector('#code-form button[type=submit]').disabled,priorResend);assert.equal(actions.filter(x=>x.action==='request').length,2);assert.equal(actions.filter(x=>x.action==='request')[1].consent,true);
  await page.locator('#code').fill('123456');await page.locator('#code-form button[type=submit]').click();await page.locator('#trial-approve').waitFor({state:'visible'});assert.deepEqual(errors,[]);await page.close();
 });
