@@ -18,6 +18,6 @@ test('catalogue retains products and clearly identifies paused AUDIO',()=>{
  assert.doesNotMatch(audio,/無料試聴|square\.link|checkout\.square/);
  const status=fs.readFileSync('audio-status.html','utf8');
  assert.match(status,/現在サービスを一時停止しています/);
- assert.match(status,/href="\/account\/"/);
+ assert.match(status,/href="\/support.html#downloads"/);
  assert.doesNotMatch(status,/<form|<input|checkout\.square|square\.link/);
 });

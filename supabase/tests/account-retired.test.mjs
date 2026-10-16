@@ -1,0 +1,6 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {createRetiredHandler} from '../functions/zasu-account/retired.mjs';
+import {createServiceRouter} from '../functions/zasu-account/service.mjs';
+const req=action=>new Request('https://api.test',{method:'POST',headers:{origin:'https://zasuworks.jp','Content-Type':'application/json'},body:JSON.stringify({action})});
+for(const action of ['request','verify','me','purchases','claim_request','download','audio_jobs','update','close'])test('retired public action '+action,async()=>{const r=await createRetiredHandler()(req(action));assert.equal(r.status,410);assert.equal(r.headers.get('Access-Control-Allow-Origin'),'https://zasuworks.jp');assert.match(await r.text(),/account_retired/)});
+test('shared service webhook and replay remain operational',async()=>{let events=0;const handler=createServiceRouter({key:'private-key',accountHandler:createRetiredHandler(),processEvent:async()=>events++,replay:async()=>({completed:1}),authorizeRecovery:async()=>true});const r=req('commerce_event');r.headers.set('authorization','Bearer private-key');assert.equal((await handler(r)).status,200);assert.equal(events,1);const q=req('commerce_replay');q.headers.set('x-zasu-commerce-key','recovery-key');assert.equal((await handler(q)).status,200)});
