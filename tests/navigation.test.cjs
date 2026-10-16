@@ -19,7 +19,7 @@ test('mobile menu locks and restores scroll, traps focus, closes on Escape and l
  assert.equal(await page.locator('[data-zw-header]').getAttribute('aria-modal'),'true');
  assert.equal(await page.evaluate(()=>getComputedStyle(document.body).position),'fixed');
  const panel=page.locator('#studio-nav');assert.ok(await panel.evaluate(e=>e.scrollHeight>e.clientHeight));
- await panel.getByRole('link',{name:'ZASU ACCOUNT',exact:true}).focus({timeout:3000});await page.keyboard.press('Tab');assert.equal(await button.evaluate(e=>e===document.activeElement),true);
+ await panel.getByRole('link',{name:'お問い合わせ',exact:true}).focus({timeout:3000});await page.keyboard.press('Tab');assert.equal(await button.evaluate(e=>e===document.activeElement),true);
  await page.keyboard.press('Escape');assert.equal(await button.getAttribute('aria-expanded'),'false');assert.equal(await page.evaluate(()=>scrollY),y);
  await button.click();await panel.getByRole('link',{name:'プロジェクト',exact:true}).click();await page.waitForURL(u=>u.hash==='#projects');
  assert.equal(await button.getAttribute('aria-expanded'),'false');assert.ok(await page.locator('#projects').boundingBox().then(b=>b.y>=70));

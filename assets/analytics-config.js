@@ -34,6 +34,7 @@ window.ZASU_ANALYTICS_CONFIG = {
     "/zasu-finish/tokushoho.html",
     "/zasu-loud/",
     "/zasu-loud/privacy.html",
+    "/zasu-loud/refund-guarantee-20261017-current.html",
     "/zasu-loud/terms.html",
     "/zasu-loud/tokushoho.html",
     "/zasu-vocal/",
