@@ -127,3 +127,37 @@ ZASUVocalTrialProcessorTests Passed 7.14 sec
 ```
 
 これはMac実機上で実行した数値的な製品処理テストの成功。Logic Pro内での期限到達・聴取、既存ボーカルの解析/render結果がある状態での期限切れ、Intel実機、全サンプルレートの保証へは拡張しない。実アカウントの2026-10-22 22:27:31 JSTという期限は試験に使用・変更しない。
+
+## 09:45–10:02 JST：Release候補・公証済み検証用DMG
+
+対象ソース：`1e7cadf7d59e3a2580b0c2b0c51f91906afa5e8e`。
+ユーザーMacの専用ReleaseビルドディレクトリーでAU/VST3/Standaloneを生成。
+設定はRelease、arm64;x86_64、deployment target 11.0、通常のステージング公開鍵、ステージングtrial endpoint、ブラウザーURLは http://127.0.0.1:8765/account/。
+BUILD_TESTING=OFF。既存の有料版インストール先には配置していない。
+
+ユーザーが共有したコマンド出力と起動結果：
+
+- 3形式のlipo結果はそれぞれ `x86_64 arm64`。Intel Mac上での実行成功を意味しない。
+- 3形式を既存Developer ID Applicationで署名。runtime/timestamp、Standaloneにaudio-input entitlement。strict署名検証成功。
+- 既存KeychainプロファイルでStandalone ZIPをAppleへ提出。提出ID `de777f7b-fdbe-4938-9cc8-1e2cb21d51eb`、結果Accepted。
+- Standaloneにstaple、validate成功。Gatekeeperはaccepted / source=Notarized Developer ID。
+- このRelease Standaloneを起動し、既存ライセンスで無料体験残り時間が表示されたとユーザー報告。新しい認証・権限発行は行わせていない。
+- 3形式とステージング用READMEのみを含むUDZO DMGを作成。自動インストーラーは含まない。
+- DMGをDeveloper ID署名しstrict検証後Appleへ提出。提出ID `3acaecfb-ca61-4bc3-81b7-6a5faa86373c`、結果Accepted。
+- DMGにstaple、validate成功。Gatekeeperはaccepted / source=Notarized Developer ID。
+- 読み取り専用マウントしたDMG内の3形式すべてでstrict署名検証成功、lipo結果x86_64 arm64。収録Standaloneのstapler validate成功。
+- 既存Standaloneを終了してからDMG内Standaloneを起動し、画面と無料体験残り時間が表示されたとユーザー報告。
+- アプリ終了後DMG取り外し成功。staple後の最終DMGのSHA-256を保存。
+
+配布候補（ユーザーMacにのみ保存、GitHubへのバイナリー公開なし）：
+
+`ZASU-VOCAL-Trial-STAGING-Universal.dmg`
+
+```text
+6d34b3006c4101391e48c5c36f45df3b60b8374c4a8414f0f3f3243fbac237d7  ZASU-VOCAL-Trial-STAGING-Universal.dmg
+```
+
+公証済みの非公開ステージング候補であり、一般向け配布準備完了ではない。
+本候補のRelease AUのLogic音声・保存復元、VST3ホスト、隔離したダウンロード/隔離属性経由の初回起動、インストール/アンインストール、Intel実機、Windows実環境とインストーラーは未検証。
+以前のDebug AUの実機結果を、このRelease候補のホスト検証成功には代用しない。
+元の体験期限・署名鍵・認証キャッシュ・有料版配置を変更せず、公開フラグや本番設定にも変更なし。
