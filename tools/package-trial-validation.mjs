@@ -7,7 +7,7 @@ const sourceDefault=fileURLToPath(new URL('../',import.meta.url));
 const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
 async function regularFile(file,boundary){
  let current=path.resolve(file);const root=boundary&&path.resolve(boundary);
- do {const stat=await fs.lstat(current);if(stat.isSymbolicLink())throw Error('Linked source is not allowed');current=path.dirname(current);}while(root&&current!==root&&current!==path.dirname(current));
+ while(true){const stat=await fs.lstat(current);if(stat.isSymbolicLink())throw Error('Linked source is not allowed');if(!root||current===root)break;const parent=path.dirname(current);if(parent===current)throw Error('Source outside package root');current=parent;}
  if(!(await fs.lstat(file)).isFile())throw Error('Expected regular source file');
  return fs.readFile(file);
 }

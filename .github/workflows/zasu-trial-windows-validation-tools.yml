@@ -46,16 +46,19 @@ jobs:
           try {
             $ready=$false;$deadline=[DateTime]::UtcNow.AddSeconds(15)
             while([DateTime]::UtcNow -lt $deadline){
-              try {$page=Invoke-WebRequest http://127.0.0.1:8765/account/;$ready=$page.StatusCode -eq 200;if($ready){break}}catch{}
+              $p.Refresh()
               if($p.HasExited){throw 'Packaged server exited'}
+              $started=(Test-Path "$env:RUNNER_TEMP/preview.log") -and ((Get-Content -Raw -Encoding utf8 "$env:RUNNER_TEMP/preview.log") -match '検証ページ: http://127.0.0.1:8765/account/')
+              if($started){try {$page=Invoke-WebRequest http://127.0.0.1:8765/account/;$ready=$page.StatusCode -eq 200;if($ready){break}}catch{}}
               Start-Sleep -Milliseconds 100
             }
             if(!$ready -or $page.Content -notmatch '非公開ステージング検証'){throw 'Packaged preview is not ready'}
             $config=(Invoke-WebRequest http://127.0.0.1:8765/account/config.mjs).Content
             if($config -notmatch 'giljyqaohutxoxlpkfjf' -or $config -notmatch 'zasu-trial-account-validation'){throw 'Packaged preview configuration mismatch'}
             if((Invoke-WebRequest http://127.0.0.1:8765/trial.env -SkipHttpErrorCheck).StatusCode -ne 404){throw 'Private path is not blocked'}
+            $p.Refresh();if($p.HasExited){throw 'Copied runtime did not remain running'}
             Write-Host 'PASS copied signed Node runtime serves only the private staging preview'
-          } finally {if(!$p.HasExited){Stop-Process -Id $p.Id -Force};$p.Dispose()}
+          } finally {if(!$p.HasExited){Stop-Process -Id $p.Id -Force};$p.WaitForExit(5000)|Out-Null;$p.Dispose()}
       - name: Create private ZIP and checksum
         shell: pwsh
         run: |

@@ -46,3 +46,10 @@ test('portable validation refuses linked source directories instead of copying t
   await assert.rejects(packageValidation(f),/link/i);
  }finally{await fs.rm(f.root,{recursive:true,force:true});}
 });
+test('portable validation refuses a linked source root',async()=>{
+ const {packageValidation}=await load();const f=await fixture();
+ try{
+  const other=path.join(f.root,'source-real');await fs.rename(f.source,other);await fs.symlink(other,f.source,'junction');
+  await assert.rejects(packageValidation(f),/link/i);
+ }finally{await fs.rm(f.root,{recursive:true,force:true});}
+});
