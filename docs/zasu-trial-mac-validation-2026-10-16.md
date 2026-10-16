@@ -107,3 +107,23 @@ CI成功、今回のMac実機成功、未実施の配布品質保証は別の検
 
 PR #9/#6はdraft・未マージ。一般公開・配布フラグ有効化・本番販売/決済・広告設定/予算変更は行わない。
 「配布準備完了」「全製品完成」とは報告しない。
+
+
+## 09:38 JST：期限到達の隔離製品処理テスト
+
+ユーザーがhead `1e7cadf7d59e3a2580b0c2b0c51f91906afa5e8e`へff-only更新後、Apple Silicon Mac上でarm64/Debugのテスト専用ターゲットを別ディレクトリーへビルドした。
+
+保存先：`/Users/taka/ZASU-VOCAL-EXPIRY-TEST.u276rk`。
+テストはCI専用の一時RSA鍵で生成したfixtureを使用。運用署名鍵を読み取らず、専用一時キャッシュとモックHTTPで実Controller・署名検証・処理ゲート・Fade・状態保存を実行した。接続先はexample.invalidを指定し、通常版のビルド・インストール先・ユーザーのライセンスは変更しない。
+
+共有された実行ログ：
+
+```text
+JUCE v8.0.15
+PASS isolated unauthenticated dry passthrough, no capture/render, state roundtrip
+PASS signed active-to-expired processor transition, bounded fade, exact dry bypass, no new capture/render, 65% parameter and state preserved
+ZASUVocalTrialProcessorTests Passed 7.14 sec
+100% tests passed out of 1
+```
+
+これはMac実機上で実行した数値的な製品処理テストの成功。Logic Pro内での期限到達・聴取、既存ボーカルの解析/render結果がある状態での期限切れ、Intel実機、全サンプルレートの保証へは拡張しない。実アカウントの2026-10-22 22:27:31 JSTという期限は試験に使用・変更しない。
