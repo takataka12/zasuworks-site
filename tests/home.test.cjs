@@ -47,7 +47,7 @@ for(const width of [320,360,375,390,414,430,768,820,1024,1440])test(`creative st
  for(const product of ['daw','vocal','loud']){
   const box=await page.locator('#'+product+' .text-link').boundingBox();assert.ok(box.height>=44&&box.x>=0&&box.x+box.width<=width+1,'CTA fits and is tappable');
  }
- assert.equal(await page.getByRole('link',{name:'ZASU AUDIOを使う →',exact:true}).getAttribute('href'),'https://zasumaster.com/');
+ assert.equal(await page.getByRole('link',{name:'サービス停止のお知らせ →',exact:true}).getAttribute('href'),'/audio-status.html');
  assert.equal(await page.getByRole('link',{name:'iOSアプリを見る →',exact:true}).getAttribute('href'),'/products.html#ios');
  assert.deepEqual(await page.evaluate(()=>[...document.querySelectorAll('a[href^="#"]')].filter(a=>!document.getElementById(a.hash.slice(1))).map(a=>a.hash)),[]);
  await page.keyboard.press('Tab');assert.equal(await page.evaluate(()=>document.activeElement.classList.contains('studio-skip')),true);

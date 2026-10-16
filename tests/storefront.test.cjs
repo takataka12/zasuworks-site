@@ -8,8 +8,16 @@ test('BOOTH buyers can choose their receipt route on every desktop download page
   assert.match(html,/Squareの購入登録は不要/);
  }
 });
-test('all six catalogue products have real screen links and charging information',()=>{
+test('catalogue retains products and clearly identifies paused AUDIO',()=>{
  const html=fs.readFileSync('products.html','utf8');
  for(const key of ['daw','vocal','vocal-editor','loud','finish','audio'])assert.match(html,new RegExp(`data-catalog-product="${key}"`));
- assert.match(html,/1曲ごと/);
+ assert.match(html,/新規受付停止中/);
+ const audio=html.match(/<article class="zw-catalog-card" id="zasu-audio"[\s\S]*?<\/article>/)[0];
+ assert.match(audio,/一時停止中/);
+ assert.match(audio,/href="\/audio-status.html"/);
+ assert.doesNotMatch(audio,/無料試聴|square\.link|checkout\.square/);
+ const status=fs.readFileSync('audio-status.html','utf8');
+ assert.match(status,/現在サービスを一時停止しています/);
+ assert.match(status,/href="\/account\/"/);
+ assert.doesNotMatch(status,/<form|<input|checkout\.square|square\.link/);
 });
