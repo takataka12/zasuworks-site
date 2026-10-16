@@ -1,0 +1,39 @@
+name: ZASU TRIAL browser regression
+# Frozen by owner instruction 2026-10-16: no automatic execution.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    if: ${{ false }} # Owner freeze: explicit restart required.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-15, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install test-only browser dependency
+        shell: bash
+        run: |
+          npm install --prefix "$RUNNER_TEMP/zasu-browser-check" playwright@1.56.1
+          node "$RUNNER_TEMP/zasu-browser-check/node_modules/playwright/cli.js" install --with-deps chromium
+      - name: Browser authentication and account regressions (mock HTTP, no real OTP)
+        shell: bash
+        run: |
+          NODE_PATH="$RUNNER_TEMP/zasu-browser-check/node_modules" node --test tests/trial-browser.test.cjs tests/trial-auth-state.test.mjs tests/account-ui.test.cjs tests/account-phase3-ui.test.cjs tests/trial-staging-server.test.mjs
+      - name: Prepare static pages and run the complete site test suite
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          node tools/build-media.cjs
+          node tools/build-navigation.cjs
+          node tools/build-product-guide.cjs
+          node tools/build-storefront.cjs
+          node tools/build-analytics.cjs
+          NODE_PATH="$RUNNER_TEMP/zasu-browser-check/node_modules" node --test tests/*.test.cjs tests/*.test.mjs supabase/tests/*.test.mjs

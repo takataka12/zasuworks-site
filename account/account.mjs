@@ -1,43 +1,76 @@
+import {installTrials} from './trials.mjs';
+import {trialRequestState,authAttemptState} from './trial-auth-state.mjs';
 import {CATALOG,ownedUpdates} from './catalog.mjs';
-import {SUPABASE_URL,PUBLISHABLE_KEY} from './config.mjs';
-const ENDPOINT=SUPABASE_URL+'/functions/v1/zasu-account',STORE='zasu.account.session.v1';
+import {SUPABASE_URL,PUBLISHABLE_KEY,ACCOUNT_ENDPOINT} from './config.mjs';
+const ENDPOINT=ACCOUNT_ENDPOINT,STORE='zasu.account.session.v1';
 const $=id=>document.getElementById(id);
+let sessionEpoch=0;
 let session=null,account=null,purpose='login',challenge=null,email='',closeChallenge=null,resendAt=0,refreshing=null,purchaseChallenge=null,purchaseResendAt=0;
-try{session=JSON.parse(sessionStorage.getItem(STORE)||'null')}catch{sessionStorage.removeItem(STORE)}
-const audioParams=new URLSearchParams(location.hash.slice(1));
+let tabStorage;try{tabStorage=window.sessionStorage;session=JSON.parse(tabStorage.getItem(STORE)||'null')}catch{try{tabStorage?.removeItem(STORE)}catch{}}
+const authAttempt=authAttemptState(tabStorage);
+// JUCE URL::getAnchorString escapes the fragment separator '=' as %3D.
+// Normalize only this exact trial key; request IDs still require UUID validation.
+const audioParams=new URLSearchParams(location.hash.slice(1).replace(/^trial_request%3d/i,'trial_request='));
+const trialRequest=trialRequestState(tabStorage,audioParams);
 const audioConnectRequest=audioParams.get('audio_connect')==='1'&&/^[A-Za-z0-9_-]{43}$/.test(audioParams.get('challenge')||'')&&/^[a-f0-9]{64}$/.test(audioParams.get('state')||'')?{challenge:audioParams.get('challenge'),state:audioParams.get('state')}:null;
 if(location.hash)history.replaceState(null,'',location.pathname+location.search);
 const channel=typeof BroadcastChannel==='function'?new BroadcastChannel('zasu-account'):null;
-channel?.addEventListener('message',e=>{if(e.data==='global-logout'){clearSession();show('auth');notify('すべての端末からログアウトしました。')}});
-function persist(s){session=s;sessionStorage.setItem(STORE,JSON.stringify(s));}
-function clearSession(){session=null;account=null;sessionStorage.removeItem(STORE);$('profile-form').reset();$('close-form').reset();$('close-form').hidden=true;$('close-consent').checked=false;closeChallenge=null;for(const id of ['user-name','user-email','settings-email','settings-id','settings-created'])$(id).textContent='';$('display-name').value='';$('purchase-list').replaceChildren();$('purchase-reference-form').reset();$('purchase-code-form').reset();$('purchase-code-form').hidden=true;$('commerce-nav').hidden=true;purchaseChallenge=null;purchaseResendAt=0;for(const id of ['audio-list','owned-summary','updates-list'])$(id).replaceChildren();$('audio-nav').hidden=true;$('audio-connect-panel').hidden=true;$('phase3-dashboard').hidden=true;}
+channel?.addEventListener('message',e=>{if(e.data==='global-logout'){clearSession(true);show('auth');notify('すべての端末からログアウトしました。')}});
+function persist(s){sessionEpoch++;session=s;try{tabStorage?.setItem(STORE,JSON.stringify(s))}catch{}}
+function clearSession(discardTrial=false){sessionEpoch++;session=null;account=null;try{tabStorage?.removeItem(STORE)}catch{}authAttempt.clear();trialUI.clear(discardTrial);$('profile-form').reset();$('close-form').reset();$('close-form').hidden=true;$('close-consent').checked=false;closeChallenge=null;for(const id of ['user-name','user-email','settings-email','settings-id','settings-created'])$(id).textContent='';$('display-name').value='';$('purchase-list').replaceChildren();$('purchase-reference-form').reset();$('purchase-code-form').reset();$('purchase-code-form').hidden=true;$('commerce-nav').hidden=true;purchaseChallenge=null;purchaseResendAt=0;for(const id of ['audio-list','owned-summary','updates-list'])$(id).replaceChildren();$('audio-nav').hidden=true;$('audio-connect-panel').hidden=true;$('phase3-dashboard').hidden=true;}
 function notify(message,error=false){$('notice').textContent=message;$('notice').classList.toggle('error',error);$('notice').hidden=!message;}
-function show(view){for(const id of ['auth','dashboard','settings','purchases','audio','loading'])$(id).hidden=id!==view;$('account-nav').hidden=!session;document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});}
-function authMode(mode){purpose=mode;challenge=null;email='';$('code-form').hidden=true;$('email-form').hidden=false;$('code').value='';$('consent-row').hidden=mode!=='signup';$('consent').required=mode==='signup';$('auth-title').textContent=mode==='signup'?'創作の道具を、ひとつに。':'おかえりなさい。';$('signup-tab').setAttribute('aria-pressed',String(mode==='signup'));$('login-tab').setAttribute('aria-pressed',String(mode==='login'));notify('');}
+function show(view){for(const id of ['auth','dashboard','settings','purchases','audio','trials','loading'])$(id).hidden=id!==view;$('account-nav').hidden=!session||view==='loading';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});}
+function authMode(mode){authAttempt.clear();purpose=mode;challenge=null;email='';$('code-form').hidden=true;$('email-form').hidden=false;$('code').value='';$('consent-row').hidden=mode!=='signup';$('consent').required=mode==='signup';$('auth-title').textContent=mode==='signup'?'創作の道具を、ひとつに。':'おかえりなさい。';$('signup-tab').setAttribute('aria-pressed',String(mode==='signup'));$('login-tab').setAttribute('aria-pressed',String(mode==='login'));notify('');}
 const messages={audio_not_available:'この完成ファイルは利用できません。保存期限・処理状態・決済状態をご確認ください。',purchase_not_available:'この購入は確認中・返金済み、または利用できない状態です。サポートへお問い合わせください。',purchase_not_verified:'購入を確認できませんでした。領収書・取引IDをご確認ください。',purchase_support_required:'この購入はサポートでの確認が必要です。購入時の領収書を添えてお問い合わせください。',receipt_lookup_incomplete:'領収書URLから決済IDを確認できませんでした。注文ID・決済IDでお試しいただくか、サポートへお問い合わせください。',invalid_purchase_reference:'Squareの領収書URL、注文ID、決済IDのいずれかを入力してください。',invalid_code:'コードが正しくないか、有効期限が切れています。新しいコードを送信してください。',rate_limited:'送信・確認の回数が上限に達しました。時間をおいてお試しください。',consent_required:'プライバシーポリシーへの同意が必要です。',invalid_profile:'表示名は80文字以内で入力してください。',authentication_required:'ログインの有効期限が切れました。もう一度ログインしてください。',temporarily_unavailable:'ただいま接続できません。時間をおいてお試しください。'};
-async function refresh(){if(!session)throw Error('authentication_required');if(refreshing)return refreshing;refreshing=(async()=>{const r=await fetch(SUPABASE_URL+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:PUBLISHABLE_KEY,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:session.refresh_token}),signal:AbortSignal.timeout(15000)});if(!r.ok){if(r.status>=500)throw Error('temporarily_unavailable');clearSession();show('auth');throw Error('authentication_required')}const s=await r.json();if(!s.access_token||!s.refresh_token)throw Error('temporarily_unavailable');persist({access_token:s.access_token,refresh_token:s.refresh_token,expires_at:s.expires_at,user:{id:s.user.id,email:s.user.email}});})().finally(()=>refreshing=null);return refreshing}
-async function api(body,authenticated=false){if(authenticated){if(!session)throw Error('authentication_required');if(!Number.isFinite(session.expires_at)||session.expires_at<Date.now()/1000+60)await refresh()}
- const r=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json',...(authenticated?{Authorization:'Bearer '+session.access_token}:{})},body:JSON.stringify(body),signal:AbortSignal.timeout(20000)});let data;try{data=await r.json()}catch{throw Error('temporarily_unavailable')}
- if(r.status===401){clearSession();show('auth');authMode('login')}
+async function refresh(){
+ if(!session)throw Error('authentication_required');
+ if(refreshing?.epoch===sessionEpoch)return refreshing.promise;
+ const epoch=sessionEpoch,refreshToken=session.refresh_token;
+ const entry={epoch,promise:null};
+ entry.promise=(async()=>{
+  const r=await fetch(SUPABASE_URL+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:PUBLISHABLE_KEY,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:refreshToken}),signal:AbortSignal.timeout(15000)});
+  if(epoch!==sessionEpoch)throw Error('session_changed');
+  if(!r.ok){if(r.status>=500)throw Error('temporarily_unavailable');clearSession();show('auth');throw Error('authentication_required');}
+  const data=await r.json();if(epoch!==sessionEpoch)throw Error('session_changed');persist(data);return sessionEpoch;
+ })();refreshing=entry;
+ try{return await entry.promise;}finally{if(refreshing===entry)refreshing=null;}
+}
+async function api(body,authenticated=false,endpoint=ENDPOINT){
+ let epoch=sessionEpoch;
+ if(authenticated){if(!session)throw Error('authentication_required');if(!Number.isFinite(session.expires_at)||session.expires_at<Date.now()/1000+60)epoch=await refresh();if(epoch!==sessionEpoch)throw Error('session_changed');}
+ const r=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json',...(authenticated?{Authorization:'Bearer '+session.access_token}:{})},body:JSON.stringify(body),signal:AbortSignal.timeout(20000)});
+ if(epoch!==sessionEpoch)throw Error('session_changed');
+ let data;try{data=await r.json()}catch{throw Error('temporarily_unavailable');}if(epoch!==sessionEpoch)throw Error('session_changed');
+ if(r.status===401){clearSession();show('auth');authMode('login');}
  if(!r.ok)throw Error(data.error||'temporarily_unavailable');return data;
 }
-async function busy(container,fn){const buttons=[...container.querySelectorAll('button')];buttons.forEach(b=>b.disabled=true);notify('');try{await fn()}catch(e){notify(messages[e.message]||messages.temporarily_unavailable,true)}finally{buttons.forEach(b=>b.disabled=false);updateResend()}}
+async function busy(container,fn){const buttons=[...container.querySelectorAll('button')];buttons.forEach(b=>b.disabled=true);notify('');try{await fn()}catch(e){if(e.message!=='session_changed')notify(messages[e.message]||messages.temporarily_unavailable,true)}finally{buttons.forEach(b=>b.disabled=false);updateResend()}}
 function updateResend(){const seconds=Math.max(0,Math.ceil((resendAt-Date.now())/1000));$('resend').disabled=seconds>0;$('resend').textContent=seconds>0?`再送まで ${seconds} 秒`:'再送する';}
-async function requestCode(){const data=await api({action:'request',email,purpose,consent:purpose==='signup'&&$('consent').checked});challenge=data.challengeId;resendAt=Date.now()+60000;$('email-form').hidden=true;$('code-form').hidden=false;$('code-destination').textContent=email+' に確認コードを送信できる場合はお送りします。';$('code').value='';updateResend();$('code').focus();}
-function renderAccount(data){account=data;$('audio-nav').hidden=!data.audioIntegrated;$('phase3-dashboard').hidden=!data.audioIntegrated;$('audio-connect-panel').hidden=!data.audioIntegrated||!audioConnectRequest;if(data.audioIntegrated)loadProductSummary().catch(e=>notify(messages[e.message]||messages.temporarily_unavailable,true));$('commerce-nav').hidden=!data.purchasesIntegrated;$('purchase-summary').hidden=!data.purchasesIntegrated;$('purchase-placeholder').hidden=!!data.purchasesIntegrated;$('purchase-pill').textContent=data.purchasesIntegrated?'購入管理':'準備中';const name=data.profile.display_name; $('user-name').textContent=name||'クリエイター';$('user-email').textContent=data.user.email;$('settings-email').textContent=data.user.email;$('settings-id').textContent=data.user.id;$('settings-created').textContent=new Date(data.profile.created_at).toLocaleDateString('ja-JP');$('display-name').value=name;$('locale').value=data.profile.locale;}
+async function requestCode(){const data=await api({action:'request',email,purpose,consent:purpose==='signup'&&$('consent').checked});challenge=data.challengeId;resendAt=Date.now()+60000;$('email-form').hidden=true;$('code-form').hidden=false;$('code-destination').textContent=email+' に確認コードを送信できる場合はお送りします。';$('code').value='';const lifetime=Math.min(600,Math.max(60,Number(data.expiresIn)||600));if(trialRequest.get())authAttempt.set({challengeId:challenge,email,purpose,consent:purpose==='signup'&&$('consent').checked,resendAt,expiresAt:Date.now()+lifetime*1000});updateResend();$('code').focus();}
+function renderAccount(data){account=data;const trialReady=trialUI.afterLogin();$('audio-nav').hidden=!data.audioIntegrated;$('phase3-dashboard').hidden=!data.audioIntegrated;$('audio-connect-panel').hidden=!data.audioIntegrated||!audioConnectRequest;if(data.audioIntegrated)loadProductSummary().catch(e=>notify(messages[e.message]||messages.temporarily_unavailable,true));$('commerce-nav').hidden=!data.purchasesIntegrated;$('purchase-summary').hidden=!data.purchasesIntegrated;$('purchase-placeholder').hidden=!!data.purchasesIntegrated;$('purchase-pill').textContent=data.purchasesIntegrated?'購入管理':'準備中';const name=data.profile.display_name; $('user-name').textContent=name||'クリエイター';$('user-email').textContent=data.user.email;$('settings-email').textContent=data.user.email;$('settings-id').textContent=data.user.id;$('settings-created').textContent=new Date(data.profile.created_at).toLocaleDateString('ja-JP');$('display-name').value=name;$('locale').value=data.profile.locale;return trialReady;}
 $('login-tab').addEventListener('click',()=>authMode('login'));$('signup-tab').addEventListener('click',()=>authMode('signup'));
 $('email-form').addEventListener('submit',e=>{e.preventDefault();email=$('email').value.trim().toLowerCase();busy($('email-form'),requestCode)});
-$('code-form').addEventListener('submit',e=>{e.preventDefault();busy($('code-form'),async()=>{const data=await api({action:'verify',challengeId:challenge,code:$('code').value.trim()});persist(data.session);$('code').value='';$('email').value='';challenge=null;renderAccount(await api({action:'me'},true));show('dashboard');notify('メール認証が完了しました。');$('dashboard').querySelector('h1').focus();})});
+$('code-form').addEventListener('submit',e=>{e.preventDefault();busy($('code-form'),async()=>{const data=await api({action:'verify',challengeId:challenge,code:$('code').value.trim()});persist(data.session);authAttempt.clear();$('code').value='';$('email').value='';challenge=null;renderAccount(await api({action:'me'},true));show('dashboard');notify('メール認証が完了しました。');$('dashboard').querySelector('h1').focus();})});
 $('resend').addEventListener('click',()=>busy($('code-form'),requestCode));$('change-email').addEventListener('click',()=>{authMode(purpose);$('email').focus()});
-for(const b of document.querySelectorAll('[data-view]'))b.addEventListener('click',()=>{notify('');show(b.dataset.view);if(b.dataset.view==='purchases')busy($('purchases'),loadPurchases);if(b.dataset.view==='audio')busy($('audio'),loadAudio)});
+for(const b of document.querySelectorAll('[data-view]'))b.addEventListener('click',()=>{notify('');show(b.dataset.view);if(b.dataset.view==='purchases')busy($('purchases'),loadPurchases);if(b.dataset.view==='audio')busy($('audio'),loadAudio);if(b.dataset.view==='trials')busy($('trials'),trialUI.load)});
 $('profile-form').addEventListener('submit',e=>{e.preventDefault();busy($('profile-form'),async()=>{const data=await api({action:'update',display_name:$('display-name').value,locale:$('locale').value},true);renderAccount({...account,profile:data.profile});notify('変更を保存しました。');})});
-for(const scope of ['local','global'])$('logout-'+scope).addEventListener('click',()=>busy($('settings'),async()=>{await api({action:'logout',scope},true);clearSession();authMode('login');show('auth');if(scope==='global')channel?.postMessage('global-logout');notify('ログアウトしました。');}));
+for(const scope of ['local','global'])$('logout-'+scope).addEventListener('click',()=>busy($('settings'),async()=>{await api({action:'logout',scope},true);clearSession(true);authMode('login');show('auth');if(scope==='global')channel?.postMessage('global-logout');notify('ログアウトしました。');}));
 $('request-close').addEventListener('click',()=>{if(!$('close-consent').checked){notify('停止の説明を確認して、チェックしてください。',true);return}busy($('settings'),async()=>{const data=await api({action:'request',email:account.user.email,purpose:'close'},true);closeChallenge=data.challengeId;$('close-form').hidden=false;$('close-code').value='';$('close-code').focus();notify('停止用の確認コードを送信できる場合はお送りします。');})});
-$('close-form').addEventListener('submit',e=>{e.preventDefault();busy($('close-form'),async()=>{await api({action:'close',challengeId:closeChallenge,code:$('close-code').value.trim()},true);clearSession();channel?.postMessage('global-logout');authMode('login');show('auth');notify('アカウントを停止しました。');})});
+$('close-form').addEventListener('submit',e=>{e.preventDefault();busy($('close-form'),async()=>{await api({action:'close',challengeId:closeChallenge,code:$('close-code').value.trim()},true);clearSession(true);channel?.postMessage('global-logout');authMode('login');show('auth');notify('アカウントを停止しました。');})});
 window.addEventListener('pageshow',e=>{if(e.persisted&&session)loadAccount()});
-async function loadAccount(){show('loading');try{renderAccount(await api({action:'me'},true));show('dashboard')}catch(e){if(!session)show('auth');else show('loading');notify(messages[e.message]||messages.temporarily_unavailable,true)}}
+async function loadAccount(){show('loading');try{const ready=renderAccount(await api({action:'me'},true));show('dashboard');await ready}catch(e){if(e.message==='session_changed')return;if(!session)show('auth');else show('loading');notify(messages[e.message]||messages.temporarily_unavailable,true)}}
 setInterval(updateResend,1000);
-if(session)loadAccount();else{authMode('login');show('auth');}
+const trialUI=installTrials({api,busy,notify,request:trialRequest,channel,isAuthenticated:()=>!!session,onHandoff:loadAccount,onCancel:()=>authAttempt.clear()});
+window.addEventListener('hashchange',()=>{
+ const incoming=new URLSearchParams(location.hash.slice(1).replace(/^trial_request%3d/i,'trial_request='));
+ if(!trialRequest.capture(incoming))return;
+ history.replaceState(null,'',location.pathname+location.search);trialUI.clear();
+ if(session)loadAccount();
+});
+if(session)loadAccount();else{
+ const saved=trialRequest.get()?authAttempt.get():null;authMode(saved?.purpose||'login');show('auth');
+ if(saved){$('consent').checked=saved.purpose==='signup'&&saved.consent===true;authAttempt.set(saved);challenge=saved.challengeId;email=saved.email;resendAt=saved.resendAt;$('email').value=email;$('email-form').hidden=true;$('code-form').hidden=false;$('code-destination').textContent=email+' に送信した確認コードを入力してください。';$('code').value='';updateResend();}
+}
 
 const productNames={vocal:'VOCAL',loud:'LOUD',daw:'DAW',finish:'FINISH',vocal_editor:'VOCAL EDITOR'};
 const purchaseStates={paid:'利用可能',pending:'決済確認中',refund_pending:'返金処理中',refunded:'返金済み',review:'サポート確認が必要',void:'取り消し済み'};

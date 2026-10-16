@@ -1,0 +1,23 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {createTrialService} from '../functions/zasu-trial/service.mjs';
+const user={id:'u',sessionId:'s'},now='2026-10-15T00:00:00Z',end='2026-10-22T00:00:00Z';
+test('sign exact server times without user personal data',async()=>{let claims;const service=createTrialService({rpc:async()=>({state:'active',product:'vocal',id:'grant',startedAt:now,expiresAt:end,serverTime:now}),sign:async c=>{claims=c;return 'signed';},catalog:async()=>[]});assert.equal((await service.exchange({requestId:'r',verifier:'secret'})).license,'signed');assert.equal(claims.exp-claims.nbf,604800);assert.equal(claims.aud,'vocal');assert.equal(claims.jti,'grant');assert.ok(!JSON.stringify(claims).includes('secret'));assert.ok(!('sub' in claims));});
+test('pending, expired, revoked and purchased never receive trial license',async()=>{for(const state of ['pending','expired','revoked','purchased']){const s=createTrialService({rpc:async()=>({state}),sign:async()=>{throw Error('should_not_sign')}});assert.equal((await s.exchange({requestId:'r',verifier:'secret'})).state,state);}});
+test('missing signer must not consume original trial',async()=>{let called=false;const s=createTrialService({rpc:async()=>{called=true;}});await assert.rejects(()=>s.exchange({requestId:'r',verifier:'secret'}));assert.equal(called,false);});
+test('stats rejects non-admin before database access',async()=>{let called=false;const s=createTrialService({rpc:async()=>{called=true;},admins:['admin']});await assert.rejects(()=>s.stats({},user),e=>e.code==='forbidden');assert.equal(called,false);});
+test('approve derives identity from account and handles expired requests',async()=>{let args;const s=createTrialService({rpc:async(n,a)=>{args=a;return true;}});assert.deepEqual(await s.approve({requestId:'r'},user),{ok:true});assert.deepEqual(args,{p_request:'r',p_user:'u',p_session:'s'});});
+test('authorization preview never starts trial and uses authenticated identity',async()=>{let n,args;const s=createTrialService({rpc:async(name,a)=>{n=name;args=a;return {name:'ZASU VOCAL'};}});assert.equal((await s.inspect({requestId:'r'},user)).name,'ZASU VOCAL');assert.equal(n,'trial_request_info');assert.equal(args.p_user,user.id);});
+test('polling budget supports full ten-minute five-second polling independently per request',async()=>{const {limits}=await import('../functions/zasu-trial/limits.mjs');const a=limits('exchange','11111111-aaaa-4111-8111-111111111111'),b=limits('exchange','22222222-aaaa-4222-8222-222222222222');assert.ok(a.limit>=a.window/5+1);assert.notEqual(a.bucket,b.bucket);});
+test('authorization URL is configured by server, never browser input',async()=>{const s=createTrialService({rpc:async()=> 'request',accountUrl:'http://127.0.0.1:8765/account/'});assert.equal((await s.begin({product:'vocal',platform:'mac',challenge:'x'})).authorizeUrl,'http://127.0.0.1:8765/account/#trial_request=request');});
+test('catalog exposes only a digest of the actual signing public modulus for read-only diagnostics',async()=>{
+ const {createSigner}=await import('../functions/zasu-trial/crypto.mjs');
+ const keys=await crypto.subtle.generateKey({name:'RSASSA-PKCS1-v1_5',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['sign','verify']);
+ const privateJwk=await crypto.subtle.exportKey('jwk',keys.privateKey),publicJwk=await crypto.subtle.exportKey('jwk',keys.publicKey);
+ const sign=await createSigner(privateJwk);let writes=0;
+ const service=createTrialService({rpc:async()=>{writes++;throw Error('catalog must not change trial rights');},sign,catalog:async()=>[]});
+ const result=await service.catalog();
+ const {createHash}=await import('node:crypto');const expected=createHash('sha256').update(Buffer.from(publicJwk.n,'base64url').toString('hex')).digest('hex');
+ assert.equal(result.verificationKeySha256,expected);assert.equal(writes,0);
+ assert.deepEqual(Object.keys(result).sort(),['products','verificationKeySha256']);
+ assert.ok(!JSON.stringify(result).includes(privateJwk.d));assert.ok(!JSON.stringify(result).includes(privateJwk.n));
+});

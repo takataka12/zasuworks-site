@@ -42,6 +42,10 @@
     let u;try{u=new URL(input.href,'https://zasuworks.jp'+input.page);}catch{return null;}
     if(u.protocol==='mailto:'){events=['contact_email_open'];destination='email_client';return result();}
     if(!['http:','https:'].includes(u.protocol))return null;
+    const trialId=input.trialProduct==='vocal_editor'?'vocal-editor':input.trialProduct;
+    if(['vocal','loud','finish','vocal-editor','daw'].includes(trialId)&&['download','purchase'].includes(input.trialAction)){
+      p={id:trialId,name:names[trialId]};events=[input.trialAction==='download'?'trial_download':'trial_purchase_click'];destination=input.trialAction==='download'?'trial_download_requested':'product_page';return result();
+    }
     const key=u.pathname.split('/').filter(Boolean).pop();
     if(u.hostname==='percymusic.booth.pm'){
       const id=u.pathname.match(/^\/items\/(\d+)\/?$/)?.[1];

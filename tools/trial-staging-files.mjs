@@ -1,0 +1,2 @@
+// One source of truth for private preview serving and portable packaging.
+export const STAGING_FILES=Object.freeze(['account/index.html','account/account.mjs','account/account.css','account/catalog.mjs','account/trials.mjs','account/trial-auth-state.mjs','trial/model.mjs','assets/site-improvements.css','assets/navigation.css','assets/navigation.js','assets/favicon.svg','favicon.ico','apple-touch-icon.png']);

@@ -1,0 +1,4 @@
+export const productPages={vocal:'zasu-vocal',loud:'zasu-loud',finish:'zasu-finish',vocal_editor:'zasu-vocal-editor',daw:'zasu-daw'};
+export function remaining(expiresAt,serverTime){const ms=Date.parse(expiresAt)-Date.parse(serverTime);return Number.isFinite(ms)?Math.max(0,Math.ceil(ms/3600000)):0;}
+export function safeDownloads(product){if(product?.released!==true)return [];return ['mac','win'].flatMap(platform=>{try{const url=new URL(product[platform+'_url']);if(url.protocol!=='https:'||url.username||url.password||! /^[a-f0-9]{64}$/.test(product[platform+'_sha256']||''))return [];return [{platform,url:url.href,sha256:product[platform+'_sha256']}];}catch{return []}});}
+export const statusLabel=state=>({purchased:'購入済み',active:'体験中',expired:'体験終了',revoked:'利用停止',not_started:'未開始'}[state]||'確認中');

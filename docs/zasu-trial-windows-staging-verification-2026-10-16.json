@@ -1,0 +1,34 @@
+{
+  "sourceCommit": "44a59ac80f425e30bb4475cf412afc052d6e0ea2",
+  "environment": "staging",
+  "publicKeySha256": "27fec33eb59362eaa51bcb7c0d178a1264d60a4a35e90f151f1a9a178c124b8d",
+  "setupSha256": "3955a58fac42c87b5022eca675337f01f969a0e7d12ff246d456651257c7d84a",
+  "installerSignature": "NotSigned",
+  "installerManifestLevels": [
+    "asInvoker"
+  ],
+  "installerChecks": 30,
+  "binaryMachines": [
+    "x64",
+    "x64"
+  ],
+  "binarySignatures": [
+    "NotSigned",
+    "NotSigned"
+  ],
+  "realAccount": "NOT RUN",
+  "hardwareAudio": "NOT RUN",
+  "restart": "NOT RUN",
+  "publicRelease": false,
+  "archiveEntries": [
+    "zasu-daw/zasu-daw/staging-candidate/dist/candidate.json",
+    "zasu-daw/zasu-daw/staging-candidate/dist/README-PRIVATE.txt",
+    "zasu-daw/zasu-daw/staging-candidate/dist/SHA256SUMS.txt",
+    "zasu-daw/zasu-daw/staging-candidate/dist/ZASU-VOCAL-Trial-PRIVATE-Windows-x64-Setup.exe",
+    "zasu-daw/zasu-daw/staging-candidate/inventory/payload.json",
+    "zasu-daw/zasu-daw/staging-candidate/binary-verification.json",
+    "zasu-daw/zasu-daw/staging-candidate/build/Testing/Temporary/LastTest.log",
+    "zasu-daw/zasu-daw/scripts/Inspect-TRIAL-Windows.ps1",
+    "_temp/trial-installer-protection.json"
+  ]
+}

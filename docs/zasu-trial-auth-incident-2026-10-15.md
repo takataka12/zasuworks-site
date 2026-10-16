@@ -1,0 +1,310 @@
+# ZASU TRIAL SYSTEM 認証障害調査 — 2026-10-15（JST）
+
+## 結論と変更禁止事項
+
+**2026-10-16 更新:** 署名検証の解放後参照に続き、Mac統合CIの待機遅延蓄積を実測で特定・修正。
+コミット `29253a4a04d19a08c807aa0377a86ba472b2d80c` のMac/Windows統合CIと独立共通CIはすべてsuccess。
+**08:29 JST 実機更新:** Mac実機で受信・署名検証・保存・オフライン復元、Logicの解析/自動補正/プロジェクト復元、有料版復帰後の互換性まで確認。詳細は[10月16日実機記録](zasu-trial-mac-validation-2026-10-16.md)。期限切れ・他ホスト・Windows実機・配布検証は未完了。以下の初期調査時点の記録と、最新結果を区別する。
+
+初期調査時点ではMacの実認証の再確認は未完了だった。後段の追加調査で署名検証中の解放後メモリー参照を再現・修正した（末尾の更新を優先）。
+既存記録から推測できるのは、サーバーでの権限発行以降、クライアントが有効化される以前の区間で失敗したこと。
+「鍵が違う」「署名検証が失敗した」を実機の確定原因として扱わない。
+
+PR #9 / #6はdraft・未マージ。全5製品 released=false。実購入者の有料AUは復帰済み。
+本番・広告・予算・購入導線・既存権利・秘密鍵・体験期間は変更しない。
+認証コード再送、再ログイン、キャッシュ削除、権利初期化、鍵再生成は停止する。
+今回のサーバー配備は既存ステージングのcatalog応答に公開鍵の指紋を追加する診断変更のみ。
+
+## A. 確認した事実と処理別の状態
+
+| 処理 | 状態 | 証拠・限界 |
+|---|---|---|
+| 接続先 | コード・配備確認済み、Macバイナリ照合は未確認 | ステージング giljyqaohutxoxlpkfjf と127.0.0.1:8765の固定組合わせ。Macの埋込み値を当方から読めない |
+| ACCOUNTログイン | 過去の実操作で成功 | 画面に認証済みアカウント。再ログインは調査に不要 |
+| Supabase Auth | 承認時の成功を確認、現在有効かは別 | adapterがgetUserとaccount_session_activeを検査し、承認・交換が成立した。現在のブラウザトークンは取得しない |
+| ブラウザへの要求引渡し | 欠陥を再現し修正済み | JUCE URLがfragment内の = を %3D にする。ブラウザがtrial_requestを取得できなかった。ad85287で限定的に正規化し回帰テスト成功 |
+| コールバック／リダイレクト | 設計を確認 | 独自URLコールバックは使わず、ブラウザは承認のみ。アプリがPKCE verifierを保持してexchangeをポーリング。アクセストークンをアプリへ渡さない |
+| セッション期限・更新 | コードとブラウザ回帰確認、現Mac期限は未確認 | sessionStorageはタブ単位。新規タブで未ログインになるため既存タブのログイン有無だけで判断できない。refresh時の古い応答が新しいセッションを上書きしないテストも成功 |
+| ユーザー承認 | 実サーバーで成功 | 2026-10-15 22:27:25.968857 JST |
+| 利用権限発行 | 実サーバーで成功・保全 | 開始22:27:31.014479 JST、終了2026-10-22 22:27:31.014479 JST、active、ちょうど168時間。最終認証時刻も開始時と同じ |
+| ライセンス発行API | サーバー処理の成功記録 | 22:27:31.032のzasu-trial HTTP 200。配備サービスはactive grantに署名してから200を返す。ただしHTTP 200だけでMacの受信・検証成功とはしない |
+| Macのライセンス受信／検証 | 未確認 | 当時の処理段階ログがなく、保存ファイルなしという報告だけでは通信・鍵・claimsのどれかを判別できない |
+| 状態更新・重複開始 | 欠陥を再現して修正 | begin()が実行中の次要求も予約していた。失敗直後に次要求が状態表示を上書きする。実記録でも初回発行直後に別要求が作成されているが、これだけで元の失敗原因までは確定しない |
+| ローカル保存 | 実機では未完了 | ~/Library/ZASU WORKS/Trial/vocal.json が存在しないとの実行結果。保存失敗自体が原因か、検証前に停止した結果かは未確定 |
+| 再起動復元／オフライン | 自動検証成功、Mac実機未確認 | 実Controller・署名検証・実ファイル保存を使い、HTTP境界のみ置換して検証 |
+| フリーズ | サンプル上は認めない | 22:39のsampleではControllerが250ms待機。UIは通常runloop。これで全状況の非フリーズを保証はしない |
+
+## B. 未確定の仮説と識別方法
+
+1. Macビルドの公開鍵とサーバー署名鍵の公開部分の不一致。
+   サーバーはimportしたRSA JWKの公開modulusだけから指紋を生成する。Macの公開ファイル・CMake設定・実バイナリと照合する。
+2. API応答の受信・解析、ライセンス形式、署名、claimsのいずれかの拒否。
+   今回の診断はHTTP状態、受信、形式／header／公開鍵／署名／claimsの各拒否を区別する。
+3. 保存先の作成またはatomic replaceの失敗。
+   保存失敗を記録し、認証中表示に戻さず「認証済み・保存失敗」を維持する。
+4. 古い接続先または古いバイナリ。
+   Mac側のCMakeのtrial ON・API・ACCOUNT URLと実バイナリの公開鍵埋込みを読み取りで検査する。
+
+## C. 検証方法と証拠
+
+重複開始の再現: 実ControllerのHTTP境界のみを固定応答に置換。最初のbeginを保持し、UIから追加beginを2回呼ぶ。
+署名検証を失敗させた後、追加beginが送られず失敗表示が残ることを要求した。
+修正前: `FAIL: duplicate begin overwrote the signature failure or issued a second request`。
+修正後: 同テスト成功。署名拒否と不正なキャッシュを生成しないことも確認。
+
+同じControllerで実WebCrypto署名fixtureを受信し、JUCE検証→有効化→atomic保存→ネットワークなしの新Controllerで復元を検証。
+一度transport_errorを返した後、元の要求のまま復旧すること、保存先をファイルで塞ぐと保存失敗表示が残ることを検証。
+これは制御したテスト環境の証拠であり、Mac実通信・Logic・Windowsの保証ではない。
+
+再現コマンド（開発環境。Macの運用鍵を使わない）:
+
+```sh
+# vocalリポジトリ直下。秘密のテスト鍵は生成中のメモリー内だけ。
+node scripts/trial-test-key.mjs
+cmake -S modules/trial -B build/trial-core -DJUCE_PATH=/absolute/path/to/JUCE-8.0.15 -DZASU_TRIAL_TEST_FIXTURE="$PWD/trial-test-fixture.json"
+cmake --build build/trial-core --parallel 2
+ctest --test-dir build/trial-core --output-on-failure
+```
+
+実施環境の結果は末尾「検証結果」を参照。CIにはMac/Windowsで同じController検証を行う工程を追加するが、実行済み扱いにはしない。
+
+## D. 原因の確定範囲
+
+確定: fragmentエスケープを解釈できないブラウザ側の欠陥、重複開始がエラーを上書きするアプリ側の欠陥、保存失敗の黙殺、診断不足。
+未確定: 今回のMacで最初にライセンスが有効化されなかった直接原因。
+理由: 当時のMacでHTTP／ライセンス／検証／保存の段階が記録されず、当方にはMac内の鍵・バイナリへの直接アクセスがない。
+
+## E. 修正内容と保護範囲
+
+- 認証中のbeginをatomic guardで抑止。有効な体験中も新要求を作らない。UIも待機中の開始ボタンを無効化。
+- 失敗表示を次の予約要求で消さない。通信障害は元要求のまま、最大600秒の範囲内で待機。未知／不正応答は停止し、無限再認証を起こさない。
+- WebInputStreamを接続前からキャンセル対象にし、接続と本文読取を期限内に制限。HTTPコードと解析失敗を記録。
+- 署名検証の形式／header／公開鍵／署名／claimsの拒否を分類。署名・期限の受入条件は緩和しない。
+- 保存結果を確認し、失敗を画面と診断に残す。
+- 「診断をコピー」は固定ラベル、公開鍵指紋、HTTP数値、active/busyだけを出力。
+  メール、要求ID、パス、OTP、verifier、JWT、ライセンス本文、秘密鍵、HTTP本文や例外メッセージを出力しない。自動送信なし。
+- paidビルドはtrial OFFのまま。DSP、Processor、AU/VST3識別子、state保存形式は今回変更しない。診断UIはtrial条件内のみ。
+
+## F. 次に必要な操作と鍵照合の意味
+
+以前の秘密鍵環境ファイル全体のSHA-256とSupabase CLI digestの照合案は撤回する。
+これはファイル値の同一性を見るだけで、JWKの並び順や改行でも変化し、アプリの公開鍵との対応を直接証明しない。
+今後は秘密鍵を読まず、RSA公開modulusを小文字hex化した512文字のSHA-256に統一する。
+サーバー指紋は実署名用JWKの公開nだけから生成。指紋が一致してもMacの署名検証や保存成功まで保証しない。
+
+必要なMac操作は `tools/check-trial-staging-key.mjs` の読み取り診断1回。
+公開ファイル、CMakeCache、既存ビルドのバイナリだけを読み、固定ステージングcatalogへ1回問い合わせる。
+OTP、ログイン、begin、approve、exchangeを呼ばず、ファイルや利用権限を変更しない。trial.envも読まない。
+正常: 6項目すべてtrueと公開鍵指紋。
+不一致: serverKeyMatches=falseならサーバーとMac公開鍵の対応がない。buildKeyMatches/binaryKeyMatches=falseならビルド不整合。
+stagingConfiguration=falseなら接続設定不整合。signerConfigured=falseなら署名設定の問題か旧API配備を確認する。
+ファイル・ネットワークエラーは原因別に調べ、同じ操作を機械的に繰り返さない。
+
+この確認が必要な理由: サーバー公開鍵指紋は当方で取得できたが、Mac固有の公開ファイル・ビルド設定・実バイナリに対応する情報は既存記録にないため。
+一致後も原因が残る場合にのみ診断付きバイナリへの更新を案内し、再認証の可否・必要性を先に説明する。
+
+## G. 完了条件と公開までの残課題
+
+1. コードレビューと自動テスト: 失敗再現→修正後成功、paid回帰、診断への機密混入なし。
+2. ローカル・ステージング: 環境と公開鍵対応、期限168時間・冪等性・RLS・private allowlistを確認。実利用権限を変更しない。
+3. 署名付きライセンス: 受信→署名→claims→保存の成功を同一の診断で確認。
+4. Mac実機: Standaloneで有効化、終了・再起動・オフライン復元が成功。現在ここが未完了。
+5. Logic: 有料AUの保全・復旧手順を維持し、新規テストprojectでtrial AU読込と実DSPを確認。
+6. 期限・オフライン: 制御したテスト用fixtureで期限直前後・時刻変更・通信断・安全なバイパス。実ユーザー権利やOS時刻を無断変更しない。
+7. 有料版互換: 保存済みproject/preset、automation、DSP、ログイン不要、AU/VST3 IDs維持を実機で確認。
+8. Windows x64: ビルド・署名／installer・host・uninstall・offline。VM/ARM上x64の場合は明示。
+9. Release署名、公証、Staple、配布物、download、承認を経て初めて公開。ほか4製品はVOCAL合格後。
+
+救済案（未実施・承認待ちの提案）: 開始時刻・同一grant ID・購入権を保持し、この検証アカウントのVOCALに限り障害で失った時間を終了時刻に加える。
+正常化時刻と救済量を提示し、承認後にold/new期限と理由を監査記録に残す別トランザクションを設計・検証する。
+現行trial_admin_auditはstatsのみ許可するため、既存監査表へ不適切に書き込まない。期間は現時点で一切変更しない。
+
+## 検証結果（この変更）
+
+- Node: `node --test site/supabase/tests/*.test.mjs site/tests/*test.mjs` 325/325成功。
+- ブラウザ・analytics・staging: 対象10/10成功。実ChromeのACCOUNT画面、JUCEエスケープ引渡し、明示承認を検証。API応答はテスト用であり実アカウント認証ではない。
+- JUCE共通: CTest 4/4成功（Core、RequestDeadline、WebCrypto署名、Controller）。Controllerは24.47秒で成功。
+- Linux VOCAL: Standalone / VST3 / trial processorのビルド成功、trial processor CTest 1/1成功。
+- Linux paid: 今回のソースでpaid processorを再ビルド、CTest 1/1成功（12.57秒）。Macの有料AU再確認の代替にはしない。
+- ステージングv6: catalog HTTP200、実署名公開鍵の指紋取得、全5製品released=false。grant開始・終了時刻は変更しない。
+- Mac/Windowsの今回の変更後ビルド・実認証・Logic・署名公証は未実施。CI工程を追加したが、その結果は別途確認する。
+
+サイト全体の初回一括実行はリポジトリ外のcwdから行ったため530件中10件失敗した。
+失敗名: build output is current and matches the public manifest / editorial routes fit 320px・390px・768px・1440px / empty archive has honest state; sample is not a review / no-JS pages keep reading and direct contact / all public pages share navigation and every header route/anchor resolves / BOOTH buyers can choose their receipt route on every desktop download page / all six catalogue products have real screen links and charging information。
+後2件は相対パスENOENT。ほかは生成済み静的ページ・ナビの検証を含むため、独立コピーをリポジトリ直下としてCIと同じ5つのbuildツールを実行して再検証する。これらの生成変更を認証修正に混ぜない。
+
+再検証結果: 独立コピーでCIと同じ生成手順を実行し、正しいリポジトリcwdで全テストを実行。530/530成功、47.88秒、失敗・skipなし。
+生成前のナビ不足と実行cwdが初回10件失敗の要因。認証修正と無関係な生成HTMLの変更は今回のコミットに含めない。
+
+```sh
+node tools/build-media.cjs
+node tools/build-navigation.cjs
+node tools/build-product-guide.cjs
+node tools/build-storefront.cjs
+node tools/build-analytics.cjs
+NODE_PATH=/tmp/zasu-home-check/node_modules node --test tests/*.test.cjs tests/*.test.mjs supabase/tests/*.test.mjs
+```
+
+
+## 追加調査：署名検証のメモリー寿命不具合を再現・修正
+
+ユーザー実行の読み取り検査は全6項目true。公開ファイル・ビルド設定・実バイナリの鍵と実サーバーの公開鍵指紋が一致した。
+指紋は27fec33eb59362eaa51bcb7c0d178a1264d60a4a35e90f151f1a9a178c124b8d。
+鍵の再設定・再生成は不要。
+
+GitHub Actions実行38749656712のMac runnerで、通信もログインも使わないWebCrypto署名fixtureがJUCEで拒否された。
+Mac trial processorとpaid processorは成功していたが、追加したLicenseTestsとControllerTestsが失敗。
+したがって、APIやブラウザに依存しない検証経路で不具合を再現できた。
+
+原因コード:
+
+```cpp
+auto message=(parts[0]+"."+parts[1]).toUTF8();
+auto digest=juce::SHA256(message.getAddress(),message.sizeInBytes()-1).getRawData();
+```
+
+JUCE String::toUTF8()は所有権を持つコピーではなく、Stringの内部データを指す。
+一時Stringは最初の文の終わりで破棄され、次の文のmessageは解放済み領域を参照する。
+Linuxの通常実行で通ったことは安全性の証拠ではなかった。
+
+同じ検証コードとWebCrypto fixtureをAddressSanitizerで実行した結果:
+
+```text
+ERROR: AddressSanitizer: heap-use-after-free
+zasu::trial::verify ... TrialLicense.cpp:27
+freed by ... zasu::trial::verify ... TrialLicense.cpp:27
+SUMMARY: AddressSanitizer ... in strlen
+```
+
+修正: `const auto signedText=parts[0]+"."+parts[1];` を保持し、その所有者が生存する間にtoUTF8とSHA-256を実行。
+公開鍵指紋のtoLowerCase().toUTF8()にも同じ寿命パターンがあったため所有Stringを保持。
+修正後の同じASan実行はexit 0で、WebCrypto RS256検証・改ざん拒否・別製品拒否・誤鍵拒否が成功。
+受入条件、秘密鍵、DSP、保存形式は変更しない。
+
+Windows runnerは別にTrialController.cpp:45のstd::maxでC2059を報告。
+Windowsヘッダーのmaxマクロとの衝突を避けるため `(std::max)(...)` に修正。Windows再ビルドが必要。
+
+再発防止: 共通CMakeに開発用AddressSanitizerオプション、Mac CIで有効化、共通モジュールだけを早く検証するMac/Windows workflowを追加。
+ASanの修正前失敗→修正後成功は確認済み。修正後Mac/Windows CIとユーザー実機の認証完了は別途結果を確認する。
+
+一時的に準備した「認証を行わない署名プローブ」は、CIとASanで再現できたためMacへの操作案内を省略した。
+ステージングcatalogに一時追加したdiagnosticProofも除去し、v8でv6と同じbundleへ復帰（SHA256 02b51805784a4e282317e4f34e6a3f560c1f4948127c91d0416f30c123ce91b0）。
+プローブは利用権限RPCを呼ばず、実利用権限・開始終了日時を変更していない。公開鍵指紋の既存診断は維持。
+
+次のMac操作は、CI結果を確認した修正版ソースの取得とビルド。新しい診断コマンド・再ログインを先に依頼しない。
+
+## 2026-10-16 — polling recovery regression
+
+The previous Mac candidate run 38752850373 on daa6eaf failed only `ZasuTrialControllerTests: transient network failure did not recover`. The independent native Mac run 38752850031 passed. Both used macos-15, AppleClang 17.0.0.17000013, JUCE 8.0.15 at 91ad83ae34a81e0833b1a2b0866f54846370ae53, Debug universal binaries, AddressSanitizer with detect_leaks=0, and serial CTest. The candidate generated its signed fixture before the paid/trial builds; the isolated workflow generated its fixture before the common build. Fixtures remain valid for seven days; neither test uses the staging account, server grant, or real network. Each controller test has its own UUID temporary directory and joins workers before cleanup. There is no common cache between workflow jobs.
+
+### Reproduction and bounded fix
+
+The controller previously approximated five seconds by twenty relative 250ms waits. OS scheduling delay accumulates in every wait. A notification also consumes one counted wait without spending its intended time. The transient test needs two polling intervals inside its unchanged 12,500ms bound. A local-only pthread wait interposer that delays each controller resume by 100ms reproduces the exact failed assertion: only one exchange completed; the controller remained busy with transport_failed and no second authorization. This experiment is evidence for the scheduling mechanism, not a measurement of the original Mac runner's scheduler.
+
+The production polling wait is now extracted into waitForTrialPoll in TrialRequestDeadline.h and waits against a steady-clock deadline. It still ticks the license clock and remains cancellable in at-most-250ms wait slices. No HTTP timeout, activation timeout, signature rule or trial period is changed. No test timeout is increased and no test is removed/skipped. Deterministic fake-time tests call that same production wait: the old counted implementation took 7000ms and failed `poll interval accumulated scheduler delay`; the corrected implementation takes 5100ms including the final delayed resume. Early notification and cancellation are also checked. The full real-controller test with the same 100ms resume delay passes after the fix (exchange recovery about 10.2s).
+
+The existing transient controller regression additionally asserts one begin request, two exchange attempts, unchanged request/verifier, a real verified signature, and a saved license. The exchange counter is atomic. Test-only traces contain stage labels and elapsed milliseconds, never credentials. Candidate/native CI now expose these traces and retain test logs on failure without publishing failed binaries. No server state was changed.
+
+The original Mac failure's precise scheduler timing is not available in its old log. A diagnostic-only commit 710c8b6 records phase times before this fix; its CI result must be distinguished from the controlled reproduction. Do not infer that all possible network faults or real Mac activation are verified by this injected-transport test.
+
+Local verification: common CTest 4/4 and delayed-resume controller success. Mac/Windows fixed-head CI results must be recorded after completion. Real Mac activation, offline restart, Logic activated DSP/project compatibility and signed/notarized distribution remain pending. PRs remain draft/unmerged and all release flags remain disabled. Existing grant 2026-10-15 22:27:31 to 2026-10-22 22:27:31 JST is untouched; relief requires separate user approval.
+
+
+### Mac統合CIの実測で原因を確定（2026-10-16）
+
+診断だけを加えた `710c8b64776ecdae07ef1ca7c9e04a47b3c84971` の統合実行
+[38814641542 / Mac job 116696122578](https://github.com/takataka12/zasu-daw/actions/runs/38814641542/job/116696122578)
+でも同じアサーション失敗を再現した。
+
+```text
+TRACE 13492ms transport begin
+TRACE 19730ms transport transient failure
+TRACE 26028ms transient recovery deadline reached
+exchange_count=1 active=false busy=true
+stages: cache_missing, activation_started, browser_ready, transport_failed
+FAIL: transient network failure did not recover
+```
+
+要求開始から最初のexchangeまで6238ms。公称5秒の相対待機が約1.24秒延びていた。
+次の待機も積み上がり、12500msのテスト上限までに2回目のexchangeに到達していない。
+これはローカルで各待機の再開を100ms遅らせた再現と一致する。
+この実測により、当初の「ランナーのタイミング差かもしれない」という仮説から、
+**待機回数による時間管理がスケジューリング遅延を蓄積する実装上の欠陥**として特定できた。
+OS内部で再開が遅れた個別要因（タイマー合流・CPU割り当て等）までは計測していない。
+アプリ側でそれらの個別要因に依存しない期限方式へ修正した。
+
+同じ診断コミットのWindows job 116696122689は、認証より前の既存有料版UI性能テストで失敗した。
+`Long Pitch display ... 6466.44 ms` が既存の2000ms上限を超過。
+このWindows失敗も記録し、しきい値変更・スキップ・無条件の再実行は行わない。
+修正版headのWindows統合結果を別途記録する。
+
+### 修正版のMac統合成功
+
+対象コミット: `29253a4a04d19a08c807aa0377a86ba472b2d80c`。
+[統合CI run 38815217566 / Mac job 116698064390](https://github.com/takataka12/zasu-daw/actions/runs/38815217566/job/116698064390) はsuccess。
+有料版Processor 1/1（18.42s）、体験版Processor 1/1（0.53s）、AU/VST3/Standaloneビルド、共通4/4（Controller 26.33s）を確認。
+Mac共通テストにはAddressSanitizerを有効化し、検出エラーなし。
+
+```text
+scheduler_delay_poll_ms=5100
+PASS polling deadline, delayed scheduling, early notification and cancellation
+TRACE 10872ms transport begin
+TRACE 15906ms transport transient failure
+TRACE 21050ms transport signed exchange
+TRACE 21095ms transient recovered
+PASS transient exchange failure recovers with original request
+100% tests passed out of 4
+```
+
+復旧は要求開始から10223ms、元の12500ms上限を維持して成功。
+一つのbegin、二つのexchange、同じ要求ID・verifier、実署名検証、保存をアサートしている。
+このテストで置き換えているのはHTTP境界だけであり、実SupabaseとのHTTP通信やユーザー実機認証を成功したとは扱わない。
+
+[独立共通CI run 38815217615](https://github.com/takataka12/zasu-daw/actions/runs/38815217615) も両OS success。
+Mac job 116698064840、Windows job 116698065171。各4/4。
+Linux側は共通4/4、有料版Processor 1/1、体験版Processor 1/1、Standalone/VST3ビルド、準備済みサイト全530/530（失敗・skipなし）成功。
+
+ステージングDBは読み取りのみ。5製品のreleased=false、既存VOCAL grantの開始・終了・last_authenticated_atに変更がないことを再確認。
+体験期間は2026-10-15 22:27:31〜2026-10-22 22:27:31 JST。
+障害期間の救済案は、実機認証完了までの利用不能期間を集計し、承認後に当該grantの期限だけを監査付きで延長すること。
+現時点で承認・延長・再発行は行っていない。
+
+
+### 最終Windows統合結果・検証ゲート
+
+同じ `29253a4a04d19a08c807aa0377a86ba472b2d80c` の
+[Windows job 116698064048](https://github.com/takataka12/zasu-daw/actions/runs/38815217566/job/116698064048) はsuccess。
+統合run 38815217566全体もcompleted/success。
+有料版Processor 1/1（18.98s）、体験版Processor 1/1（0.09s）、VST3/Standaloneビルド、共通4/4（Controller 25.51s）成功。
+復旧は10025ms。同じ要求の維持、署名、保存、オフライン復元、既存期限・時計判定も実行。
+
+| 検証 | Mac | Windows |
+|---|---|---|
+| 独立共通4件・run 38815217615 | success / job 116698064840 | success / job 116698065171 |
+| 製品統合・run 38815217566 | success / job 116698064390 | success / job 116698064048 |
+| 有料版処理 | 1/1 | 1/1 |
+| 体験版処理 | 1/1 | 1/1 |
+| 統合内の共通認証 | 4/4・ASan有効 | 4/4 |
+| 製品形式 | AU・VST3・Standalone | VST3・Standalone |
+| ユーザー実機認証・ホスト | 未完了 | 未完了 |
+
+別コミットのWindows描画性能6466.44msは未解明の測定変動として保留する。
+今回の最終統合では同じ2000ms基準を変更せず通過したが、認証修正で描画問題も修正したとは主張しない。
+DSP/音質/Processor/プラグインID/保存形式には今回の差分なし。有料版のDRMなし・認証不要の分離も維持。
+
+再現テストはTrialRequestTests.cppのpollingScheduleとTrialControllerTests.cppに保存。
+共通テストの再実行方法は .github/workflows/zasu-trial-module-tests.yml、製品統合はzasu-trial-candidate.ymlに固定。
+検証用鍵はscripts/trial-test-key.mjsでメモリー内生成し、秘密鍵を保存・表示しない。
+修正前の「20回×250ms」実装へ戻すと、同じ決定的テストは7000msで失敗する。
+12500msの待機上限、署名受理条件、試用期間を変更したり失敗を無効化したりしていない。
+
+実機検証の完了条件（CIとは別）:
+1. ソースhead確認 → 固定ステージング・既存公開鍵でビルド → 署名検証。一般の有料AUは置換しない。
+2. 既存の公開鍵照合結果と新バイナリーの一致、診断コピー機能を確認してから、必要な認証検証を一度だけ実施。
+3. 診断でlicense_received/signature_verified/cache_saved/activated、再起動・オフライン復元を確認。
+4. AUを一時配置する場合は有料版退避・復元を維持し、Logicで解析/AUTO FIX/実音声/プロジェクト保存復元を確認。
+5. 期限切れと有料版互換性、Windows実環境、署名/公証/Staple/インストーラー/配布導線を別ゲートで確認。
+
+この報告時点でMac利用者に依頼するのはVOCAL検証ブランチのff-only取得とhead確認のみ。
+期待head先頭は29253a4a04d1。本人の完了応答を待ってから次のビルド操作へ進む。
+認証再送・鍵再生成・キャッシュ削除・ライセンス再発行・期限変更・PRマージ・一般公開は行わない。

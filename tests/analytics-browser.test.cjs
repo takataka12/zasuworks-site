@@ -7,7 +7,7 @@ const {createServer}=require('node:http');
 const root=path.resolve(__dirname,'..');let server,browser,origin;
 before(async()=>{
  server=createServer(async(req,res)=>{let file=path.resolve(root,'.'+new URL(req.url,'http://local').pathname);if(!file.startsWith(root+'/')&&file!==root)return res.writeHead(403).end();try{if((await fs.stat(file)).isDirectory())file+='/index.html';res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css'})[path.extname(file)]||'application/octet-stream');res.end(await fs.readFile(file));}catch{res.writeHead(404).end();}});await new Promise(r=>server.listen(0,'127.0.0.1',r));origin='http://127.0.0.1:'+server.address().port;
- browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+ browser=await chromium.launch({headless:true,args:['--no-sandbox'],...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
 });
 after(async()=>{await browser?.close();if(server)await new Promise(r=>server.close(r));});
 async function pageWithMeasurement(options={}){
