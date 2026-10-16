@@ -1,0 +1,73 @@
+name: ZASU TRIAL private Windows validation tools
+on:
+  push:
+    branches: ['codex/zasu-trial-system']
+    paths:
+      - 'account/**'
+      - 'trial/model.mjs'
+      - 'tools/serve-trial-staging.mjs'
+      - 'tools/trial-staging-files.mjs'
+      - 'tools/package-trial-validation.mjs'
+      - 'tests/trial-validation-package.test.mjs'
+      - '.github/workflows/zasu-trial-windows-validation-tools.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: private-windows-validation-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  portable-tools:
+    runs-on: windows-2022
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.2'
+      - name: Test packaging and local server security
+        run: node --test tests/trial-validation-package.test.mjs tests/trial-staging-server.test.mjs
+      - name: Verify signed Node runtime and package only allowlisted preview files
+        shell: pwsh
+        run: |
+          $node=(Get-Command node.exe).Source
+          $signature=Get-AuthenticodeSignature -LiteralPath $node
+          if($signature.Status -ne 'Valid'){throw 'Portable Node runtime signature must be valid'}
+          $license=Join-Path (Split-Path $node) 'LICENSE'
+          if(!(Test-Path -LiteralPath $license)){throw 'Node license is required for redistribution'}
+          $version=(& $node --version).Trim()
+          & $node tools/package-trial-validation.mjs --output "$PWD/private-windows-validation" --node-runtime $node --node-license $license --runtime-version $version
+          if($LASTEXITCODE){throw 'Validation tools packaging failed'}
+          @{runtimeVersion=$version;runtimeSignature=$signature.Status.ToString();runtimeSigner=$signature.SignerCertificate.Subject;publicRelease=$false}|ConvertTo-Json|Set-Content -Encoding utf8 runtime-signature.json
+      - name: Launch the copied runtime and verify the packaged private page
+        shell: pwsh
+        run: |
+          $p=Start-Process -FilePath "$PWD/private-windows-validation/runtime/node.exe" -ArgumentList 'tools/serve-trial-staging.mjs' -WorkingDirectory "$PWD/private-windows-validation" -PassThru -RedirectStandardOutput "$env:RUNNER_TEMP/preview.log" -RedirectStandardError "$env:RUNNER_TEMP/preview-error.log"
+          try {
+            $ready=$false;$deadline=[DateTime]::UtcNow.AddSeconds(15)
+            while([DateTime]::UtcNow -lt $deadline){
+              try {$page=Invoke-WebRequest http://127.0.0.1:8765/account/;$ready=$page.StatusCode -eq 200;if($ready){break}}catch{}
+              if($p.HasExited){throw 'Packaged server exited'}
+              Start-Sleep -Milliseconds 100
+            }
+            if(!$ready -or $page.Content -notmatch '非公開ステージング検証'){throw 'Packaged preview is not ready'}
+            $config=(Invoke-WebRequest http://127.0.0.1:8765/account/config.mjs).Content
+            if($config -notmatch 'giljyqaohutxoxlpkfjf' -or $config -notmatch 'zasu-trial-account-validation'){throw 'Packaged preview configuration mismatch'}
+            if((Invoke-WebRequest http://127.0.0.1:8765/trial.env -SkipHttpErrorCheck).StatusCode -ne 404){throw 'Private path is not blocked'}
+            Write-Host 'PASS copied signed Node runtime serves only the private staging preview'
+          } finally {if(!$p.HasExited){Stop-Process -Id $p.Id -Force};$p.Dispose()}
+      - name: Create private ZIP and checksum
+        shell: pwsh
+        run: |
+          Compress-Archive -Path private-windows-validation/* -DestinationPath ZASU-TRIAL-Windows-Validation-PRIVATE.zip
+          $hash=(Get-FileHash ZASU-TRIAL-Windows-Validation-PRIVATE.zip -Algorithm SHA256).Hash.ToLower()
+          "$hash  ZASU-TRIAL-Windows-Validation-PRIVATE.zip"|Set-Content -Encoding ascii ZASU-TRIAL-Windows-Validation-PRIVATE.zip.sha256
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: ZASU-TRIAL-Windows-Validation-PRIVATE
+          path: |
+            ZASU-TRIAL-Windows-Validation-PRIVATE.zip
+            ZASU-TRIAL-Windows-Validation-PRIVATE.zip.sha256
+            runtime-signature.json
+          retention-days: 14
