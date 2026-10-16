@@ -1,19 +1,12 @@
 name: ZASU TRIAL browser regression
+# Frozen by owner instruction 2026-10-16: no automatic execution.
 on:
-  push:
-    branches: ['codex/zasu-trial-system']
-    paths:
-      - 'account/**'
-      - 'trial/**'
-      - 'tests/**'
-      - 'supabase/tests/**'
-      - 'tools/serve-trial-staging.mjs'
-      - '.github/workflows/zasu-trial-browser-tests.yml'
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   browser:
+    if: ${{ false }} # Owner freeze: explicit restart required.
     strategy:
       fail-fast: false
       matrix:

@@ -1,15 +1,6 @@
 name: ZASU TRIAL private Windows validation tools
+# Frozen by owner instruction 2026-10-16: no automatic execution.
 on:
-  push:
-    branches: ['codex/zasu-trial-system']
-    paths:
-      - 'account/**'
-      - 'trial/model.mjs'
-      - 'tools/serve-trial-staging.mjs'
-      - 'tools/trial-staging-files.mjs'
-      - 'tools/package-trial-validation.mjs'
-      - 'tests/trial-validation-package.test.mjs'
-      - '.github/workflows/zasu-trial-windows-validation-tools.yml'
   workflow_dispatch:
 permissions:
   contents: read
@@ -18,6 +9,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   portable-tools:
+    if: ${{ false }} # Owner freeze: explicit restart required.
     runs-on: windows-2022
     timeout-minutes: 10
     steps:
