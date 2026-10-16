@@ -1,7 +1,7 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const skip=new Set(['.git','node_modules','tests','supabase','admin','account','client','audio-integration','download','thanks','release','docs']);
-const versionPrefix='20261015-a3';
+const versionPrefix='20261017-media-pause1';
 function pages(dir){return fs.readdirSync(dir,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name,'en')).flatMap(e=>skip.has(e.name)?[]:e.isDirectory()?pages(path.join(dir,e.name)):e.name.endsWith('.html')&&e.name!=='qa.html'?[path.join(dir,e.name)]:[]);}
 function build(root){
  const files=pages(root),configPath=path.join(root,'assets/analytics-config.js');
