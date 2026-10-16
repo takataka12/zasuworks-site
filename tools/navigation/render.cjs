@@ -9,12 +9,12 @@ function renderNavigation(route){
  return `<!-- ZW_NAV_START -->
 <header class="zw-header studio-header" data-zw-header>
 <div class="zw-bar"><a class="zw-brand" href="/" aria-label="ZASU WORKS ホーム"><img src="/assets/favicon.svg" alt="" width="40" height="40"><span>ZASU WORKS</span></a>
-<nav class="zw-desktop" data-zw-desktop aria-label="メインナビゲーション">${config.main.map(x=>x[0]==='製品'?group('製品',config.products):link(x)).join('')}${group('活動・サービス',config.activity)}${group('サポート',config.support)}</nav>
+<nav class="zw-desktop" data-zw-desktop aria-label="メインナビゲーション">${config.main.map(x=>link(x)).join('')}</nav>
 <button class="zw-toggle studio-menu" data-zw-toggle type="button" aria-label="メニュー" aria-expanded="false" aria-controls="studio-nav"><span data-zw-label>メニュー</span><span class="zw-toggle-icon" aria-hidden="true"></span></button></div>
 <div class="zw-overlay" data-zw-overlay hidden></div>
 <div id="studio-nav" class="zw-mobile" aria-label="サイトメニュー" hidden>
-<nav aria-label="モバイルナビゲーション"><div class="zw-group zw-primary"><p>メインナビゲーション</p>${config.main.map(x=>link(x)).join('')}</div><div class="zw-group"><p>活動・サービス</p>${config.activity.map(x=>link(x,x[0]==='ZASU MEDIA'?' class="zw-media-link"':'')).join('')}</div><div class="zw-group"><p>サポート</p>${config.support.map(x=>link(x)).join('')}</div></nav></div>
-<noscript><style>.zw-toggle.zw-toggle{display:none!important}</style><details class="zw-nojs"><summary>メニュー</summary><nav aria-label="サイトメニュー">${[...config.main,...config.activity,...config.support].map(x=>link(x)).join('')}</nav></details></noscript>
+<nav aria-label="モバイルナビゲーション"><div class="zw-group zw-primary">${config.main.map(x=>link(x)).join('')}</div></nav></div>
+<noscript><style>.zw-toggle.zw-toggle{display:none!important}</style><details class="zw-nojs"><summary>メニュー</summary><nav aria-label="サイトメニュー">${config.main.map(x=>link(x)).join('')}</nav></details></noscript>
 </header>${localHTML}
 <!-- ZW_NAV_END -->`;
 }

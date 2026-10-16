@@ -18,8 +18,8 @@ for(const width of [320,390,820,1024,1440])test(`buyer can reach support and ret
  await page.goto(origin+'/');
  assert.equal(await page.evaluate(()=>Boolean(document.querySelector('#products').compareDocumentPosition(document.querySelector('#purchase-support')) & Node.DOCUMENT_POSITION_FOLLOWING)),true,'support follows product selection');
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
- if(width<1200){await page.getByRole('button',{name:'メニュー',exact:true}).click();assert.equal(await page.locator('#studio-nav a[href="/support.html"]').isVisible(),true);await page.keyboard.press('Escape');}
- else {await page.locator('[data-zw-desktop] summary').filter({hasText:'サポート'}).click();assert.equal(await page.locator('[data-zw-desktop] a[href="/support.html"]').isVisible(),true);await page.keyboard.press('Escape');}
+ if(width<800){await page.getByRole('button',{name:'メニュー',exact:true}).click();assert.equal(await page.locator('#studio-nav a[href="/support.html"]').isVisible(),true);await page.keyboard.press('Escape');}
+ else {assert.equal(await page.locator('[data-zw-desktop] a[href="/support.html"]').isVisible(),true);await page.keyboard.press('Escape');}
  await page.getByRole('link',{name:'無料導入サポートについて →',exact:true}).click();
  assert.equal(new URL(page.url()).pathname,'/support.html');
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);

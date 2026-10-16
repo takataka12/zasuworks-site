@@ -36,6 +36,9 @@ jobs:
       - name: Build storefront and purchase channel guides
         run: node tools/build-storefront.cjs
 
+      - name: Build simplified software shop
+        run: node tools/build-shop.cjs
+
       - name: Build consent-gated analytics and public route inventory
         run: node tools/build-analytics.cjs
 
@@ -50,6 +53,7 @@ jobs:
 
       - name: Verify homepage routes and responsive layout
         run: |
+          python tools/check-public-links.py
           npm install --prefix /tmp/zasu-home-check playwright@1.56.1
           /tmp/zasu-home-check/node_modules/.bin/playwright install --with-deps chromium
           NODE_PATH=/tmp/zasu-home-check/node_modules CAPTURE_DIR=/tmp/zasu-home-shots node --test tests/*.test.cjs supabase/tests/*.test.mjs
@@ -76,7 +80,7 @@ jobs:
                   html = read_page('/')
                   media = read_page('/media/')
                   reviews = read_page('/media/reviews/')
-                  if 'id="choose-product"' in html and 'navigation.css?v=20261013-nav1' in html and 'data-zw-header' in media and 'studio-home' in html and 'readability.css?v=20261011-r1' in html and 'id="purchase-support"' in html and 'support-promo.css?v=20261012-r2' in html and 'editorial.css?v=20261013-r1' in media and 'id="review-list"' in reviews:
+                  if 'id="choose-product"' in html and 'data-shop-revision="20261017"' in html and 'data-zw-header' in media and 'shop-page' in html and 'shop.css?v=20261017' in html and 'id="purchase-support"' in html and 'id="contact"' in html and 'editorial.css?v=20261013-r1' in media and 'id="review-list"' in reviews:
                       break
               except Exception as error:
                   print(type(error).__name__)

@@ -47,7 +47,7 @@ html{scroll-padding-top:90px}
 .zw-context.zw-context a{display:flex;align-items:center;min-height:34px;color:inherit;text-decoration:none;font-size:12px;font-weight:600;letter-spacing:0;text-transform:none}
 .zw-context.zw-context a:hover{text-decoration:underline}
 @keyframes zw-enter{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
-@media(max-width:1199px){.zw-header .zw-desktop{display:none}.zw-header .zw-toggle{display:flex}}
+@media(max-width:799px){.zw-header .zw-desktop{display:none}.zw-header .zw-toggle{display:flex}}
 @media(max-width:480px){.zw-header .zw-bar{padding:0 18px;gap:12px}.zw-header .zw-brand{font-size:17px;gap:8px}.zw-header .zw-brand img{width:36px;height:36px}.zw-header .zw-mobile{padding-top:20px}.zw-context.zw-context{gap:2px 18px;padding:8px 18px}}
 @media(prefers-reduced-motion:reduce){.zw-header .zw-mobile{animation:none}.zw-header .zw-toggle-icon::before,.zw-header .zw-toggle-icon::after{transition:none}}
 /* Ensure existing skip links remain above the unified sticky header. */
@@ -56,5 +56,7 @@ html{scroll-padding-top:90px}
 .zw-header .zw-nojs summary{padding:8px 14px;border:1px solid #ccc;min-height:44px}
 .zw-header .zw-nojs nav{display:grid;position:absolute;top:58px;right:-24px;width:min(100vw,400px);max-height:calc(100vh - 72px);overflow:auto;background:#fafaf7;border:1px solid #ddd;padding:16px 24px}
 .zw-header .zw-nojs nav a{font-size:15px;min-height:44px;padding:10px 0}
-@media(min-width:1200px){.zw-header .zw-nojs{display:none}}
+@media(min-width:800px){.zw-header .zw-nojs{display:none}}
 .zw-header .zw-toggle [data-zw-label]{font-size:13px;line-height:1.5;font-weight:600}
+
+.zw-header.zw-header .zw-nojs nav{background:#111;color:#f4f4f2}.zw-header.zw-header .zw-nojs nav a{color:#f4f4f2}
