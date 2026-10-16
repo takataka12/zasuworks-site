@@ -5,6 +5,8 @@
 #include <thread>
 #include <iostream>
 #include <stdexcept>
+#include <future>
+#include <memory>
 static void check(bool value,const char* message){if(!value)throw std::runtime_error(message);}
 static void pollingSchedule(){
  using namespace zasu::trial;using namespace std::chrono;
@@ -24,4 +26,27 @@ static void pollingSchedule(){
  check(time==origin&&stopped,"polling cancellation did not interrupt wait");
  std::cout<<"PASS polling deadline, delayed scheduling, early notification and cancellation\n";
 }
-int main(){pollingSchedule();std::atomic<bool> cancelled{false};{zasu::trial::RequestDeadline deadline([&]{cancelled=true;},std::chrono::milliseconds(20));std::this_thread::sleep_for(std::chrono::milliseconds(80));assert(cancelled);}cancelled=false;{zasu::trial::RequestDeadline deadline([&]{cancelled=true;},std::chrono::seconds(1));}assert(!cancelled);zasu::trial::AccessDeadline access;access.set(100);assert(access.active(99));assert(!access.active(100));assert(!access.active(101));}
+static void watchdogLifecycle(){
+ using namespace zasu::trial;using namespace std::chrono;
+ // Synchronize on the callback, not a guess about when a new OS thread runs.
+ std::promise<void> cancelled;auto completion=cancelled.get_future();
+ {RequestDeadline deadline([&]{cancelled.set_value();},milliseconds(20));
+  check(completion.wait_for(seconds(2))==std::future_status::ready,"request watchdog did not cancel");}
+ std::atomic<int> unexpected{0};
+ {RequestDeadline deadline([&]{++unexpected;},hours(1));}
+ check(unexpected==0,"destroyed watchdog invoked cancellation");
+ // Destruction must join an already executing callback before references die.
+ std::promise<void> entered,release;auto started=entered.get_future();
+ auto permit=release.get_future().share();std::atomic<bool> callbackFinished{false};
+ auto deadline=std::make_unique<RequestDeadline>([&]{entered.set_value();permit.wait();callbackFinished=true;},milliseconds(1));
+ if(started.wait_for(seconds(2))!=std::future_status::ready){release.set_value();deadline.reset();check(false,"watchdog callback did not start");}
+ std::promise<void> destroying;auto destructionStarted=destroying.get_future();
+ auto destruction=std::async(std::launch::async,[&]{destroying.set_value();deadline.reset();return callbackFinished.load();});
+ const bool began=destructionStarted.wait_for(seconds(2))==std::future_status::ready;
+ const bool blocked=began&&destruction.wait_for(milliseconds(20))==std::future_status::timeout;
+ release.set_value();
+ const bool joined=destruction.wait_for(seconds(2))==std::future_status::ready;
+ check(began&&blocked&&joined&&destruction.get(),"watchdog destruction did not join callback");
+ std::cout<<"PASS request watchdog completion, early destruction and callback join\n";
+}
+int main(){pollingSchedule();watchdogLifecycle();zasu::trial::AccessDeadline access;access.set(100);check(access.active(99),"access expired early");check(!access.active(100),"access allowed at expiry");check(!access.active(101),"access allowed after expiry");}
