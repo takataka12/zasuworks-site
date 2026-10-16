@@ -45,3 +45,11 @@ Existing real grant remains `2026-10-22 22:27:31 JST`. No clock changes, cache d
 ## Completion rule
 
 Parallels pass requires actual installation, one approval/signature/save, offline/restart restoration, VST3 real audio/AUTO FIX, preset/project roundtrip, protected uninstall and paid migration evidence. Intel/AMD native x64, clean-machine SmartScreen behavior and signed Windows distribution remain separate gates. No flags, production endpoints, sales or ads are changed by this protocol.
+
+## Official architecture/privilege checks (2026-10-16)
+
+The installer uses `ArchitecturesAllowed=x64compatible` and `ArchitecturesInstallIn64BitMode=x64compatible`. Inno's [architecture documentation](https://jrsoftware.org/ishelp/topic_archidentifiers.htm) explicitly includes Windows 11 ARM64 x64 emulation in `x64compatible`; it differs from `x64os`, which would exclude ARM64. No architecture flag change is needed merely to permit Parallels Windows 11 ARM. This is installer eligibility, not evidence of audio performance.
+
+Inno's [PrivilegesRequired documentation](https://jrsoftware.org/ishelp/topic_setup_privilegesrequired.htm) states that `lowest` avoids requesting administrative elevation and selects non-administrative installation mode. The artifact still needs actual standard-user/Windows Settings UX confirmation.
+
+Microsoft's [Windows on Arm emulation documentation](https://learn.microsoft.com/en-us/windows/arm/apps-on-arm-x86-emulation) distinguishes Windows 11 x64 application emulation from driver support: kernel drivers must be ARM64. Do not install an x64-only audio driver into the ARM guest or assume that a Mac audio interface's Windows driver works there. Begin with an already functioning guest audio device; record latency/dropouts separately. No driver installation or paid host purchase is authorized by this test plan.
