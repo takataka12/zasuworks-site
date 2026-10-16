@@ -7,6 +7,7 @@ window.ZASU_ANALYTICS_CONFIG = {
   ],
   "publicPaths": [
     "/about.html",
+    "/audio-status.html",
     "/avatarlive/",
     "/avatarlive/privacy/",
     "/avatarlive/review/",

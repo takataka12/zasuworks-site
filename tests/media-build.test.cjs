@@ -51,3 +51,11 @@ test('build output is current and matches the public manifest',()=>{
  const manifest=JSON.parse(fs.readFileSync(path.join(__dirname,'../media/reviews.json'),'utf8'));
  assert.deepEqual(build(path.join(__dirname,'..'),true),{reviews:manifest.reviews.length,pages:5+manifest.reviews.length});
 });
+test('paused publisher rejects even an otherwise approved new review',()=>{
+ const root=fs.mkdtempSync(path.join(require('node:os').tmpdir(),'media-paused-build-'));
+ try{
+  fs.mkdirSync(path.join(root,'media'));
+  fs.writeFileSync(path.join(root,'media/reviews.json'),JSON.stringify({schemaVersion:1,reviews:[fixture()]}));
+  assert.throws(()=>require(builder).build(root),/ZASU MEDIA is paused/);
+ }finally{fs.rmSync(root,{recursive:true,force:true});}
+});

@@ -43,20 +43,11 @@ test('empty archive has honest state; sample is not a review',async()=>{
  await p.goto(origin+'/media/sample/');assert.ok((await p.locator('main').innerText()).includes('実際のレビューではありません'));
  assert.equal(await p.locator('meta[name="robots"]').getAttribute('content'),'noindex,follow');await p.close();
 });
-test('no-JS pages keep reading and direct contact',async()=>{
+test('no-JS pages keep reading and stop applications',async()=>{
  const ctx=await browser.newContext({javaScriptEnabled:false});const p=await ctx.newPage();
- await p.goto(origin+'/media/');assert.ok(await p.locator('a[href^="mailto:zasuworks@gmail.com"]').count());
+ await p.goto(origin+'/media/');assert.equal(await p.locator('#review-form, #send-mail').count(),0);assert.ok((await p.locator('main').innerText()).includes('新規作品の応募受付およびレビュー掲載は停止中'));
  assert.ok(await p.locator('.hero a[href="/media/reviews/"]').isVisible());
  await p.goto(origin+'/media/stories/hello/');assert.ok(await p.getByRole('heading',{name:/作る側から/}).isVisible());await ctx.close();
-});
-test('application rejects blank names and unsupported URLs without errors',async()=>{
- const p=await browser.newPage();const errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto(origin+'/media/');
- await p.locator('#maker').fill('   ');await p.locator('#product').fill('作品');await p.locator('#url').fill('https://example.com');
- await p.locator('#review-form').evaluate(f=>f.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})));
- assert.equal(await p.locator('#draft').isVisible(),false);
- await p.locator('#maker').fill('作者');await p.locator('#url').fill('javascript:alert(1)');
- await p.locator('#review-form').evaluate(f=>f.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})));
- assert.equal(await p.locator('#draft').isVisible(),false);assert.deepEqual(errors,[]);await p.close();
 });
 test('filters match purpose, category and normalised text using temporary fixtures only',async()=>{
  const {renderArchive}=require('../tools/build-media.cjs');

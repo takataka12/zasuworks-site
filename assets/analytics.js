@@ -16,7 +16,7 @@
     gtag('event',name,{...params(),...extra,send_to:c.measurementId,transport_type:'beacon'});
   }
   function beginClarity(){
-    if(document.querySelector('form,input,textarea,select,[contenteditable]'))return;
+    if(document.querySelector('form,input,textarea,select,[contenteditable],[data-zw-no-recording]'))return;
     if(clarityStarted||!(/^[a-z0-9]{5,24}$/.test(c.clarityProjectId||''))||!core.recordingEligible(location.href,document.referrer,c))return;
     if(window.clarity||document.querySelector('script[src*="clarity.ms/tag/"]'))return;
     // Mask all text, including subsequently inserted forms; retain layout/interaction heatmaps.
