@@ -37,3 +37,11 @@ Standalone stays in its dedicated candidate directory. Removing that dedicated c
 Remaining: actual GUI VST3-host recognition, audio/analysis/AUTO FIX and state/paid migration; Intel Mac; real-host rates/automation/presets; clean-user downloaded/quarantined first launch; Logic expiry with a distinct test OS account and ephemeral-key fixture AU. Never change the real grant ending 2026-10-22 22:27:31 JST, system clock or real cache. No GUI expiry fixture build has yet been delivered; numerical isolated expiry success alone cannot complete that gate.
 
 Only approve a public candidate after production configuration is separately frozen, the current artifact passes hardware/distribution gates and the operator explicitly authorizes release. PR #6/#9 remain draft/unmerged, all public flags remain false and sales/advertising are unchanged.
+
+
+## CI preparation completed after this protocol was written
+
+Source `1fd2f21bdac256abf5535b65b25ddd46d843fc3c` now has a successful [actual Universal Release preparation build](https://github.com/takataka12/zasu-daw/actions/runs/38851946359). AU/VST3/Standalone and paid/trial processor tests passed. [Independent downloaded-artifact verification](zasu-trial-mac-staging-verification-2026-10-16.json) confirms both slices, compiled key/endpoints, main-binary minimum OS 11.0.0 and file hashes. This completes the unsigned/ad-hoc CI preparation boundary only: no latest-source Developer ID/notarization/staple/DMG/hardware gate is completed by it.
+
+
+The existing CI signing references were checked by a separate presence-only diagnostic workflow: all five app/notary settings were unavailable. Therefore the Developer ID / Apple notarization steps are blocked on the existing local Keychain, not merely omitted by choice. No private credential export is requested. See the [distribution evidence](zasu-trial-distribution-qa-2026-10-16.md#apple-signing-availability-was-checked-not-assumed).

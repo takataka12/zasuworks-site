@@ -1,0 +1,44 @@
+{
+  "sourceCommit": "1fd2f21bdac256abf5535b65b25ddd46d843fc3c",
+  "zipSha256": "9946e28607e5f30b8849495264094d5c57535f7effd970bc19db777937ad3f35",
+  "publicKeySha256": "27fec33eb59362eaa51bcb7c0d178a1264d60a4a35e90f151f1a9a178c124b8d",
+  "configuration": "Release",
+  "environment": "staging",
+  "publicRelease": false,
+  "products": [
+    {
+      "format": "AU",
+      "bundleIdentifier": "jp.zasuworks.ZASUVOCAL",
+      "binarySha256": "93857cf82a8b8258fcc0fe05f735bd149c763d4e265edc45bd3c6b077c52f10b",
+      "sliceMinimumOS": {
+        "0x1000007": "11.0.0",
+        "0x100000c": "11.0.0"
+      },
+      "compiledKeyAndEndpointsMatch": true
+    },
+    {
+      "format": "VST3",
+      "bundleIdentifier": "jp.zasuworks.ZASUVOCAL",
+      "binarySha256": "32eda1718b3bb5a78427c5a8f12cfeccc4eaf2b543636d3dede63b8c57276f79",
+      "sliceMinimumOS": {
+        "0x1000007": "11.0.0",
+        "0x100000c": "11.0.0"
+      },
+      "compiledKeyAndEndpointsMatch": true
+    },
+    {
+      "format": "Standalone",
+      "bundleIdentifier": "jp.zasuworks.ZASUVOCAL",
+      "binarySha256": "ecbc6e47ecdac3fbb137edc4e345549aac2e0f3bc3a200c5fa1b34d66aa10212",
+      "sliceMinimumOS": {
+        "0x1000007": "11.0.0",
+        "0x100000c": "11.0.0"
+      },
+      "compiledKeyAndEndpointsMatch": true
+    }
+  ],
+  "developerId": "NOT RUN",
+  "notarization": "NOT RUN",
+  "staple": "NOT RUN",
+  "hardware": "NOT RUN"
+}
