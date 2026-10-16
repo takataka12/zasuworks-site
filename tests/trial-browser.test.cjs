@@ -3,6 +3,21 @@ let browser,server,origin;
 before(async()=>{server=http.createServer(async(req,res)=>{const p=path.resolve(__dirname,'..','.'+req.url.split('?')[0]+(req.url.split('?')[0].endsWith('/')?'index.html':''));try{const b=await fs.readFile(p);res.setHeader('content-type',p.endsWith('.mjs')?'text/javascript':p.endsWith('.css')?'text/css':'text/html');res.end(b);}catch{res.writeHead(404).end();}});await new Promise(r=>server.listen(0,'127.0.0.1',r));origin='http://127.0.0.1:'+server.address().port;browser=await chromium.launch({headless:true,args:['--no-sandbox'],executablePath:process.env.CHROME_PATH});});
 after(async()=>{await browser?.close();await new Promise(r=>server.close(r));});
 const rid='11111111-aaaa-4111-8111-111111111111';
+test('navigation waits for initial account validation and cannot be overwritten by its late response',async()=>{
+ const {page,errors}=await setup();page.setDefaultTimeout(2500);let held,response;
+ const waiting=new Promise(resolve=>held=resolve);
+ await page.route('https://siwmzradvrtetotakkbi.supabase.co/**',async route=>{
+  if(route.request().method()==='OPTIONS')return route.fallback();const body=route.request().postDataJSON();
+  if(body.action!=='me')return route.fallback();response=route;held();
+ });
+ await page.addInitScript(()=>sessionStorage.setItem('zasu.account.session.v1',JSON.stringify({access_token:'test',refresh_token:'test',expires_at:Date.now()/1000+3600})));
+ await page.goto(origin+'/account/');await waiting;
+ assert.equal(await page.locator('#account-nav').isVisible(),false,'navigation must not race unvalidated account response');
+ await response.fulfill({status:200,headers:{'access-control-allow-origin':origin,'content-type':'application/json'},body:JSON.stringify({user:{id:rid,email:'test@example.invalid'},profile:{display_name:'Trial user',locale:'ja',created_at:'2026-10-15T00:00:00Z'},purchasesIntegrated:false})});
+ await page.getByRole('button',{name:'アカウント設定',exact:true}).click();
+ await page.getByLabel('アカウント停止の説明を確認した').waitFor({state:'visible'});
+ assert.deepEqual(errors,[]);await page.close();
+});
 test('cancel before login clears trial continuation without sending or approving anything',async()=>{
  const {page,actions,errors}=await setup(390,true);page.setDefaultTimeout(2000);
  await page.goto(origin+'/account/#trial_request='+rid);
