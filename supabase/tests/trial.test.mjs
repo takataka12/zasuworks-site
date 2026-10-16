@@ -14,4 +14,19 @@ test('limits run before public database work; errors reveal no secrets',async()=
 test('oversized bodies and invalid JSON fail safely',async()=>{assert.equal((await setup()(request({x:'a'.repeat(9000)}))).status,413);assert.equal((await setup()(new Request('https://a.invalid',{method:'POST',headers:{origin,'content-type':'application/json'},body:'{'}))).status,400);});
 test('RSA license binds product, entitlement, algorithm and exact expiry',async()=>{const keys=await crypto.subtle.generateKey({name:'RSASSA-PKCS1-v1_5',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['sign','verify']);const privateJwk=await crypto.subtle.exportKey('jwk',keys.privateKey),pub=await crypto.subtle.exportKey('jwk',keys.publicKey);const sign=await createSigner(privateJwk);const t=1800000000,claims={iss:'zasu-trial',aud:'vocal',kind:'trial',v:1,jti:id,iat:t,nbf:t,exp:t+604800};const license=await sign(claims);assert.deepEqual(await verifyLicense(license,pub,'vocal',t),claims);assert.equal(await verifyLicense(license,pub,'loud',t),null);assert.equal(await verifyLicense(license,pub,'vocal',t+604800),null);assert.equal(await verifyLicense(license+'x',pub,'vocal',t),null);const parts=license.split('.');parts[1]=parts[1].slice(0,-4)+'AAAA';assert.equal(await verifyLicense(parts.join('.'),pub,'vocal',t),null);assert.equal(await verifyLicense(license,pub,'vocal',t-1),null);});
 test('missing signing key fails closed',async()=>{await assert.rejects(()=>createSigner(null));});
+test('all five products accept only their own signed 168-hour license',async()=>{
+ const products=['vocal','loud','finish','vocal_editor','daw'];
+ const keys=await crypto.subtle.generateKey({name:'RSASSA-PKCS1-v1_5',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['sign','verify']);
+ const pub=await crypto.subtle.exportKey('jwk',keys.publicKey),sign=await createSigner(await crypto.subtle.exportKey('jwk',keys.privateKey));
+ const t=1800000000;
+ for(const product of products){
+  const claims={iss:'zasu-trial',aud:product,kind:'trial',v:1,jti:id,iat:t,nbf:t,exp:t+604800},license=await sign(claims);
+  assert.equal((await setup()(request({action:'begin',product,platform:'win',challenge:'a'.repeat(43)},null,null))).status,200);
+  for(const audience of products)assert.deepEqual(await verifyLicense(license,pub,audience,t),audience===product?claims:null,product+' license audience '+audience);
+  assert.deepEqual(await verifyLicense(license,pub,product,t+604799),claims);
+  assert.equal(await verifyLicense(license,pub,product,t+604800),null);
+  assert.equal(await verifyLicense(license,pub,product,t-1),null);
+  assert.equal(await verifyLicense(license+'x',pub,product,t),null);
+ }
+});
 test('PKCE uses RFC S256 base64url',async()=>{assert.equal(await sha256('dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'),'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM');});
