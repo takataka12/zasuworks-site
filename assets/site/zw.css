@@ -1,5 +1,6 @@
 /* ZASU WORKS site v2 — one stylesheet for all generated pages.
    Palette is taken from the products' own UIs: dark console panels, green = in tune, amber = off pitch. */
+@font-face{font-family:"Archivo";src:url("/assets/site/fonts/archivo-wide-800.woff") format("woff");font-weight:800;font-stretch:112% 125%;font-style:normal;font-display:swap}
 :root{
   --paper:#F3F4F2; --paper-2:#E9EBE7; --card:#FFFFFF;
   --ink:#1E2421; --ink-2:#4A524E; --ink-3:#626A66;
