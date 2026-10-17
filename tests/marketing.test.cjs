@@ -31,13 +31,14 @@ for (const width of [375, 390, 768, 1440]) {
     page.on('pageerror', e => errors.push(e.message));
     await page.goto(origin+'/zasu-daw/');
     await page.evaluate(() => document.fonts.ready);
-    assert.match(await page.locator('h1').innerText(), /ZASU DAW v1\.4 正式版/);
-    const hero = page.locator('.hero');
+    assert.match(await page.locator('h1').innerText(), /ZASU DAW/);
+    assert.match(await page.locator('.p-kind').innerText(), /v1\.4 正式版/);
+    const hero = page.locator('.p-hero');
     assert.match(await hero.innerText(), /FOUNDING USER/);
     assert.match(await hero.innerText(), /1,980/);
     assert.match(await hero.innerText(), /先着10名/);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'no horizontal overflow');
-    assert.ok(await page.locator('#pricing .price').evaluate(e=>parseFloat(getComputedStyle(e).fontSize)>=56), 'pricing amount remains a prominent headline');
+    assert.ok(await page.locator('#pricing .price .amount').evaluate(e=>parseFloat(getComputedStyle(e).fontSize)>=34), 'pricing amount remains prominent');
     for (const cta of await page.locator('[data-checkout]').all()) {
       assert.equal(await cta.getAttribute('href'), 'https://square.link/u/M3YGTWd8');
       assert.equal(await cta.getAttribute('aria-disabled'), 'false');
@@ -49,13 +50,11 @@ for (const width of [375, 390, 768, 1440]) {
       await page.screenshot({path:resolve(process.env.CAPTURE_DIR,`marketing-${width}.png`)});
       if(width===390 || width===1440) await page.screenshot({path:resolve(process.env.CAPTURE_DIR,`marketing-${width}-full.png`),fullPage:true});
     }
-    await page.locator('[data-image="assets/pitch-editor-v14.png"]').first().click();
-    assert.equal(await page.locator('#image-dialog').evaluate(e=>e.open), true);
-    assert.ok(await page.locator('#expanded-image').evaluate(e=>e.complete && e.naturalWidth>0));
-    await page.keyboard.press('Escape');
-    assert.equal(await page.locator('#image-dialog').evaluate(e=>e.open), false);
-    assert.equal(await page.getByRole('link',{name:'公式LINEで相談する',exact:true}).first().getAttribute('href'), 'https://line.me/R/ti/p/@860wogaj');
-    assert.equal(await page.getByRole('link',{name:'実際にZASU DAWが動いているところを見る',exact:true}).getAttribute('href'), 'https://youtu.be/yAD6oBCpNwU');
+    // Site v2: screenshots open the full image directly (works without JavaScript).
+    const full = await page.locator('#pitch-editor a').first().getAttribute('href');
+    assert.equal((await page.request.get(origin+full)).status(), 200);
+    assert.equal(await page.getByRole('link',{name:/^公式LINEで相談する/}).first().getAttribute('href'), 'https://line.me/R/ti/p/@860wogaj');
+    assert.equal(await page.getByRole('link',{name:/^実際にZASU DAWが動いているところを見る/}).getAttribute('href'), 'https://youtu.be/yAD6oBCpNwU');
     await page.getByRole('link',{name:'購入済みの方：更新・再ダウンロード',exact:true}).first().click();
     assert.equal(new URL(page.url()).pathname, '/zasu-daw/download/');
     assert.equal(await page.locator('#download-mac').getAttribute('href'), null);

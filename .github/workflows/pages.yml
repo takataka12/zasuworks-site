@@ -27,17 +27,11 @@ jobs:
       - name: Build ZASU MEDIA editorial pages
         run: node tools/build-media.cjs
 
+      - name: Build site v2 pages from the product catalog
+        run: node tools/build-site.cjs
+
       - name: Build shared site navigation
         run: node tools/build-navigation.cjs
-
-      - name: Build product selection guides
-        run: node tools/build-product-guide.cjs
-
-      - name: Build storefront and purchase channel guides
-        run: node tools/build-storefront.cjs
-
-      - name: Build simplified software shop
-        run: node tools/build-shop.cjs
 
       - name: Build consent-gated analytics and public route inventory
         run: node tools/build-analytics.cjs
@@ -80,7 +74,7 @@ jobs:
                   html = read_page('/')
                   media = read_page('/media/')
                   reviews = read_page('/media/reviews/')
-                  if 'id="choose-product"' in html and 'data-shop-revision="20261017"' in html and 'data-zw-header' in media and 'shop-page' in html and 'shop.css?v=20261017' in html and 'id="purchase-support"' in html and 'id="contact"' in html and 'editorial.css?v=20261013-r1' in media and 'id="review-list"' in reviews:
+                  if 'id="choose-product"' in html and 'data-site="v2"' in html and 'data-zw-header' in media and 'zw.css?v=20261017-v2' in html and 'id="purchase-support"' in html and 'id="contact"' in html and 'editorial.css?v=20261013-r1' in media and 'id="review-list"' in reviews:
                       break
               except Exception as error:
                   print(type(error).__name__)
@@ -88,7 +82,7 @@ jobs:
           else:
               raise SystemExit('Published studio homepage or ZASU MEDIA has not propagated yet')
           PYCODE
-          NODE_PATH=/tmp/zasu-home-check/node_modules SITE_URL=https://zasuworks.jp CAPTURE_DIR=/tmp/zasu-home-shots/production node --test tests/home.test.cjs tests/account-ui.test.cjs tests/support.test.cjs tests/media.test.cjs tests/media-editorial.test.cjs tests/navigation.test.cjs tests/product-guide.test.cjs
+          NODE_PATH=/tmp/zasu-home-check/node_modules SITE_URL=https://zasuworks.jp CAPTURE_DIR=/tmp/zasu-home-shots/production node --test tests/site-v2.test.cjs tests/account-ui.test.cjs tests/media.test.cjs tests/media-editorial.test.cjs tests/navigation.test.cjs
 
       - name: Save homepage screenshots
         if: always()

@@ -1,49 +1,49 @@
 /* Scoped site navigation. Keep legacy product, checkout and editorial styles isolated. */
 html{scroll-padding-top:90px}
-.zw-header.zw-header{position:sticky;inset:0 0 auto;top:0;display:block;width:100%;height:72px;min-height:72px;margin:0;padding:0;border:0;border-bottom:1px solid #ddd;background:#fafaf7;color:#141414;z-index:110;backdrop-filter:none;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;box-sizing:border-box;line-height:1.5;isolation:isolate}
+.zw-header.zw-header{position:sticky;inset:0 0 auto;top:0;display:block;width:100%;height:72px;min-height:72px;margin:0;padding:0;border:0;border-bottom:1px solid #D6DAD7;background:#F3F4F2;color:#1E2421;z-index:110;backdrop-filter:none;font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI",Meiryo,system-ui,sans-serif;box-sizing:border-box;line-height:1.5;isolation:isolate}
 .zw-header *,.zw-context,.zw-context *{box-sizing:border-box}
 .zw-header .zw-bar{width:min(1440px,100%);height:71px;margin:auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between;gap:28px}
-.zw-header a{color:#141414;text-decoration:none;text-transform:none;letter-spacing:0;font-weight:600}
+.zw-header a{color:#1E2421;text-decoration:none;text-transform:none;letter-spacing:0;font-weight:600}
 /* Product pages redefine --ink to a light color. Keep the unified light navigation readable. */
-.studio-page .zw-header.zw-header a{color:#141414}
+.studio-page .zw-header.zw-header a{color:#1E2421}
 .zw-header .zw-brand{display:flex;align-items:center;flex-shrink:0;gap:10px;font-size:19px;line-height:1;letter-spacing:-.5px;font-weight:850;white-space:nowrap}
 .zw-header .zw-brand img{display:block;width:40px;height:40px;max-width:none;border:0;border-radius:0;object-fit:contain}
 .zw-header .zw-brand span{color:inherit;font-weight:850;font-size:inherit}
 .zw-header .zw-desktop{display:flex;align-items:center;gap:20px;margin:0;padding:0}
 .zw-header .zw-desktop>a,.zw-header summary{font-size:13px;min-height:44px;display:flex;align-items:center;gap:6px;white-space:nowrap;padding:0;cursor:pointer}
 .zw-header a[aria-current],.zw-header summary[data-active]{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:7px}
-.zw-header a:hover{color:#666}
-.zw-header a:focus-visible,.zw-header button:focus-visible,.zw-header summary:focus-visible,.zw-context a:focus-visible{outline:2px solid #141414;outline-offset:4px}
+.zw-header a:hover{color:#0A6A49}
+.zw-header a:focus-visible,.zw-header button:focus-visible,.zw-header summary:focus-visible,.zw-context a:focus-visible{outline:2px solid #1E2421;outline-offset:4px}
 .zw-header .zw-dropdown{position:relative;margin:0;padding:0;border:0;background:none;color:inherit}
 .zw-header summary{list-style:none;border:0;font-weight:600;background:none;line-height:1.5}
 .zw-header summary::-webkit-details-marker{display:none}
 .zw-header summary::after{content:none}
 .zw-header summary span{font-size:16px}
 .zw-header details[open] summary span{transform:rotate(180deg)}
-.zw-header .zw-dropdown-panel{position:absolute;top:calc(100% + 13px);right:0;width:240px;padding:10px;background:#fafaf7;border:1px solid #ddd;box-shadow:0 12px 32px #00000012}
+.zw-header .zw-dropdown-panel{position:absolute;top:calc(100% + 13px);right:0;width:240px;padding:10px;background:#F3F4F2;border:1px solid #D6DAD7;box-shadow:0 12px 32px #00000012}
 .zw-header .zw-dropdown-panel a{display:block;font-size:14px;line-height:1.5;padding:12px;min-height:44px}
-.zw-header .zw-account{border:1px solid #141414;padding:10px 14px!important;font-size:12px!important;justify-content:center;display:flex;align-items:center;min-height:44px}
-.zw-header .zw-toggle{display:none;background:transparent;color:#141414;border:1px solid #c8c8c4;border-radius:0;min-height:44px;min-width:106px;padding:10px 12px;font-family:inherit;font-size:13px;font-weight:600;line-height:1.5;align-items:center;justify-content:space-between;gap:14px;cursor:pointer}
+.zw-header .zw-account{border:1px solid #1E2421;padding:10px 14px!important;font-size:12px!important;justify-content:center;display:flex;align-items:center;min-height:44px}
+.zw-header .zw-toggle{display:none;background:transparent;color:#1E2421;border:1px solid #C2C8C4;border-radius:0;min-height:44px;min-width:106px;padding:10px 12px;font-family:inherit;font-size:13px;font-weight:600;line-height:1.5;align-items:center;justify-content:space-between;gap:14px;cursor:pointer}
 .zw-header .zw-toggle-icon{display:block;width:16px;height:16px;position:relative}
 .zw-header .zw-toggle-icon::before,.zw-header .zw-toggle-icon::after{content:"";position:absolute;left:0;top:7px;width:16px;height:1px;background:currentColor;transition:transform .2s}
 .zw-header .zw-toggle-icon::after{transform:rotate(90deg)}
 .zw-header .zw-toggle[aria-expanded="true"] .zw-toggle-icon::before{transform:rotate(45deg)}
 .zw-header .zw-toggle[aria-expanded="true"] .zw-toggle-icon::after{transform:rotate(-45deg)}
 .zw-header [hidden]{display:none!important}
-.zw-header .zw-mobile{position:fixed;inset:72px 0 auto;max-height:calc(100vh - 72px);height:calc(100dvh - 72px);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:#fafaf7;color:#141414;z-index:2;padding:24px max(24px,env(safe-area-inset-right)) max(32px,env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left));animation:zw-enter .2s ease-out}
+.zw-header .zw-mobile{position:fixed;inset:72px 0 auto;max-height:calc(100vh - 72px);height:calc(100dvh - 72px);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:#F3F4F2;color:#1E2421;z-index:2;padding:24px max(24px,env(safe-area-inset-right)) max(32px,env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left));animation:zw-enter .2s ease-out}
 .zw-header .zw-mobile nav{display:block;max-width:680px;margin:auto;padding:0}
-.zw-header .zw-group{display:grid;grid-template-columns:1fr 1fr;gap:0 20px;padding:20px 0;border-top:1px solid #dededa}
+.zw-header .zw-group{display:grid;grid-template-columns:1fr 1fr;gap:0 20px;padding:20px 0;border-top:1px solid #D6DAD7}
 .zw-header .zw-group:first-child{padding-top:0;border-top:0}
-.zw-header .zw-group p{grid-column:1/-1;margin:0 0 10px;font-size:11px;font-weight:500;letter-spacing:.08em;color:#72726c;line-height:1.5}
+.zw-header .zw-group p{grid-column:1/-1;margin:0 0 10px;font-size:11px;font-weight:500;letter-spacing:.08em;color:#6B736F;line-height:1.5}
 .zw-header .zw-group a{display:flex;align-items:center;min-height:46px;padding:10px 0;font-size:14px;line-height:1.6}
 .zw-header .zw-primary{grid-template-columns:1fr}
 .zw-header .zw-primary a{font-size:20px;letter-spacing:-.4px;font-weight:700;min-height:48px}
 .zw-header .zw-media-link{font-weight:800!important}
 .zw-header .zw-account-group{grid-template-columns:1fr}
 .zw-header .zw-account-group .zw-account{justify-content:space-between;font-size:15px!important;padding:14px 18px!important}
-.zw-header .zw-account-group small{font-size:11px;color:#72726c;margin-top:9px}
+.zw-header .zw-account-group small{font-size:11px;color:#6B736F;margin-top:9px}
 .zw-header .zw-overlay{position:fixed;inset:72px 0 0;background:#0004;z-index:1}
-.zw-context.zw-context{display:flex;position:relative;align-items:center;gap:22px;flex-wrap:wrap;width:100%;margin:0;padding:10px max(24px,calc((100vw - 1184px)/2));border-bottom:1px solid #ddd;background:#f2f2ee;color:#141414;font-family:-apple-system,BlinkMacSystemFont,Meiryo,sans-serif;font-size:12px;line-height:1.5}
+.zw-context.zw-context{display:flex;position:relative;align-items:center;gap:22px;flex-wrap:wrap;width:100%;margin:0;padding:10px max(24px,calc((100vw - 1184px)/2));border-bottom:1px solid #D6DAD7;background:#E9EBE7;color:#1E2421;font-family:-apple-system,BlinkMacSystemFont,Meiryo,sans-serif;font-size:12px;line-height:1.5}
 .zw-context.zw-context a{display:flex;align-items:center;min-height:34px;color:inherit;text-decoration:none;font-size:12px;font-weight:600;letter-spacing:0;text-transform:none}
 .zw-context.zw-context a:hover{text-decoration:underline}
 @keyframes zw-enter{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
@@ -52,11 +52,19 @@ html{scroll-padding-top:90px}
 @media(prefers-reduced-motion:reduce){.zw-header .zw-mobile{animation:none}.zw-header .zw-toggle-icon::before,.zw-header .zw-toggle-icon::after{transition:none}}
 /* Ensure existing skip links remain above the unified sticky header. */
 .studio-skip:focus,.skip:focus{z-index:120}
-.zw-header .zw-nojs{position:absolute;right:24px;top:14px;margin:0;border:0;padding:0;background:#fafaf7}
+.zw-header .zw-nojs{position:absolute;right:24px;top:14px;margin:0;border:0;padding:0;background:#F3F4F2}
 .zw-header .zw-nojs summary{padding:8px 14px;border:1px solid #ccc;min-height:44px}
-.zw-header .zw-nojs nav{display:grid;position:absolute;top:58px;right:-24px;width:min(100vw,400px);max-height:calc(100vh - 72px);overflow:auto;background:#fafaf7;border:1px solid #ddd;padding:16px 24px}
+.zw-header .zw-nojs nav{display:grid;position:absolute;top:58px;right:-24px;width:min(100vw,400px);max-height:calc(100vh - 72px);overflow:auto;background:#F3F4F2;border:1px solid #D6DAD7;padding:16px 24px}
 .zw-header .zw-nojs nav a{font-size:15px;min-height:44px;padding:10px 0}
 @media(min-width:800px){.zw-header .zw-nojs{display:none}}
 .zw-header .zw-toggle [data-zw-label]{font-size:13px;line-height:1.5;font-weight:600}
 
 .zw-header.zw-header .zw-nojs nav{background:#111;color:#f4f4f2}.zw-header.zw-header .zw-nojs nav a{color:#f4f4f2}
+
+/* Site v2 brand: wordmark set like a hardware label; works without the web font on legacy pages. */
+.zw-header .zw-brand span{font-family:"Archivo","Hiragino Sans",system-ui,sans-serif;font-stretch:125%;font-weight:800;letter-spacing:.01em;font-size:17px}
+.zw-header .zw-brand img{width:32px;height:32px}
+.zw-header .zw-desktop{gap:28px}
+.zw-header .zw-desktop>a{font-size:14px}
+.zw-header a[aria-current],.zw-header summary[data-active]{text-decoration-color:#0E8A5F}
+.zw-header a:focus-visible,.zw-header button:focus-visible{outline-color:#0E8A5F}
