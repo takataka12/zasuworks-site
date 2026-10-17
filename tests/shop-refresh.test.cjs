@@ -4,11 +4,11 @@ const {renderNavigation}=require('../tools/navigation/render.cjs');
 test('shop navigation offers only products, buyer support and contact',()=>{
  const nav=renderNavigation('/');
  assert.doesNotMatch(nav,/href="(?:\/media\/|\/radio.html|\/crowdfunding.html|\/services.html|\/account\/|https:\/\/zasumaster.com)/);
- for(const text of ['製品一覧','購入者サポート','お問い合わせ'])assert.ok(nav.includes(text));
+ for(const text of ['製品','サポート','お問い合わせ'])assert.ok(nav.includes(text));
 });
 test('homepage leads with real VOCAL screen and retains bundle purchase and all buyer routes',()=>{
- const h=fs.readFileSync('index.html','utf8');assert.match(h,/data-shop-revision="20261017"/);
- assert.ok(h.indexOf('logic-pro-v1.0.0.jpg')<h.indexOf('id="vocal-loud-set"'));
+ const h=fs.readFileSync('index.html','utf8');assert.match(h,/data-site="v2"/);
+ assert.ok(h.indexOf('vocal-logic-')<h.indexOf('id="vocal-loud-set"'));
  for(const key of ['loud','finish','vocal-editor','daw'])assert.ok(h.includes(`data-product="${key}"`));
  assert.doesNotMatch(h,/href="(?:\/services.html|\/crowdfunding.html|\/radio.html|\/media\/|\/audio-status.html|\/account\/)/);
  assert.match(h,/id="bundle-checkout"[^>]*KCX5YJTJVCYOP6RC4AFYRQ5X/);

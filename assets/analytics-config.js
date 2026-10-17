@@ -26,6 +26,7 @@ window.ZASU_ANALYTICS_CONFIG = {
     "/sales.html",
     "/services.html",
     "/support.html",
+    "/vocal-loud-set/",
     "/zasu-daw/",
     "/zasu-daw/terms.html",
     "/zasu-daw/tokushoho.html",

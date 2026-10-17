@@ -27,7 +27,9 @@ test('no Google requests without consent; one pageview and view_item on acceptan
  assert.equal(await page.locator('[data-zw-analytics-choice]').count(),2);assert.equal(requests.length,0);assert.deepEqual(await events(page),[]);
  await page.getByRole('button',{name:'解析を許可する',exact:true}).click();
  await page.waitForFunction(()=>window.dataLayer?.some(a=>a[0]==='event'&&a[1]==='page_view'));
- assert.equal(requests.length,1);const es=await events(page);assert.deepEqual(es.map(e=>e.name),['page_view','view_item']);
+ assert.equal(requests.length,1);const es=await events(page);
+ // Site v2 shows the price in the first screen, so view_price may follow immediately; never purchase.
+ assert.deepEqual(es.map(e=>e.name).slice(0,2),['page_view','view_item']);assert.ok(es.every(e=>['page_view','view_item','view_price'].includes(e.name)));
  assert.ok(es[0].params.page_location.includes('utm_source=x'));assert.ok(!JSON.stringify(es).includes('alice'));assert.ok(!JSON.stringify(es).includes('secret'));
  await page.addScriptTag({url:origin+'/assets/analytics.js'});assert.equal((await events(page)).filter(e=>e.name==='page_view').length,1);
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await context.close();
@@ -50,6 +52,7 @@ test('reject and withdraw prevent later events and clear analytics cookies',asyn
  await page.getByRole('button',{name:'許可しない',exact:true}).click();assert.equal(requests.length,0);
  await page.getByRole('button',{name:'アクセス解析の設定',exact:true}).click();await page.getByRole('button',{name:'解析を許可する',exact:true}).click();
  await page.evaluate(()=>{document.cookie='_ga=TEST;path=/';document.addEventListener('click',e=>e.preventDefault());});
+ await page.waitForTimeout(400); // let already-visible price observers report while consent is still granted
  const count=(await events(page)).length;await page.getByRole('button',{name:'アクセス解析の設定',exact:true}).click();await page.getByRole('button',{name:'許可しない',exact:true}).click();await page.locator('a.checkout').first().click();
  assert.equal((await events(page)).length,count);assert.ok(!(await context.cookies()).some(c=>c.name==='_ga'));await context.close();
 });
