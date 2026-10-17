@@ -2,9 +2,9 @@
    Palette is taken from the products' own UIs: dark console panels, green = in tune, amber = off pitch. */
 :root{
   --paper:#F3F4F2; --paper-2:#E9EBE7; --card:#FFFFFF;
-  --ink:#1E2421; --ink-2:#4A524E; --ink-3:#6B736F;
+  --ink:#1E2421; --ink-2:#4A524E; --ink-3:#626A66;
   --line:#D6DAD7;
-  --signal:#0E8A5F; --signal-ink:#0A6A49; --phosphor:#3DDC97; --amber:#E8A33A;
+  --signal:#0B7D55; --signal-ink:#0A6A49; --phosphor:#3DDC97; --amber:#E8A33A;
   --console:#141917; --console-2:#1D2421; --console-ink:#E4EAE6; --console-ink-2:#A7B2AC; --console-line:#2C3531;
   --wide:"Archivo","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
   --jp:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI","Yu Gothic",Meiryo,system-ui,sans-serif;

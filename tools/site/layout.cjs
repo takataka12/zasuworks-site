@@ -95,7 +95,7 @@ function page({ route, title, description, body, ogImage = '/assets/site/img/og-
 <link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <script>document.documentElement.className=matchMedia('(prefers-reduced-motion: reduce)').matches?'js reduced':'js'</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112..125,800&amp;display=swap">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112..125,800&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112..125,800&amp;display=swap"></noscript>
 <link rel="stylesheet" href="/assets/site/zw.css?v=${VERSION}">
 <link rel="stylesheet" href="/assets/navigation.css?v=${navConfig.version}"><script src="/assets/navigation.js?v=${navConfig.version}" defer></script>
 ${duo ? '<script defer src="/assets/duo-release.js"></script><script defer src="/assets/offer-display.js?v=20261013-p1"></script>\n' : ''}${headExtra}<script type="application/ld+json">${JSON.stringify(ld.length === 1 ? ld[0] : ld).replace(/</g, '\\u003c')}</script>

@@ -34,14 +34,14 @@ html{scroll-padding-top:90px}
 .zw-header .zw-mobile nav{display:block;max-width:680px;margin:auto;padding:0}
 .zw-header .zw-group{display:grid;grid-template-columns:1fr 1fr;gap:0 20px;padding:20px 0;border-top:1px solid #D6DAD7}
 .zw-header .zw-group:first-child{padding-top:0;border-top:0}
-.zw-header .zw-group p{grid-column:1/-1;margin:0 0 10px;font-size:11px;font-weight:500;letter-spacing:.08em;color:#6B736F;line-height:1.5}
+.zw-header .zw-group p{grid-column:1/-1;margin:0 0 10px;font-size:11px;font-weight:500;letter-spacing:.08em;color:#626A66;line-height:1.5}
 .zw-header .zw-group a{display:flex;align-items:center;min-height:46px;padding:10px 0;font-size:14px;line-height:1.6}
 .zw-header .zw-primary{grid-template-columns:1fr}
 .zw-header .zw-primary a{font-size:20px;letter-spacing:-.4px;font-weight:700;min-height:48px}
 .zw-header .zw-media-link{font-weight:800!important}
 .zw-header .zw-account-group{grid-template-columns:1fr}
 .zw-header .zw-account-group .zw-account{justify-content:space-between;font-size:15px!important;padding:14px 18px!important}
-.zw-header .zw-account-group small{font-size:11px;color:#6B736F;margin-top:9px}
+.zw-header .zw-account-group small{font-size:11px;color:#626A66;margin-top:9px}
 .zw-header .zw-overlay{position:fixed;inset:72px 0 0;background:#0004;z-index:1}
 .zw-context.zw-context{display:flex;position:relative;align-items:center;gap:22px;flex-wrap:wrap;width:100%;margin:0;padding:10px max(24px,calc((100vw - 1184px)/2));border-bottom:1px solid #D6DAD7;background:#E9EBE7;color:#1E2421;font-family:-apple-system,BlinkMacSystemFont,Meiryo,sans-serif;font-size:12px;line-height:1.5}
 .zw-context.zw-context a{display:flex;align-items:center;min-height:34px;color:inherit;text-decoration:none;font-size:12px;font-weight:600;letter-spacing:0;text-transform:none}
@@ -66,5 +66,5 @@ html{scroll-padding-top:90px}
 .zw-header .zw-brand img{width:32px;height:32px}
 .zw-header .zw-desktop{gap:28px}
 .zw-header .zw-desktop>a{font-size:14px}
-.zw-header a[aria-current],.zw-header summary[data-active]{text-decoration-color:#0E8A5F}
-.zw-header a:focus-visible,.zw-header button:focus-visible{outline-color:#0E8A5F}
+.zw-header a[aria-current],.zw-header summary[data-active]{text-decoration-color:#0B7D55}
+.zw-header a:focus-visible,.zw-header button:focus-visible{outline-color:#0B7D55}
