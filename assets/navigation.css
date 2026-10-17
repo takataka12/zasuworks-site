@@ -1,3 +1,4 @@
+@font-face{font-family:"Archivo";src:url("/assets/site/fonts/archivo-wide-800.woff") format("woff");font-weight:800;font-stretch:112% 125%;font-style:normal;font-display:swap}
 /* Scoped site navigation. Keep legacy product, checkout and editorial styles isolated. */
 html{scroll-padding-top:90px}
 .zw-header.zw-header{position:sticky;inset:0 0 auto;top:0;display:block;width:100%;height:72px;min-height:72px;margin:0;padding:0;border:0;border-bottom:1px solid #D6DAD7;background:#F3F4F2;color:#1E2421;z-index:110;backdrop-filter:none;font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI",Meiryo,system-ui,sans-serif;box-sizing:border-box;line-height:1.5;isolation:isolate}
@@ -68,3 +69,16 @@ html{scroll-padding-top:90px}
 .zw-header .zw-desktop>a{font-size:14px}
 .zw-header a[aria-current],.zw-header summary[data-active]{text-decoration-color:#0B7D55}
 .zw-header a:focus-visible,.zw-header button:focus-visible{outline-color:#0B7D55}
+
+/* Header fits 320px whatever font has loaded (fallback before swap, Archivo after).
+   The wordmark may shrink; the menu button never moves past the screen edge. */
+.zw-header .zw-brand{min-width:0;flex-shrink:1}
+.zw-header .zw-brand span{min-width:0;overflow:hidden}
+.zw-header .zw-toggle{flex-shrink:0}
+@media(max-width:380px){
+ .zw-header .zw-bar{padding:0 16px;gap:10px}
+ .zw-header .zw-brand{gap:7px}
+ .zw-header .zw-brand img{width:28px;height:28px}
+ .zw-header .zw-brand span{font-size:15px;font-stretch:112%;letter-spacing:0}
+ .zw-header .zw-toggle{min-width:0;gap:10px;padding:10px 12px}
+}

@@ -181,3 +181,22 @@ test('structured data is valid JSON and prices match the catalog', () => {
     assert.match(h, /<meta name="description" content="[^"]{40,}"/);
   }
 });
+
+// Regression (deploy #197): at 320px the header overflowed once the wide wordmark font loaded.
+// The header must fit before the font arrives (fallback) and after it is applied.
+test('header fits 320px with the wordmark font blocked and loaded (no font-timing race)', async () => {
+  for (const blocked of [true, false]) {
+    const context = await browser.newContext({ viewport: { width: 320, height: 844 }, reducedMotion: 'reduce' });
+    const own = new URL(origin).host;
+    await context.route(u => u.host !== own || (blocked && u.pathname.endsWith('.woff')), r => r.abort());
+    const page = await context.newPage();
+    for (const route of ['/', '/zasu-finish/', '/zasu-vocal-editor/', '/zasu-daw/', '/zasu-loud/download/', '/zasu-finish/tokushoho.html']) {
+      await page.goto(origin + route); await page.evaluate(() => document.fonts.ready);
+      if (!blocked && !route.includes('download') && !route.includes('tokushoho')) assert.equal(await page.evaluate(() => document.fonts.check('800 17px Archivo')), true, `${route}: self-hosted wordmark font applied`);
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `${route} overflows (font ${blocked ? 'blocked' : 'loaded'})`);
+      const t = await page.locator('[data-zw-toggle]').boundingBox(); assert.ok(t.x + t.width <= 320, `${route}: menu button inside the screen`);
+      assert.ok(t.height >= 44, 'menu button keeps a 44px touch target');
+    }
+    await context.close();
+  }
+});
