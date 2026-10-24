@@ -68,7 +68,7 @@ function footer() {
   return `<footer class="foot"><div class="wrap"><div class="foot-grid">
 <div><p class="mark wide">ZASU WORKS</p><p style="margin-top:10px">歌ってみた制作のための音楽ソフトウェア。<br>東京で、一人で開発しています。</p></div>
 <nav aria-label="製品"><h2>製品</h2><ul><li><a href="/zasu-vocal/">ZASU VOCAL</a></li><li><a href="/zasu-loud/">ZASU LOUD</a></li><li><a href="/zasu-finish/">ZASU FINISH</a></li><li><a href="/zasu-vocal-editor/">ZASU VOCAL EDITOR</a></li><li><a href="/zasu-daw/">ZASU DAW</a></li><li><a href="/vocal-loud-set/">歌ってみた制作セット</a></li></ul></nav>
-<nav aria-label="購入とサポート"><h2>購入とサポート</h2><ul><li><a href="/support.html">購入者サポート</a></li><li><a href="/support.html#downloads">再ダウンロード</a></li><li><a href="/support.html#contact">お問い合わせ</a></li><li>${ext(BOOTH_SHOP, 'BOOTHショップ')}</li><li>${ext(LINE_URL, 'LINE公式アカウント')}</li></ul></nav>
+<nav aria-label="購入とサポート"><h2>購入とサポート</h2><ul><li><a href="/support.html">購入者サポート</a></li><li><a href="/support.html#downloads">再ダウンロード</a></li><li><a href="/support.html#contact">お問い合わせ</a></li><li>${ext(BOOTH_SHOP, 'BOOTHショップ')}</li><li>${ext(LINE_URL, 'LINE公式アカウント')}</li><li>${ext('https://x.com/zasuworks', 'X（旧Twitter）｜@zasuworks')}</li></ul></nav>
 <nav aria-label="規約"><h2>規約</h2><ul><li><a href="/sales.html">販売条件・返金・特商法</a></li><li><a href="/zasu-loud/terms.html#refund-guarantee">7日間返金保証</a></li><li><a href="/privacy.html">プライバシーポリシー</a></li><li><a href="/about.html">ZASU WORKSについて</a></li></ul></nav>
 </div><p class="foot-base">© 2026 ZASU WORKS / Tokyo, Japan</p></div></footer>`;
 }

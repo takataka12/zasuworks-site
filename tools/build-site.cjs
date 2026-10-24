@@ -119,6 +119,7 @@ ${beforeYouBuy()}
 <p>ZASU WORKSは、音楽制作とソフトウェア開発を続ける個人開発者のブランドです。専門知識や複雑な操作が、作りたいものを作る邪魔にならないように。欲しいものを作り、実機で試し、公開して、直し続けています。</p>
 <p>開発も、販売も、購入後の質問への返事も、同じ一人がしています。</p>
 <p><a href="/about.html">ZASU WORKSについて</a></p>
+<p>開発の近況や新製品のお知らせは、${ext('https://x.com/zasuworks', '公式X（@zasuworks）')}でも発信しています。</p>
 </div></div></section>
 
 <section class="section" id="contact" aria-labelledby="contact-title"><div class="wrap" id="purchase-support">

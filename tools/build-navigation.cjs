@@ -14,6 +14,15 @@ for(const file of pages()){
  // Keep page CSS intact; scoped shared styles always load last.
  html=html.replace(/<link rel="stylesheet" href="\/assets\/navigation\.css[^>]*>/g,'').replace(/<script src="\/assets\/navigation\.js[^>]*><\/script>/g,'');
  html=html.replace('</head>',`<link rel="stylesheet" href="/assets/navigation.css?v=${config.version}"><script src="/assets/navigation.js?v=${config.version}" defer></script></head>`);
+ // Older public pages retain their own footer layout; add the same official link at build time.
+ const xLink='<a class="zw-x-link" href="https://x.com/zasuworks" target="_blank" rel="noopener noreferrer" aria-label="X（旧Twitter）｜@zasuworks（新しいタブで開きます）">X（旧Twitter）｜@zasuworks</a>';
+ if(/<footer\b/i.test(html))html=html.replace(/<footer\b[\s\S]*?<\/footer>/gi,footer=>{
+  if(footer.includes('href="https://x.com/zasuworks"'))return footer;
+  const navEnd=footer.lastIndexOf('</nav>');
+  if(navEnd!==-1)return footer.slice(0,navEnd)+xLink+footer.slice(navEnd);
+  return footer.replace('</footer>',`<p class="zw-social-link">${xLink}</p></footer>`);
+ });
+ else html=html.replace('</body>',`<footer class="zw-social-footer">${xLink}</footer></body>`);
  fs.writeFileSync(file,html);count++;
 }
 console.log(`Shared navigation built for ${count} public pages.`);
